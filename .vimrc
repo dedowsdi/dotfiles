@@ -2,7 +2,7 @@ set nocompatible
 
 filetype off		
 " set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim,~/.vim/mycpp
+set rtp+=~/.vim/bundle/Vundle.vim,~/.vim/misc
 
 
 call vundle#begin()				" alternatively, pass a path as  vundle#begin('~/some/path/here') 
@@ -35,6 +35,7 @@ Plugin 'digitaltoad/vim-jade'			" jade syntax
 Plugin 'octol/vim-cpp-enhanced-highlight'
 Plugin 'mileszs/ack.vim'
 Plugin 'junegunn/vim-easy-align'
+Plugin 'peanutandchestnut/mycpp'
 
 call vundle#end()						" All of your Plugins must be added before this line
 filetype plugin indent on				" required. To ignore plugin indent changes, instead use: filetype plugin on
