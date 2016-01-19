@@ -1,0 +1,13 @@
+*.swp
+*.py
+*.pyc
+*.log
+pj.sh
+mygui
+ubmygui
+gdbcmd
+tags
+script/pj.viminfo
+script/session.vim
+obj
+thirdlib

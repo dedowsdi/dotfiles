@@ -9,6 +9,7 @@ command! -nargs=0 Vcf :call VcmtFunc()
 command! -nargs=0 V :source %
 command! -nargs=0 Vb :breakadd here  
 command! -nargs=* Vbf :call VbreakAtFuncLine(<f-args>)
+command! -nargs=* Vsf :call VcallScriptFunc(<f-args>)
 
 "search regex------------------------------------------------
 let s:reFunc = '^s*fu'
@@ -56,6 +57,17 @@ function! VbreakAtFuncLine(...)
 	execute 'breakadd func ' . breakLine . ' ' . funcName
 	
 	call cursor(startLine, startCol)
+endfunction
+
+""
+" Call script scope function 
+" @param plugFileName : plugin file name
+" @param funcName : function name 
+" @return : 
+""
+function! VcallScriptFunc(plugFileName, funcName)
+	let fullname = '<SNR>'.util#getSid(a:plugFileName).'_'.a:funcName
+	return call(fullname,[])
 endfunction
 
 

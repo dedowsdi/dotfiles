@@ -7,6 +7,7 @@ set rtp+=~/.vim/bundle/Vundle.vim,~/.vim/misc
 
 call vundle#begin()				" alternatively, pass a path as  vundle#begin('~/some/path/here') 
 
+
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 Plugin 'pangloss/vim-javascript'		" javascript support
 Plugin 'Valloric/YouCompleteMe'			" auto complete
@@ -32,10 +33,13 @@ Plugin 'tpope/vim-abolish'				" substitute
 Plugin 'marijnh/tern_for_vim'			" javascript autocomplete support
 Plugin 'klen/python-mode'
 Plugin 'digitaltoad/vim-jade'			" jade syntax
-Plugin 'octol/vim-cpp-enhanced-highlight'
-Plugin 'mileszs/ack.vim'
-Plugin 'junegunn/vim-easy-align'
-Plugin 'peanutandchestnut/mycpp'
+"Plugin 'octol/vim-cpp-enhanced-highlight'		"replaced by easytags
+Plugin 'mileszs/ack.vim'				"find
+Plugin 'junegunn/vim-easy-align'		"align
+Plugin 'peanutandchestnut/mycpp'		"c++ implement , reorder, function objects
+Plugin 'xolox/vim-easytags'				"easy ctags
+Plugin 'xolox/vim-misc'					"need for easytags
+Plugin 'xolox/vim-shell'				"needed for asynchronous easytags
 
 call vundle#end()						" All of your Plugins must be added before this line
 filetype plugin indent on				" required. To ignore plugin indent changes, instead use: filetype plugin on
@@ -76,6 +80,8 @@ set path+=**/**					"set up find path, find in all subdirectories
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 let &backup = !has("vms")		"set auto backup
+set cpoptions+=d					"let tags use current dir
+set wildignore=*.o				"ignore obj files
 
 hi CursorLine   cterm=NONE ctermbg=lightblue ctermfg=white guibg=darkred guifg=white		
 hi CursorColumn cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white		
@@ -90,12 +96,25 @@ noremap <F3> :set hlsearch! hlsearch?<CR>
 "search visual selection with * and #
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
-function! s:VSetSearch()
+"replace word, WORD, use \v mode
+nnoremap <Leader>sw :%s/\v<>/
+nnoremap <Leader>sW :%s/\v<>/
+"replace selection, us \V mode
+xnoremap <Leader>s :s/\V=<SID>getVisual()/
+
+
+function! s:getVisual()
 	"record @s, restore later
 	let temp = @s
 	norm! gv"sy
-	let @/ = '\V' . substitute(escape(@s, '/\'), '\n', '\\n', 'g')
+	let str = @s
 	let @s = temp
+	return str
+endfunction
+
+function! s:VSetSearch()
+	"record @s, restore later
+	let @/ = '\V' . substitute(escape(s:getVisual(), '/\'), '\n', '\\n', 'g')
 endfunction
 " syntatic--------------------------------------------------------------------------------------
 execute pathogen#infect()		
@@ -161,6 +180,7 @@ nmap ga <Plug>(EasyAlign)"
 "project------------------------------------------------------
 command! -nargs=0 Ps :mksession! script/session.vim|:wviminfo! script/pj.viminfo
 
+
 "deprecated----------------------------------------------------
 "quickfix do
 "command! -nargs=0 -bar Qargs execute 'args' QuickfixFilenames()
@@ -181,3 +201,11 @@ command! -nargs=0 Ps :mksession! script/session.vim|:wviminfo! script/pj.viminfo
 	"endfor
 	"return join(map(values(buffer_numbers), 'fnameescape(v:val)'))
 "endfunction
+"easytags-----------------------------------------
+" automatically create a project specific tags file based on the first name in
+" the 'tags' option.
+let g:easytags_dynamic_files = 2		
+let g:easytags_async = 1
+"create separate tags files for each file type in the configured directory
+"g:easytags_dynamic_files take precedence over this option
+let g:easytags_by_filetype = "~/.vim/ctags"
