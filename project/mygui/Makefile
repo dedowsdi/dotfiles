@@ -18,6 +18,7 @@ INCLUDES = \
 
 SRCDIR = src/
 SRCS = src/*.cpp
+CMP := clang++
 
 OBJDIR = obj/
 OBJS =\
@@ -25,16 +26,16 @@ ${OBJDIR}BaseApplication.o\
 ${OBJDIR}TutorialApplication.o 
 
 UBS = ub/*.cpp
-CFLAGS = -Wall -g
+CFLAGS = -Wall -std=c++11 -g
 
 #--------------------------------------------------------------------
 ogre: ${OBJS} 
-	g++  ${CFLAGS} -o $@ ${OBJS} ${INCLUDES} ${LIBS} 
+	${CPL}  ${CFLAGS} -o $@ ${OBJS} ${INCLUDES} ${LIBS} 
 
 #--------------------------------------------------------------------
 #implicit obj
 ${OBJDIR}%.o : ${SRCDIR}%.cpp
-	g++  ${CFLAGS} -o $@ -c $< ${INCLUDES} ${LIBS} 
+	${CPL}  ${CFLAGS} -o $@ -c $< ${INCLUDES} ${LIBS} 
 #--------------------------------------------------------------------
 #build all obj
 .PHONY : obj

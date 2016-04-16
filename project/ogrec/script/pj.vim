@@ -8,10 +8,3 @@ let g:mycppMakes = {
 let g:mycppBuildDir = "build"
 "let g:mycppPreRequisite=['pacConsolePreRequisite.h']
 "let g:mycppStable=['pacStable.h']
-
-
-
-
-"project related macro------------------------------
-"define paramcmd:
-"   0wdiw:Cnc " ParamCmd5j

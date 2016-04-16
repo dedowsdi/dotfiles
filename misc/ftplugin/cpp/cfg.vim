@@ -1,7 +1,40 @@
-"if exists("g:loaded_cppcfg")
-"finish
-"endif
-"let g:loaded_cppcfg = 1
+if exists("g:loaded_cppcfg")
+finish
+endif
+let g:loaded_cppcfg = 1
+
+"some abbrevation
+:iab sc static_cast<>()<Left><Left><Left>
+:iab cS& const String&
+:iab cs& const std::string&
+"boost  abbreviation
+:iab br boost::regex
+:iab brm boost::regex_match()<Left>
+:iab brs boost::regex_search()<Left>
+:iab brr boost::regex_replace()<Left>
+:iab bsm boost::smatch
+"opengl abbreviation
+:iab glb  GLbtype
+:iab gls  GLshort
+:iab gli  GLint
+:iab glf  GLfloat
+:iab gld  GLdobule
+:iab glub GLubyte
+:iab glus GLushort
+:iab glui GLuint
+:iab glc  GLchar
+:iab glv  GLvoid
+:iab gle  GLenum
+:iab gl_  GL_
+
+
+
+
+
+
+
+
+
 
 
 "cscope-----------------------------------------------------

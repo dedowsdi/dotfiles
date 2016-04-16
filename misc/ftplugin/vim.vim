@@ -1,21 +1,24 @@
 
 "load guard
-if exists("g:loaded_myvim")
-	finish
-endif
-let g:loaded_myvim = 1
+"if exists("g:loaded_myvim")
+	"finish
+"endif
+"let g:loaded_myvim = 1
 
 command! -nargs=0 Vcf :call VcmtFunc()
 command! -nargs=0 V :source %
 command! -nargs=0 Vb :breakadd here  
 command! -nargs=* Vbf :call VbreakAtFuncLine(<f-args>)
 command! -nargs=* Vsf :call VcallScriptFunc(<f-args>)
+command! -nargs=? Vgf :call VgotoFunction(<f-args>)
+nnoremap <leader>J Js<bar><esc>
 
 "search regex------------------------------------------------
-let s:reFunc = '^s*fu'
+let s:reFuncStart = '^s*fu'
+let s:reFuncEnd = '^s*endfu'
 
 "extract regex------------------------------------------
-let s:rexFuncName = '\v\zs[^ \t:]+\ze\s*\(.*\)'
+let s:rexFuncName = '\v\zs[^ \t]+\ze\s*\(.*\)'
 
  ""
  " Call break add line func . This also works for script scope function. Add
@@ -42,8 +45,8 @@ function! VbreakAtFuncLine(...)
 			let breakLine = startLine - line('.')	
 			if VisScopeScript()
 				"add <SNR>SID_ prefix	
-				let plugFileName = expand('%:t')
-				let funcName = '<SNR>'.util#getSid(plugFileName).'_'.funcName
+				let plugFileName = expand('%')
+				let funcName = '<SNR>'.mycpp#util#getSid(plugFileName).'_'.funcName[2:]
 			endif
 		else
 			echoe 'function not found'
@@ -51,7 +54,7 @@ function! VbreakAtFuncLine(...)
 	elseif len(plugFileName) > 0
 		"break at script function specified by funcName and plugFileName
 		"add <SNR>SID_ prefix	
-		let funcName = '<SNR>'.util#getSid(plugFileName).'_'.funcName
+		let funcName = '<SNR>'.mycpp#util#getSid(plugFileName).'_'.funcName
 	endif
 
 	execute 'breakadd func ' . breakLine . ' ' . funcName
@@ -65,9 +68,9 @@ endfunction
 " @param funcName : function name 
 " @return : 
 ""
-function! VcallScriptFunc(plugFileName, funcName)
-	let fullname = '<SNR>'.util#getSid(a:plugFileName).'_'.a:funcName
-	return call(fullname,[])
+function! VcallScriptFunc(plugFileName, funcName,...)
+	let fullname = '<SNR>'.mycpp#util#getSid(a:plugFileName).'_'.a:funcName
+	return call(fullname,a:000)
 endfunction
 
 
@@ -83,20 +86,48 @@ endfunction
 
 
  ""
- " goto 1st function name line before this line 
+ " Goto current function name line or specific line 
+ " @param1 line : line number
  " @cursor range : anywhere in function definition 
  " @return : 0 or 1
  ""
-function! VgotoFunction()
+function! VgotoFunction(...)
 	let startLine = line('.')
 	let startCol = col('.')
 
-	if search(s:reFunc, 'bW')	
-		return 1
+	normal! $
+	if search(s:reFuncStart, 'bW')	
+		if a:0 == 0	
+			return 1
+		else
+			execute 'normal! '.a:1.'j'
+			return 1
+		endif
 	endif
 
 	call cursor(startLine, startCol)
 	return 0
+endfunction
+
+""
+" Get current function range 
+" @cursor range : 
+" @return : [startline,endline]
+""
+function! VgetFuncRange()
+		
+	let [startLine, startCol] = [line('.'), col('.')]|try
+	if VgotoFunction()
+		let funcStartLine = line('.')	
+		if search(s:reFuncEnd, 'W')
+			return [funcStartLine, line('.')]	
+		else
+			throw 'function end not found!'
+		endif
+	endif
+	return [0,0]
+	finally|call cursor(startLine, startCol)|endtry
+
 endfunction
 
 
