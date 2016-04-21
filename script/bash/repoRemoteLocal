@@ -1,0 +1,10 @@
+git https://github.com/peanutandchestnut/cfg.git                     /usr/local/source/cfg
+git https://github.com/vim/vim.git                                   /usr/local/source/vim
+git https://github.com/MyGUI/mygui.git                               /usr/local/source/mygui/mygui2.1
+git https://github.com/bulletphysics/bullet3.git                     /usr/local/source/bullet/bullet2.83
+git https://github.com/glfw/glfw.git                                 /usr/local/source/glfw/glfw3
+git https://github.com/skaslev/gl3w.git                              /usr/local/source/gl3w
+git https://github.com/seebi/dircolors-solarized.git                 /usr/local/source/dircolors-solarized
+git https://github.com/Anthony25/gnome-terminal-colors-solarized.git /usr/local/source/gnome-terminal-colors-solarized
+git https://github.com/powerline/fonts.git                           /usr/local/source/fonts
+hg  https://bitbucket.org/sinbad/ogre                                /usr/local/source/ogre/ogre2.1

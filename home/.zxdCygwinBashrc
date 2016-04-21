@@ -1,0 +1,5 @@
+source /usr/local/source/mintty-colors-solarized/sol.dark
+export DISPLAY=:0.0
+shopt -s extglob
+PATH=${PATH}:/usr/local/bin/script
+export PATH

@@ -1,0 +1,7 @@
+[user]
+	name = PntAndCnt
+	email = peanutandchestnut@gmail.com
+[push]
+	default = simple
+[core]
+	editor = vim
