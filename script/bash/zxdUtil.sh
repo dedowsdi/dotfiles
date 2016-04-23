@@ -87,6 +87,22 @@ getFileLineNumber()
     fi
 }
 
+appInstall()
+{
+    #install app if it's not nod found
+    if [ $# -lt 1 ] ; then
+        echo wrong arg numbers, it should be appInstall appName
+        exit 1
+    fi
+    appName=$1
+    if  dpkg -l $appName > /dev/null ; then
+        echo $appName already installed
+    else
+        echo installing $appName
+        apt -y install $appName
+    fi
+}
+
 #test, set__TEST to true to begin test
 
 if ${__TEST} ; then

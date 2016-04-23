@@ -184,6 +184,7 @@ let g:ctrlp_follow_symlinks=1
 "------------------------------------------------------------------------------
 "ycm option
 let g:ycm_confirm_extra_conf = 0
+"let g:ycm_server_python_interpreter = "/usr/bin/python3.5"
 nnoremap <SPACE>i :YcmCompleter GoToInclude<CR>
 nnoremap <SPACE>d :YcmCompleter GoToDefinition<CR>
 nnoremap <SPACE>c :YcmCompleter GoToDeclaration<CR>
@@ -242,7 +243,5 @@ noremap <Leader>nt :NERDTreeToggle<CR>
 noremap <Leader>nf :NERDTreeFind<CR>
 "airline----------------------------------------------------------------------
 let g:airline_theme='solarized'
-if has ('win32unix') && !has('gui_running')
-  "cygwin
-  let g:airline_powerline_fonts = 1
-endif
+let g:airline_powerline_fonts = 1
+"let g:Powerline_symbols = 'fancy'

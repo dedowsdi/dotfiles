@@ -1,85 +1,73 @@
-# this file will be sourced at project/script/buildThirdlibs.sh
-
+#!/bin/bash
 # used to build cpp dependenpence, it reads libs and includes from project
 # setting, create symbolic for them as under ./thirdlib, update .ycm_extrac_conf
 # include information(after /usr/local/include), build ctags for third lib, add
 # them at pj.vim
 
 #------------------------------------------------------------------------------
-#this block is project specific
-
-#ogrehome=/usr/local/source/ogre/ogre2.1
-#myguihome=/usr/local/source/mygui/mygui_ogre2.1
-
-##lib address, symbolic link name ...
-#libs=(\
-    #${ogrehome}/OgreMain Ogremain\
-    #${ogrehome}/Components/Hlms Hlms\
-    #${ogrehome}/Plugins/ParticleFX ParticleFX\
-    #${myguihome}/MyGUIEngine MyGUI\
-    #)
-
-##special local includes need to be added to .ycm_extra_conf
-#localIncludes=(\
-     #test/include\
-    #ogre/include\
-    #ogre/test/include\
-    #ogre/demo/mygui/include\
-#)
-
-#------------------------------------------------------------------------------
-source zxdUtil.sh
 #real work flow starts here
 
-PROJECT_PATH=`dirname ${BASH_SOURCE[1]}`/../
-THIRDLIB_PATH=${PROJECT_PATH}/thirdlib
-YCMCONF_PATH="${PROJECT_PATH}/.ycm_extra_conf.py"
-
-if ! [[ $PROJECT_PATH && YCMCONF_PATH ]]; then
-    echo failed to setup PROJECT_PATH or YCMCONF_PATH
+if ! [[ $# -eq 1 ]]; then
+    echo wrong arg, is should be $0 project_path
     exit 1
 fi
 
-mkdir -p $THIRDLIB_PATH 
-`cd ${THIRDLIB_PATH} && rm -rf *`
+PROJECT=`cd $1 && pwd`
+PROJECT_SCRIPT=${PROJECT}/script
+PROJECT_THIRDLIB=${PROJECT}/thirdlib
+PROJECT_YCMCONF="${PROJECT}/.ycm_extra_conf.py"
+PROJECT_LIBS=${PROJECT_SCRIPT}/.libs
+PROJECT_INCLUDES=${PROJECT_SCRIPT}/.includes
+
+#get util
+if [[ -h ${BASH_SOURCE} ]]; then
+    CFG_SCRIPT=`readlink $BASH_SOURCE`
+    CFG_SCRIPT=`dirname $SCRIPT_SOURCE`
+else
+    CFG_SCRIPT=`dirname $BASH_SOURCE`
+fi
+CFG_SCRIPT=`cd ${SCRIPT_SOURCE} && pwd`
+source ${CFG_SCRIPT}/zxdUtil.sh
+
+if ! [[ $PROJECT && -f $PROJECT_YCMCONF && -d $PROJECT_SCRIPT   ]]; then
+    echo failed to find PROJECT or PROJECT_YCMCONF or PROJECT_SCRIPT
+    exit 1
+fi
+
+mkdir -p $PROJECT_THIRDLIB 
+`cd ${PROJECT_THIRDLIB} && rm -rf *`
 
 echo preparing .ycm_extra_conf.py
 
 #clearn .ycm_extra_conf
-incBeg=`getFileLineNumber "'/usr/local/include',\s*$" $YCMCONF_PATH `
+incBeg=`getFileLineNumber "'/usr/local/include',\s*$" $PROJECT_YCMCONF `
 incBeg=$((incBeg+1))
-incEnd=`getFileLineNumber "^\s*\d*\s*]\s*$" $YCMCONF_PATH `
+incEnd=`getFileLineNumber "^\s*\d*\s*]\s*$" $PROJECT_YCMCONF `
 incEnd=$((incEnd-1))
 if [[ incEnd -ge incBeg ]]; then
     #clean original includes
     echo clean .ycm_extra_conf.py from $incBeg to $incEnd
-    sed -i "${incBeg},${incEnd}d" $YCMCONF_PATH
+    sed -i "${incBeg},${incEnd}d" $PROJECT_YCMCONF
 fi
 
-if [[ -v libs ]]; then
-    for (( i = 0; i < ${#libs[*]}; i++ )); do
-        if [[ 0 -eq $((i%2)) ]]; then
-            #build symbolic link in thirdlib
-            lib=${libs[i]}
-            linkname=${THIRDLIB_PATH}/${libs[$[i+1]]}
-            echo add lib "$lib", link as "$linkname", include at ycm
-            #update include in .ycm_extra+conf
-            ln -s $lib $linkname
-            sed -i "${incBeg}i '-isystem',\n'${linkname}/include',"  $YCMCONF_PATH
-        fi
-    done
+if [[ -f ${PROJECT_LIBS} ]]; then
+    for lib in `cat ${PROJECT_LIBS}` ; do
+        linkname=${PROJECT_THIRDLIB}/${lib}
+        echo add lib "$lib", link as "$linkname", include at ycm
+        #update include in .ycm_extra+conf
+        ln -s $lib $linkname
+        sed -i "${incBeg}i '-isystem',\n'${linkname}/include',"  $PROJECT_YCMCONF
+    done   
 fi
 
-if [[ -v localIncludes ]]; then
-    for (( i = 0; i < ${#localIncludes[*]}; i++ )); do
-        #add local includes in ycm
-        include=${localIncludes[i]}
+if [[ -f ${PROJECT_INCLUDES} ]]; then
+    for lib in `cat ${PROJECT_INCLUDES}` ; do
         echo include $include at ycm
         #update include in .ycm_extra+conf
-        sed -i "${incBeg}i '-isystem',\n'$include',"  $YCMCONF_PATH
-    done
+        sed -i "${incBeg}i '-isystem',\n'$include',"  $PROJECT_YCMCONF
+    done   
 fi
 
 #build ctags for third lib
-buildctags.sh ${THIRDLIB_PATH}
+buildctags.sh ${PROJECT_THIRDLIB}
 exit $?
