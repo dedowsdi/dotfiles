@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#personal script to init system(cygwin or ubuntu), it assumes you place this
-# cfg at /usr/local/source/cfg
+#personal script to init system(cygwin or ubuntu), init ubuntu can be slow, so i divide it into 3 secionts, apt install, repo clone, cfg apt, each part can be
+#called individually
 
 IS_CYGWIN=`uname -a|grep -i cygwin`
 IS_LINUX=`uname -a|grep -i Linux`
@@ -19,6 +19,24 @@ CFG=`cd ${CFG_SCRIPT}/../../ && pwd`
 CFG_HOME=${CFG}/home
 CFG_VIM=${CFG_HOME}/vim
 SCRIPT_INSTALL_DIR=/usr/local/bin
+APACHE_WEB=/var/www/html
+
+if [[ $# == 0 ]]; then
+    #do all by default
+    DO_APT=1
+    DO_REPO=1
+    DO_CFG=1
+fi
+
+while getopts ":arc" Option
+do
+    case $Option in
+        a     ) DO_APT=1  ;;
+        r     ) DO_REPO=1 ;;
+        c     ) DO_CFG=1  ;;
+        *     ) echo "Unimplemented option:${Option} " ; exit 1 ;;
+    esac
+done
 
 echo '************************************************************'
 echo preparing
@@ -57,7 +75,7 @@ if ! grep zxdBashrc ~/.bashrc ; then
     source ~/.bashrc
 fi
 
-if [[ $IS_LINUX ]]; then
+if [[ $IS_LINUX && $DO_APT ]]; then
     echo '************************************************************'
     echo "install app"
     for app in `cat ${CFG_SCRIPT}/app` ; do
@@ -66,52 +84,67 @@ if [[ $IS_LINUX ]]; then
 fi
 
 
-echo '************************************************************'
-echo get source
-if ! [[ -f ${CFG_SCRIPT}/repoRemoteLocal ]]; then
-    echo can not found ${CFG_SCRIPT}/repoRemoteLocal
-    exit 1
+if [[ $DO_REPO ]]; then
+    echo '************************************************************'
+    echo get source
+    if ! [[ -f ${CFG_SCRIPT}/repoRemoteLocal ]]; then
+        echo can not found ${CFG_SCRIPT}/repoRemoteLocal
+        exit 1
+    fi
+
+    while read cmd remote local ; do
+        repoClone $cmd $remote $local
+    done < ${CFG_SCRIPT}/repoRemoteLocal
 fi
 
-while read cmd remote local ; do
-    repoClone $cmd $remote $local
-done < ${CFG_SCRIPT}/repoRemoteLocal
 
-echo '************************************************************'
-echo init app
-echo init silver light
-buildSymbolicLink ${CFG_HOME}/.agignore ~/.agignore
-echo init mercurial
-buildSymbolicLink ${CFG_HOME}/.hgignore ~/.hgignore
-echo init git
-buildSymbolicLink ${CFG_HOME}/.gitconfig ~/.gitconfig
-echo init personal develop template
-buildSymbolicLink ${CFG_HOME}/.template ~/.template
+if [[ $DO_CFG ]]; then
+    echo '************************************************************'
+    echo cfg app
+    echo init silver light
+    buildSymbolicLink ${CFG_HOME}/.agignore ~/.agignore
+    echo init mercurial
+    buildSymbolicLink ${CFG_HOME}/.hgignore ~/.hgignore
+    echo init git
+    buildSymbolicLink ${CFG_HOME}/.gitconfig ~/.gitconfig
+    buildSymbolicLink ${CFG_HOME}/.gitignore ~/.gitignore
+    git config --global core.excludesfile ~/.gitignore
+    echo init personal develop template
+    buildSymbolicLink ${CFG_HOME}/.template ~/.template
 
-echo init vim
-if ! [[ -d ~/.vim  ]]; then
-    echo you need to build vim now
-    exit $?
+    echo init vim
+    mkdir -p ~/.vim/
+
+    buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
+    buildSymbolicLink ${CFG_VIM}/misc ~/.vim/misc
+
+    if ! [[ -d ~/.vim/bundle ]]; then
+        echo init vim plugin manager
+        echo install pathogen for vim
+        mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+            curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+        echo install vundle for vim
+        git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    fi
+
+    echo init apache2
+    if ! [[ -f /etc/apache2/conf-available/fqdn.conf ]]; then
+        echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
+        a2enconf fqdn
+        service apache2 reload
+    fi
+
+    if [[ -f ${APACHE_WEB}/index.html ]]; then
+        mv ${APACHE_WEB}/index.html ${APACHE_WEB}/apache.html
+    fi
+
+    buildSymbolicLink /usr/share/doc/cmake-doc/html /var/www/html/cmake
+    buildSymbolicLink /usr/share/doc/libstdc++6-4.7-doc/libstdc++/html /var/www/html/c++
+    buildSymbolicLink /usr/share/doc /var/www/html/doc
+    buildSymbolicLink /usr/share/doc/python3-doc/html /var/www/html/python3
+    buildSymbolicLink /usr/share/doc/libglfw3-doc/html /var/www/html/glfw3
+    buildSymbolicLink /usr/share/doc/opengl-4-html-doc /var/www/html/opengl4
 fi
-
-buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
-buildSymbolicLink ${CFG_VIM}/misc ~/.vim/misc
-
-if ! [[ -d ~/.vim/bundle ]]; then
-    echo init vim plugin manager
-    echo install pathogen for vim
-    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-        curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-    echo install vundle for vim
-    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-fi
-
-echo init apache2
-if ! [[ -f /etc/apache2/conf-available/fqdn.conf ]]; then
-    echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
-    a2enconf fqdn
-fi
-
 
 echo done
 

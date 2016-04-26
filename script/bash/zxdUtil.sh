@@ -95,7 +95,8 @@ appInstall()
         exit 1
     fi
     appName=$1
-    if  dpkg -l $appName > /dev/null ; then
+    dse=`dpkg -l $appName | tail -1 | cut -d ' ' -f 1`
+    if  [[ $dse == ii ]] ; then
         echo $appName already installed
     else
         echo installing $appName

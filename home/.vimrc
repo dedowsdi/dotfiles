@@ -76,10 +76,8 @@ function! s:VSetSearch()
     let @/ = '\V' . substitute(escape(s:getVisual(), '/\'), '\n', '\\n', 'g')
 endfunction
 
-autocmd FileType c,cpp,objc,vim setlocal shiftwidth=2
-autocmd FileType c,cpp,objc,vim setlocal tabstop=2
-autocmd FileType c,cpp,objc,vim setlocal expandtab
-autocmd FileType c,cpp,objc,vim setlocal textwidth=80
+autocmd FileType c,cpp,objc,vim setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
+autocmd FileType sh setlocal textwidth=160
 autocmd FileType cmake setlocal textwidth=160
 "project------------------------------------------------------
 command! -nargs=0 Ps :mksession! script/session.vim|:wviminfo! script/pj.viminfo
@@ -245,3 +243,6 @@ noremap <Leader>nf :NERDTreeFind<CR>
 let g:airline_theme='solarized'
 let g:airline_powerline_fonts = 1
 "let g:Powerline_symbols = 'fancy'
+"pymode-----------------------------------------------------------------------
+let pymode = 1
+let g:pymode_rope_completion = 0

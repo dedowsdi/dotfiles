@@ -1,7 +1,9 @@
+apache2
 blender
 clang
 clang-format
 cmake
+cmake-doc
 cmake-qt-gui
 doxygen
 exuberant-ctags
@@ -9,6 +11,7 @@ fcitx-sunpinyin
 freeglut3-dev
 git
 git-gui
+kchmviewer
 libcppunit-dev
 libfreeimage-dev
 libfreetype6-dev
@@ -21,6 +24,7 @@ libpython3.5-dev
 libsdl2-dev
 libsdl2-doc
 libsdl2-ttf-dev
+libstdc++6-4.7-doc
 libtinyxml-dev
 libxaw7-dev
 libzzip-dev
@@ -30,6 +34,7 @@ rapidjson-dev
 rapidjson-doc
 silversearcher-ag
 zlib1g-dev
-cmake-doc
-apache2
-libstdc++6-4.7-doc
+mesa-utils
+lldb
+opengl-4-man-doc
+opengl-4-html-doc

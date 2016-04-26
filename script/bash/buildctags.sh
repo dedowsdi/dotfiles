@@ -14,10 +14,10 @@ else
 
     cd $src
     for dir in `ls`; do
-        cd $dir
+        pushd && cd $dir
         echo build ctags for ${src}/$dir
         ctags -R --sort=foldcase --links=no
-        cd -
+        popd
     done
 
     echo '*********************************************************************'

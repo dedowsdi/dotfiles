@@ -1,10 +1,4 @@
-*.swp
-*.py
-*.pyc
-*.o
-*.log
+TAGS
 tags
-pj.sh
-script/pj.vim
-script/pj.viminfo
-script/session.vim
+build
+*.swp
