@@ -1,2 +1,2 @@
-PATH=${PATH}:/usr/local/bin/script
-export PATH 
+export PATH=${PATH}:/usr/local/bin/script
+alias go=gvfs-open

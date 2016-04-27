@@ -5,6 +5,7 @@ clang-format
 cmake
 cmake-doc
 cmake-qt-gui
+dos2unix
 doxygen
 exuberant-ctags
 fcitx-sunpinyin
@@ -28,13 +29,13 @@ libstdc++6-4.7-doc
 libtinyxml-dev
 libxaw7-dev
 libzzip-dev
+lldb
 lua5.3
-mercurial
+mesa-utils
+opengl-4-html-doc
+opengl-4-man-doc
 rapidjson-dev
 rapidjson-doc
 silversearcher-ag
 zlib1g-dev
-mesa-utils
-lldb
-opengl-4-man-doc
-opengl-4-html-doc
+mercurial

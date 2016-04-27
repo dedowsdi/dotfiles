@@ -1,6 +1,6 @@
 set nocompatible
 "set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim,~/.vim/misc
+set rtp+=~/.vim/bundle/Vundle.vim
 "basic setting----------------------------------------------------------------------------------
 set autoindent                  " set auto-indenting on for programming
 set showmatch                   " autoshow matching brackets. works like it does in bbedit.
@@ -107,6 +107,7 @@ Plugin 'junegunn/vim-easy-align'        " align
 Plugin 'kana/vim-operator-user'         " recomanded by vim-clang-format
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'peanutandchestnut/misc'
 "git
 Plugin 'tpope/vim-fugitive'             " git wrapper
 "c++ related
