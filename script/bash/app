@@ -25,6 +25,7 @@ libpython3.5-dev
 libsdl2-dev
 libsdl2-doc
 libsdl2-ttf-dev
+libsdl2-mixer-dev
 libstdc++6-4.7-doc
 libtinyxml-dev
 libxaw7-dev
@@ -39,3 +40,8 @@ rapidjson-doc
 silversearcher-ag
 zlib1g-dev
 mercurial
+libsdl2-image-dev
+libsdl2-ttf-dev
+default-jre
+neovim
+xsel

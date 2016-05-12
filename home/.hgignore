@@ -1,3 +1,8 @@
 tags
 .myignore
 Components/Hlms/Unlit/OgreHlmsUnlitDatablock.h
+.ycm_extra_conf
+script/pj.vim
+script/pj.viminfo
+script/session.vim
+pj.sh

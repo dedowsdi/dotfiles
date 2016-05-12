@@ -16,17 +16,22 @@ PROJECT=`cd $1 && pwd`
 PROJECT_SCRIPT=${PROJECT}/script
 PROJECT_THIRDLIB=${PROJECT}/thirdlib
 PROJECT_YCMCONF="${PROJECT}/.ycm_extra_conf.py"
-PROJECT_LIBS=${PROJECT_SCRIPT}/.libs
-PROJECT_INCLUDES=${PROJECT_SCRIPT}/.includes
+PROJECT_LIBS=${PROJECT_SCRIPT}/libs
+PROJECT_INCLUDES=${PROJECT_SCRIPT}/includes
 
 #get util
 if [[ -h ${BASH_SOURCE} ]]; then
     CFG_SCRIPT=`readlink $BASH_SOURCE`
-    CFG_SCRIPT=`dirname $SCRIPT_SOURCE`
+    CFG_SCRIPT=`dirname $CFG_SCRIPT`
 else
     CFG_SCRIPT=`dirname $BASH_SOURCE`
 fi
-CFG_SCRIPT=`cd ${SCRIPT_SOURCE} && pwd`
+CFG_SCRIPT=`cd ${CFG_SCRIPT} && pwd`
+if ! [[ $CFG_SCRIPT ]]; then
+    echo "CFG_SCRIPT not found "
+    exit 1
+fi
+
 source ${CFG_SCRIPT}/zxdUtil.sh
 
 if ! [[ $PROJECT && -f $PROJECT_YCMCONF && -d $PROJECT_SCRIPT   ]]; then
@@ -52,7 +57,7 @@ fi
 
 if [[ -f ${PROJECT_LIBS} ]]; then
     for lib in `cat ${PROJECT_LIBS}` ; do
-        linkname=${PROJECT_THIRDLIB}/${lib}
+        linkname=${PROJECT_THIRDLIB}/`basename ${lib}`
         echo add lib "$lib", link as "$linkname", include at ycm
         #update include in .ycm_extra+conf
         ln -s $lib $linkname
@@ -61,7 +66,7 @@ if [[ -f ${PROJECT_LIBS} ]]; then
 fi
 
 if [[ -f ${PROJECT_INCLUDES} ]]; then
-    for lib in `cat ${PROJECT_INCLUDES}` ; do
+    for include in `cat ${PROJECT_INCLUDES}` ; do
         echo include $include at ycm
         #update include in .ycm_extra+conf
         sed -i "${incBeg}i '-isystem',\n'$include',"  $PROJECT_YCMCONF
@@ -69,5 +74,5 @@ if [[ -f ${PROJECT_INCLUDES} ]]; then
 fi
 
 #build ctags for third lib
-buildctags.sh ${PROJECT_THIRDLIB}
+#buildctags ${PROJECT_THIRDLIB}
 exit $?

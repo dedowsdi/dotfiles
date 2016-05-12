@@ -28,6 +28,12 @@ if [[ $# == 0 ]]; then
     DO_CFG=1
 fi
 
+#add neovim repository
+if  ! find /etc/apt/sources.list.d -name "neovim*">/dev/null ; then
+add-apt-repository ppa:neovim-ppa/unstable
+apt update
+fi
+
 while getopts ":arc" Option
 do
     case $Option in
@@ -114,15 +120,22 @@ if [[ $DO_CFG ]]; then
 
     echo init vim
     mkdir -p ~/.vim/
+    mkdir -p ~/.config/nvim
 
     buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
-    buildSymbolicLink ${CFG_VIM}/misc ~/.vim/misc
+    buildSymbolicLink ${CFG_HOME}/.config/nvim/init.vim ~/.config/nvim/init.vim
+
+    if ! [[ -f ~/.config/nvim/autoload/plug.vim ]]; then
+        echo init nvim plugin manager
+        curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
+                https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    fi
 
     if ! [[ -d ~/.vim/bundle ]]; then
         echo init vim plugin manager
-        echo install pathogen for vim
-        mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-            curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+        #echo install pathogen for vim
+        mkdir -p ~/.vim/autoload ~/.vim/bundle
+        #curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
         echo install vundle for vim
         git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     fi
