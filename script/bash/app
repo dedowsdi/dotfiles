@@ -45,3 +45,5 @@ libsdl2-ttf-dev
 default-jre
 neovim
 xsel
+duplicity
+python-gi

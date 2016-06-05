@@ -1,4 +1,7 @@
 TAGS
 tags
 build
+vimScript
+dependencies
+pj.sh
 *.swp

@@ -1,3 +1,12 @@
+" Remove ALL autocommands for the current group.
+autocmd!
+
+if has("Win32")
+   let &shada = "!,'200,<50,s10,h,rA:,rB:"
+else
+   let &shada="!,'200,<50,s10,h"
+endif
+
 "python3
 let g:python3_host_prog = "/usr/bin/python3"
 "set the runtime path to include Vundle and initialize
@@ -46,6 +55,7 @@ iab s8 -------------------------------------------------------------------------
 :tnoremap <A-j> <C-\><C-n><C-w>j
 :tnoremap <A-k> <C-\><C-n><C-w>k
 :tnoremap <A-l> <C-\><C-n><C-w>l
+:tnoremap <C-\><C-n> <C-\><C-n>?\S<CR>
 :nnoremap <A-h> <C-w>h
 :nnoremap <A-j> <C-w>j
 :nnoremap <A-k> <C-w>k
@@ -64,6 +74,7 @@ cnoremap <expr> %t getcmdtype() == ':' ? expand('%:t').'/' : '%t'
 noremap <F3> :set hlsearch! hlsearch?<CR>
 "toggle paste
 nnoremap <Leader>p :set paste! paste?<CR>
+nnoremap <Leader>ww :call <SID>smartSplit()<CR>
 "search visual selection with * and #
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
@@ -73,14 +84,14 @@ nnoremap <Leader>sW :%s/\v<>/
 "replace selection, us \V mode
 xnoremap <Leader>s :<C-u>%s/\V=<SID>getVisual()/
 
+function! s:smartSplit()
+  let direction = str2float(winwidth(0))/winheight(0) >= 204.0/59 ? 'vsplit':'split'
+  exec 'rightbelow ' . direction
+endfunction
 
 function! s:getVisual()
-  "record @s, restore later
-  let temp = @s
-  norm! gv"sy
-  let str = @s
-  let @s = temp
-  return str
+  let temp = @s|norm! gv"sy
+  let [str,@s] = [@s,temp] | return str
 endfunction
 
 function! s:VSetSearch()
@@ -95,41 +106,37 @@ autocmd FileType cmake setlocal textwidth=160
 "commands, all starts with J
 "remov trailing white space
 command! -nargs=0 JrmTrailingSpace :%s/\v\s*$//g
+command! -nargs=0 JrmConsecutiveBlankLines :%s/\v%(^\s*\n){1,}/\r/ge
 "save project information
 command! -nargs=0 JsaveProject :mksession! script/session.vim
 
 "plugins
 
-set rtp+=~/.fzf
+set rtp+=~/.fzf,~/.config/nvim/plugged/vim-ogre2
 call plug#begin('~/.config/nvim/plugged')
 "common
-"Plug 'scrooloose/nerdtree'              "tree resource
-"Plug 'scrooloose/syntastic'             "syntatic check
-"Plug 'neomake/neomake'
-"Plug 'Shougo/unite.vim'                "not quick enough, replaced by fzf
-"Plug 'Shougo/neomru.vim'
-"Plug 'Shougo/vimfiler.vim'
+"Plug 'scrooloose/nerdtree'             "tree resource
+"Plug 'scrooloose/syntastic'            "syntatic check
+"Plug 'neomake/neomake'                 "don't needed , ycm already did this
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }  "awesommmmmmmmmmmmmmmme
 Plug 'junegunn/fzf.vim'
 Plug 'altercation/vim-colors-solarized'   "color scheme
-"Plug 'majutsushi/tagbar'              "  replaced by fzf
 Plug 'tpope/vim-surround'             " sourounding
 Plug 'jiangmiao/auto-pairs'           " auto close pair
 Plug 'docunext/closetag.vim'          " auto close tag
 Plug 'scrooloose/nerdcommenter'       " comment helper
-Plug 'SirVer/ultisnips'               " snippet manager
+Plug 'SirVer/ultisnips'               " snippet
 Plug 'honza/vim-snippets'             " snippets
 Plug 'terryma/vim-multiple-cursors'   " multi curosr
 Plug 'triglav/vim-visual-increment'   " number sequence
 "Plug 'tpope/vim-abolish'              " never used
-Plug 'rking/ag.vim'                   " grep
-Plug 'junegunn/vim-easy-align'        " align
-Plug 'kana/vim-operator-user'         " recomanded by vim-clang-format
+Plug 'junegunn/vim-easy-align'         " align
+"Plug 'kana/vim-operator-user'         " recomanded by vim-clang-format
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'peanutandchestnut/misc'
 "git
-Plug 'tpope/vim-fugitive'             " git wrapper
+"Plug 'tpope/vim-fugitive'             " git wrapper
 "c++ related
 Plug 'Valloric/YouCompleteMe'         " auto complete
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
@@ -139,11 +146,6 @@ Plug 'lyuts/vim-rtags'
 "Plug 'Shougo/neco-vim'
 Plug 'peanutandchestnut/mycpp'        "c++ implement , reorder, function objects
 Plug 'rhysd/vim-clang-format'         "clang c/c++ format
-"Plug 'xolox/vim-easytags'              "looks like abandomed, buggy
-"Plug 'xolox/vim-misc'                  "needed for easytags
-"Plug 'xolox/vim-shell'                 "needed for easytags asynchronous easytags
-"opengl
-Plug 'tikhomirov/vim-glsl'
 "python
 Plug 'klen/python-mode'
 " javascript related
@@ -151,14 +153,12 @@ Plug 'klen/python-mode'
 "Plug 'othree/html5.vim'               " html5
 Plug 'elzr/vim-json'                  " json
 "Plug 'marijnh/tern_for_vim'           " javascript autocomplete support
-"jade
+"syntax
 Plug 'digitaltoad/vim-jade'           " jade syntax
+Plug 'tikhomirov/vim-glsl'
 call plug#end()
 
 filetype plugin indent on               " required. To ignore plugin indent changes, instead use: filetype plugin on
-" tagbar---------------------------------------------------------------------------------------
-"nnoremap <c-j> :TagbarOpenAutoClose<CR>
-"let g:TagbarOpenAutoClose = 1
 
 " syntatic--------------------------------------------------------------------------------------
 "set statusline+=%#warningmsg#
@@ -192,18 +192,6 @@ let g:UltiSnipsJumpBackwardTrigger="<c-p>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
-"ctrlp--------------------------------------------------------------
-"change default to match file name in most rescent used files
-"let g:ctrlp_by_filename = 1
-"let g:ctrlp_use_caching = 1
-"let g:ctrlp_clear_cache_on_exit = 0
-"let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-"let g:ctrlp_follow_symlinks=1
-""let g:ctrlp_custom_ignore = {
-""\ 'dir':  '\vgcc.*$',
-""\ }
-"let g:ctrlp_cmd = 'CtrlPMRU'
-"let g:ctrlp_extensions = ['tag']
 "------------------------------------------------------------------------------
 "ycm option
 let g:ycm_confirm_extra_conf = 0
@@ -220,15 +208,6 @@ vmap <Enter> <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
-"easytags--------------------------------------------------------------------
-"set tags=./tags;
-"let g:easytags_dynamic_files = 1
-"let g:easytags_async = 1
-""create separate tags files for each file type in the configured directory
-""g:easytags_dynamic_files take precedence over this option
-"let g:easytags_by_filetype = "~/.config/nvim/ctags"
-"let g:easytags_auto_highlight=0
-
 "vim-clang-format-----------------------------------------------------------
 let g:clang_format#style_options = {
       \ "AccessModifierOffset" : -2,
@@ -241,15 +220,12 @@ let g:clang_format#style_options = {
       \ "IndentWidth" : 2,
       \ "TabWidth" : 2,
       \ "UseTab" : "Never",
-      \ "Standard" : "C++11"
+      \ "Standard" : "C++11",
+      \ "SortIncludes": "false",
       \}
 noremap <leader>cf :ClangFormat<CR>
 
 "solarized-------------------------------------------------------------------
-"g:solarized_termcolors= 16 | 256 g:solarized_termtrans = 0 | 1
-"g:solarized_degrade = 0 | 1 g:solarized_bold = 1 | 0 g:solarized_underline = 1
-"| 0 g:solarized_italic = 1 | 0 g:solarized_contrast = “normal”| “high” or “low”
-"g:solarized_visibility= “normal”| “high” or “low” ————————————————
 set t_Co=16
 set background=dark
 colorscheme solarized
@@ -308,7 +284,16 @@ map <silent> <leader>n :call ToggleVExplorer()<CR>
 "\ ['ag', '--follow', '--nocolor', '--nogroup',
 "\  '--hidden', '-g', '']
 
-"fzf
+"fzf------------------------------------------------------------
+let g:fzf_ag_raw = 1
+let g:fzf_action = {
+      \ 'ctrl-t': 'tab split',
+      \ 'ctrl-x': 'split',
+      \ 'ctrl-v': 'vsplit',
+      \ 'ctrl-a': 'argedit',
+      \ }
+
+
 nnoremap <c-p><c-p> :Files<CR>
 nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*"', ':Files') <CR>
 nnoremap <c-p><c-a> :call <SID>fzf('find -L . -type f', ':Files') <CR>
@@ -317,27 +302,56 @@ nnoremap <c-p><c-g> :GitFiles<CR>
 nnoremap <c-p><c-b> :Buffers<CR>
 "nnoremap <c-p><c-c> :Colors<CR>
 "nnoremap <c-p><c-a> :Ag<CR>
-nnoremap <c-p><c-l> :Lines<CR>
-"nnoremap <c-p><c-b>l :BLines<CR>
+"nnoremap <c-p><c-l> :Lines<CR>
+nnoremap <c-p><c-l> :BLines<CR>
 nnoremap <c-p><c-t> :Tags<CR>
 nnoremap <c-p><c-j> :BTags<CR>
+autocmd! FileType cpp  nnoremap <buffer> <c-p><c-j> : call fzf#vim#buffer_tags(
+      \ "",['ctags -f - --sort=no --excmd=number --c++-kinds=+p '.expand('%:S')], g:fzf#vim#default_layout) <CR>
+"nnoremap <c-p><c-j> :BTags<CR>
 "nnoremap <c-p><c-m> :Marks<CR>
 nnoremap <c-p><c-w> :Windows<CR>
 "nnoremap <c-p><c-l> :Locate<CR>
 nnoremap <c-p><c-h> :History<CR>
-nnoremap <c-p><c-:> :History:<CR>
-nnoremap <c-p><c-<>c-/> :History/<CR>
+"nnoremap <c-p><c-;> :History:<CR>
+"nnoremap <c-p><c-/> :History/<CR>
 nnoremap <c-p><c-s> :Snippets<CR>
 "nnoremap <c-p><c-c> :Commits<CR>
 "nnoremap <c-p><c-b>c :BCommits<CR>
 nnoremap <c-p><c-c> :Commands<CR>
 nnoremap <c-p><c-m> :Maps<CR>
+
 "nnoremap <c-p>h :Helptags<CR>
 "nnoremap <c-p>f :Filetypes<CR>
 
+"command! -nargs=* -complete=file AA :call s:fzf_ag_raw(<q-args>)
+autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
+
 function! s:fzf(fzf_default_cmd, cmd)
   let oldcmds = $FZF_DEFAULT_COMMAND | try
-  let $FZF_DEFAULT_COMMAND = a:fzf_default_cmd
-  execute a:cmd
+    let $FZF_DEFAULT_COMMAND = a:fzf_default_cmd
+    execute a:cmd
   finally | let $FZF_DEFAULT_COMMAND = oldcmds | endtry
 endfunction
+
+function! s:fzf_ag_raw(cmd)
+  call fzf#vim#ag_raw('--noheading '. a:cmd)
+endfunction
+
+"rtags-------------------------
+let g:rtagsLog = '~/tmp/rtaglog'
+let g:neomake_open_list = 2
+
+"neomake-----------------------------------------
+    let g:neomake_make_maker = {
+        \ 'exe': 'make',
+        \ 'args': ['--build'],
+        \ 'errorformat': '%f:%l:%c: %m',
+        \ }
+"let g:neomake_cpp_enable_makers = ['clang']
+"let g:neomake_cpp_clang_maker = {
+            "\ 'exe' : 'clang'
+            "\ }
+"misc terminal----------------------------------
+nnoremap <m-cr> :call misc#term#terminal({"layout":"L", "size":0.5})<CR>
+tnoremap <m-cr> <c-\><c-n>:call misc#term#terminal()<CR>

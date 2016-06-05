@@ -119,7 +119,7 @@ if [[ $DO_CFG ]]; then
     buildSymbolicLink ${CFG_HOME}/.template ~/.template
 
     echo init vim
-    mkdir -p ~/.vim/
+    #mkdir -p ~/.vim/
     mkdir -p ~/.config/nvim
 
     buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
@@ -131,14 +131,14 @@ if [[ $DO_CFG ]]; then
                 https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     fi
 
-    if ! [[ -d ~/.vim/bundle ]]; then
-        echo init vim plugin manager
-        #echo install pathogen for vim
-        mkdir -p ~/.vim/autoload ~/.vim/bundle
-        #curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-        echo install vundle for vim
-        git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    fi
+    #if ! [[ -d ~/.vim/bundle ]]; then
+        #echo init vim plugin manager
+        ##echo install pathogen for vim
+        #mkdir -p ~/.vim/autoload ~/.vim/bundle
+        ##curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+        #echo install vundle for vim
+        #git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    #fi
 
     echo init apache2
     if ! [[ -f /etc/apache2/conf-available/fqdn.conf ]]; then
