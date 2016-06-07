@@ -200,7 +200,7 @@ nnoremap <SPACE>i :YcmCompleter GoToInclude<CR>
 nnoremap <SPACE>d :YcmCompleter GoToDefinition<CR>
 nnoremap <SPACE>c :YcmCompleter GoToDeclaration<CR>
 " default ycm cfg file
-let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
 "easyalign-------------------------------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vip<Enter>)

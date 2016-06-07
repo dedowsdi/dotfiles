@@ -18,7 +18,6 @@ libfreeimage-dev
 libfreetype6-dev
 libglfw3-dev
 libglfw3-doc
-libgtest-dev
 liblua5.3-dev
 libois-dev
 libpython3.5-dev
@@ -47,3 +46,4 @@ neovim
 xsel
 duplicity
 python-gi
+google-chrome-stable

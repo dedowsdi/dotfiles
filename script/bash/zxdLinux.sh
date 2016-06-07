@@ -43,6 +43,7 @@ do
         *     ) echo "Unimplemented option:${Option} " ; exit 1 ;;
     esac
 done
+shift $((OPTIND-1))
 
 echo '************************************************************'
 echo preparing
@@ -52,10 +53,13 @@ source ${CFG_SCRIPT}/zxdUtil.sh
 
 if [[ IS_LINUX ]]; then
     echo found linux
-    echo install script
-    for item in `ls ${CFG_SCRIPT}/*.sh` ; do
-        buildSymbolicLink $item ${SCRIPT_INSTALL_DIR}/`basename $item .sh`
-    done
+    if ! [[ -h ${SCRIPT_INSTALL_DIR}/zxdLinux ]]; then
+        echo install script
+        for item in `ls ${CFG_SCRIPT}/*.sh` ; do
+            buildSymbolicLink $item ${SCRIPT_INSTALL_DIR}/`basename $item .sh`
+        done
+        buildSymbolicLink $CFG_HOME/.template/cpp/pj.sh $SCRIPT_INSTALL_DIR/vpj
+    fi
 else
     echo found cygwin
     ln -s ${CFG_SCRIPT} ${SCRIPT_INSTALL_DIR}/script

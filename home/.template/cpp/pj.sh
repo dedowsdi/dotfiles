@@ -1,5 +1,5 @@
 #!/bin/bash
-script=script
+script=vimScript
 vim=nvim
 session=
 pjvim=
@@ -10,6 +10,5 @@ fi
 if [[ -a $script/pj.vim ]]; then
     pjvim=" -S $script/pj.vim"
 fi
-
 
 $vim $session $pjvim
