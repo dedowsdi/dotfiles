@@ -2,5 +2,10 @@ TAGS
 tags
 build
 dependencies
-pj.sh
+vimScript
 *.swp
+__pycache__
+.ropeproject
+.ycm_extra_conf.py
+.color_coded
+pj.sh

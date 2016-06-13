@@ -112,7 +112,7 @@ command! -nargs=0 JsaveProject :mksession! script/session.vim
 
 "plugins
 
-set rtp+=~/.fzf,~/.config/nvim/plugged/vim-ogre2
+set rtp+=~/.fzf
 call plug#begin('~/.config/nvim/plugged')
 "common
 "Plug 'scrooloose/nerdtree'             "tree resource
@@ -145,6 +145,7 @@ Plug 'lyuts/vim-rtags'
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
 Plug 'peanutandchestnut/mycpp'        "c++ implement , reorder, function objects
+Plug 'peanutandchestnut/ogre2script'
 Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
