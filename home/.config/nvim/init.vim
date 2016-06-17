@@ -107,6 +107,7 @@ autocmd FileType cmake setlocal textwidth=160
 "remov trailing white space
 command! -nargs=0 JrmTrailingSpace :%s/\v\s*$//g
 command! -nargs=0 JrmConsecutiveBlankLines :%s/\v%(^\s*\n){1,}/\r/ge
+command! -nargs=0 JrmBlankLines :%s/\v^\s*$\n//ge
 "save project information
 command! -nargs=0 JsaveProject :mksession! script/session.vim
 
@@ -117,7 +118,6 @@ call plug#begin('~/.config/nvim/plugged')
 "common
 "Plug 'scrooloose/nerdtree'             "tree resource
 "Plug 'scrooloose/syntastic'            "syntatic check
-"Plug 'neomake/neomake'                 "don't needed , ycm already did this
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }  "awesommmmmmmmmmmmmmmme
 Plug 'junegunn/fzf.vim'
 Plug 'altercation/vim-colors-solarized'   "color scheme
@@ -286,15 +286,14 @@ map <silent> <leader>n :call ToggleVExplorer()<CR>
 "\  '--hidden', '-g', '']
 
 "fzf------------------------------------------------------------
-let g:fzf_ag_raw = 1
 let g:fzf_action = {
       \ 'ctrl-t': 'tab split',
       \ 'ctrl-x': 'split',
       \ 'ctrl-v': 'vsplit',
       \ 'ctrl-a': 'argedit',
+      \ 'ctrl-o': '!gvfs-open'
       \ }
-
-
+let g:fzf_layout = {"up":'~40%'}
 nnoremap <c-p><c-p> :Files<CR>
 nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*"', ':Files') <CR>
 nnoremap <c-p><c-a> :call <SID>fzf('find -L . -type f', ':Files') <CR>

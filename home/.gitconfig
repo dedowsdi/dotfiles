@@ -4,8 +4,8 @@
 [push]
 	default = simple
 [core]
-	editor = vim
-	excludesfile = /home/pntandcnt/.gitignore
+	editor = nvim
+	excludesfile = ~/.gitignore
 [merge]
 	tool = vimdiff3
 [mergetool "vimdiff3"]
