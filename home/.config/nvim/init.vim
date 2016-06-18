@@ -320,6 +320,7 @@ nnoremap <c-p><c-s> :Snippets<CR>
 "nnoremap <c-p><c-b>c :BCommits<CR>
 nnoremap <c-p><c-c> :Commands<CR>
 nnoremap <c-p><c-m> :Maps<CR>
+command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
 
 "nnoremap <c-p>h :Helptags<CR>
 "nnoremap <c-p>f :Filetypes<CR>
@@ -336,6 +337,14 @@ endfunction
 
 function! s:fzf_ag_raw(cmd)
   call fzf#vim#ag_raw('--noheading '. a:cmd)
+endfunction
+
+" some path is ignored by git or hg, i need to use absolute path to avoid that.
+function! s:fzf_ag_expand(cmd)
+  let matches = matchlist(a:cmd, '\v(.{-})(\S*)\s*$')
+  " readlink, remove trailing linebreak
+  let ecmd = matches[1] . system("readlink -f " . matches[2])[0:-2]
+  call s:fzf_ag_raw(ecmd)
 endfunction
 
 "rtags-------------------------

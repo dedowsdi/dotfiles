@@ -125,14 +125,21 @@ if [[ $DO_CFG ]]; then
     echo init vim
     #mkdir -p ~/.vim/
     mkdir -p ~/.config/nvim
+    if ! [[ -d ~/.config/nvim  ]]; then
+        #statements
+        echo you need to build ~/.config/nvim as a normal user now
+        exit 1
+    fi
 
     buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
     buildSymbolicLink ${CFG_HOME}/.config/nvim/init.vim ~/.config/nvim/init.vim
+    chmod 777 ${CFG_HOME}/.config/nvim/init.vim
 
     if ! [[ -f ~/.config/nvim/autoload/plug.vim ]]; then
         echo init nvim plugin manager
         curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
                 https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        chmod 777 ~/.config/nvim/autoload/plug.vim
     fi
 
     #if ! [[ -d ~/.vim/bundle ]]; then
