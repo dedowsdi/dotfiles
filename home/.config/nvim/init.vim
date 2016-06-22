@@ -187,8 +187,8 @@ filetype plugin indent on               " required. To ignore plugin indent chan
 " ultisnips-------------------------------------------------------------------------
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<c-k>"
-let g:UltiSnipsJumpForwardTrigger="<c-n>"
-let g:UltiSnipsJumpBackwardTrigger="<c-p>"
+let g:UltiSnipsJumpForwardTrigger="<Down>"
+let g:UltiSnipsJumpBackwardTrigger="<Up>"
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
@@ -196,6 +196,9 @@ let g:UltiSnipsEditSplit="vertical"
 "------------------------------------------------------------------------------
 "ycm option
 let g:ycm_confirm_extra_conf = 0
+let g:ycm_min_num_of_chars_for_completion = 3
+"let g:ycm_auto_trigger = 0
+"let g:ycm_semantic_triggers = {'c':[], 'cpp':[]}
 "let g:ycm_server_python_interpreter = "/usr/bin/python3.5"
 nnoremap <SPACE>i :YcmCompleter GoToInclude<CR>
 nnoremap <SPACE>d :YcmCompleter GoToDefinition<CR>
@@ -306,8 +309,7 @@ nnoremap <c-p><c-b> :Buffers<CR>
 nnoremap <c-p><c-l> :BLines<CR>
 nnoremap <c-p><c-t> :Tags<CR>
 nnoremap <c-p><c-j> :BTags<CR>
-autocmd! FileType cpp  nnoremap <buffer> <c-p><c-j> : call fzf#vim#buffer_tags(
-      \ "",['ctags -f - --sort=no --excmd=number --c++-kinds=+p '.expand('%:S')], g:fzf#vim#default_layout) <CR>
+autocmd! FileType cpp  nnoremap <buffer> <c-p><c-j> : call <SID>fzf_cpp_tags()<CR>
 "nnoremap <c-p><c-j> :BTags<CR>
 "nnoremap <c-p><c-m> :Marks<CR>
 nnoremap <c-p><c-w> :Windows<CR>
@@ -327,6 +329,14 @@ command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
 
 "command! -nargs=* -complete=file AA :call s:fzf_ag_raw(<q-args>)
 autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
+
+let s:fzf_btags_cmd = 'ctags -f - --sort=no --excmd=number --c++-kinds=+p '
+let s:fzf_btags_options = {'options' : '--reverse -m -d "\t" --with-nth 1,4.. -n 1,-1 --prompt "BTags> "'}
+function! s:fzf_cpp_tags()
+call fzf#vim#buffer_tags(
+      \ "",[s:fzf_btags_cmd . expand('%:S')],
+      \ extend(copy(g:fzf_layout), s:fzf_btags_options))
+endfunction
 
 function! s:fzf(fzf_default_cmd, cmd)
   let oldcmds = $FZF_DEFAULT_COMMAND | try
