@@ -1,16 +1,15 @@
 " Remove ALL autocommands for the current group.
 autocmd!
+let g:python3_host_prog = "/usr/bin/python3"
 
+" ------------------------------------------------------------------------------
+" basic setting
+" ------------------------------------------------------------------------------
 if has("Win32")
    let &shada = "!,'200,<50,s10,h,rA:,rB:"
 else
    let &shada="!,'200,<50,s10,h"
 endif
-
-"python3
-let g:python3_host_prog = "/usr/bin/python3"
-"set the runtime path to include Vundle and initialize
-"basic setting----------------------------------------------------------------------------------
 set autoindent                  " set auto-indenting on for programming
 set showmatch                   " autoshow matching brackets. works like it does in bbedit.
 set vb                          " turn on "visual bell" - which is much quieter than "audio blink"
@@ -47,50 +46,79 @@ let &backup = !has("vms")       "set auto backup
 set cpoptions+=d                "let tags use current dir
 set wildignore=*.o,tags,TAGS            "ignore obj files
 set mps+=<:>                    "add match pair for < and >
+set pastetoggle=<F9>
 let g:terminal_scrollback_buffer_size=5000
 iab s8 --------------------------------------------------------------------------------
 
-"terminal
-:tnoremap <A-h> <C-\><C-n><C-w>h
-:tnoremap <A-j> <C-\><C-n><C-w>j
-:tnoremap <A-k> <C-\><C-n><C-w>k
-:tnoremap <A-l> <C-\><C-n><C-w>l
-:tnoremap <C-\><C-n> <C-\><C-n>?\S<CR>
-:nnoremap <A-h> <C-w>h
-:nnoremap <A-j> <C-w>j
-:nnoremap <A-k> <C-w>k
-:nnoremap <A-l> <C-w>l
+" ------------------------------------------------------------------------------
+" map
+" ------------------------------------------------------------------------------
 
-"hi CursorLine   cterm=NONE ctermbg=lightblue ctermfg=white guibg=darkred guifg=white
-"hi CursorColumn cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white
-" heighlight current line
-nnoremap <Leader>r :set cursorline!<CR>
-" heighlight current column
-nnoremap <Leader>c :set cursorcolumn!<CR>
+" quickfix
+nnoremap ]q :cnext<cr>zz
+nnoremap [q :cprev<cr>zz
+nnoremap ]l :lnext<cr>zz
+nnoremap [l :lprev<cr>zz
+
+" buffers
+nnoremap ]b :bnext<cr>
+nnoremap [b :bprev<cr>
+
+" tabs
+nnoremap ]t :tabn<cr>
+nnoremap [t :tabp<cr>
+
+"terminal
+tnoremap <A-h> <C-\><C-n><C-w>h
+tnoremap <A-j> <C-\><C-n><C-w>j
+tnoremap <A-k> <C-\><C-n><C-w>k
+tnoremap <A-l> <C-\><C-n><C-w>l
+tnoremap <C-\><C-n> <C-\><C-n>?\S<CR>
+nnoremap <A-h> <C-w>h
+nnoremap <A-j> <C-w>j
+nnoremap <A-k> <C-w>k
+nnoremap <A-l> <C-w>l
+nnoremap <m-cr> :call misc#term#terminal({"layout":"L", "size":0.5})<CR>
+tnoremap <m-cr> <c-\><c-n>:call misc#term#terminal()<CR>
+
 " %% as parent directory of current active file
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 cnoremap <expr> %t getcmdtype() == ':' ? expand('%:t').'/' : '%t'
-"toggle hlsearch
-noremap <F3> :set hlsearch! hlsearch?<CR>
-"toggle paste
-nnoremap <Leader>p :set paste! paste?<CR>
-nnoremap <Leader>ww :call <SID>smartSplit()<CR>
-"search visual selection with * and #
+
+" visual search
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
-"replace word, WORD, use \v mode
+" replace word, WORD, use \v regex mode
 nnoremap <Leader>sw :%s/\v<>/
 nnoremap <Leader>sW :%s/\v<>/
-"replace selection, us \V mode
+" replace selection, us \V regex mode
 xnoremap <Leader>s :<C-u>%s/\V=<SID>getVisual()/
 
+" highlight
+nnoremap <Leader>hr :set cursorline!<CR>
+nnoremap <Leader>hc :set cursorcolumn!<CR>
+noremap <F3> :set hlsearch! hlsearch?<CR>
+
+nnoremap <Leader>ww :call <SID>smartSplit()<CR>
+
+" google
+nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
+vnoremap <Leader>G :<c-u>execute 'Google ' . <SID>getVisual('s')<CR>
+
+" ------------------------------------------------------------------------------
+" small functions
+" ------------------------------------------------------------------------------
 function! s:smartSplit()
   let direction = str2float(winwidth(0))/winheight(0) >= 204.0/59 ? 'vsplit':'split'
   exec 'rightbelow ' . direction
 endfunction
 
-function! s:getVisual()
+function! s:getVisual(...)
+  let type = get(a:000, 0, ' ')
   let temp = @s|norm! gv"sy
+  if type == 's'
+    let temp = substitute(temp, '\n', ' ', 'g')
+  endif
   let [str,@s] = [@s,temp] | return str
 endfunction
 
@@ -99,20 +127,31 @@ function! s:VSetSearch()
   let @/ = '\V' . substitute(escape(s:getVisual(), '/\'), '\n', '\\n', 'g')
 endfunction
 
+" search in chrome
+function! s:google(...)
+  if len(a:000) == 0|return|endif
+  let searchItems = join(a:000, "+")
+  silent! execute '!google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
+endfunction
+
+" ------------------------------------------------------------------------------
+" command
+" ------------------------------------------------------------------------------
+command! -nargs=0 JrmTrailingSpace :%s/\v\s*$//g
+command! -nargs=0 JrmConsecutiveBlankLines :%s/\v%(^\s*\n){1,}/\r/ge
+command! -nargs=0 JrmGarbages :JrmTrailingSpace | JrmConsecutiveBlankLines
+command! -nargs=0 JrmBlankLines :%s/\v^\s*$\n//ge
+"save project information
+command! -nargs=0 JsaveProject :mksession! script/session.vim
+command! -nargs=+ Google :call <SID>google(<f-args>)
+
 autocmd FileType c,cpp,objc,vim setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
 autocmd FileType sh setlocal textwidth=160
 autocmd FileType cmake setlocal textwidth=160
 
-"commands, all starts with J
-"remov trailing white space
-command! -nargs=0 JrmTrailingSpace :%s/\v\s*$//g
-command! -nargs=0 JrmConsecutiveBlankLines :%s/\v%(^\s*\n){1,}/\r/ge
-command! -nargs=0 JrmBlankLines :%s/\v^\s*$\n//ge
-"save project information
-command! -nargs=0 JsaveProject :mksession! script/session.vim
-
-"plugins
-
+" ------------------------------------------------------------------------------
+" plugin
+" ------------------------------------------------------------------------------
 set rtp+=~/.fzf
 call plug#begin('~/.config/nvim/plugged')
 "common
@@ -161,7 +200,9 @@ call plug#end()
 
 filetype plugin indent on               " required. To ignore plugin indent changes, instead use: filetype plugin on
 
-" syntatic--------------------------------------------------------------------------------------
+" ------------------------------------------------------------------------------
+" syntatic
+" ------------------------------------------------------------------------------
 "set statusline+=%#warningmsg#
 "set statusline+=%{SyntasticStatuslineFlag()}
 "set statusline+=%*
@@ -184,8 +225,10 @@ filetype plugin indent on               " required. To ignore plugin indent chan
 "nnoremap <F7> :w<CR>:SyntasticCheck<CR>
 "nnoremap <space>j :lnext<CR>
 "nnoremap <space>k :lprevious<CR>
-" ultisnips-------------------------------------------------------------------------
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+
+" ------------------------------------------------------------------------------
+" ultisnips
+" ------------------------------------------------------------------------------
 let g:UltiSnipsExpandTrigger="<c-k>"
 let g:UltiSnipsJumpForwardTrigger="<Down>"
 let g:UltiSnipsJumpBackwardTrigger="<Up>"
@@ -193,8 +236,9 @@ let g:UltiSnipsJumpBackwardTrigger="<Up>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
-"------------------------------------------------------------------------------
-"ycm option
+" ------------------------------------------------------------------------------
+" ycm
+" ------------------------------------------------------------------------------
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_min_num_of_chars_for_completion = 3
 "let g:ycm_auto_trigger = 0
@@ -206,13 +250,18 @@ nnoremap <SPACE>c :YcmCompleter GoToDeclaration<CR>
 " default ycm cfg file
 let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
-"easyalign-------------------------------------------------------------------
+
+" ------------------------------------------------------------------------------
+" easyalign
+" ------------------------------------------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
 vmap <Enter> <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
-"vim-clang-format-----------------------------------------------------------
+" ------------------------------------------------------------------------------
+" vim-clang-format
+" ------------------------------------------------------------------------------
 let g:clang_format#style_options = {
       \ "AccessModifierOffset" : -2,
       \ "AllowShortFunctionsOnASingleLine" : "true",
@@ -229,7 +278,9 @@ let g:clang_format#style_options = {
       \}
 noremap <leader>cf :ClangFormat<CR>
 
-"solarized-------------------------------------------------------------------
+" ------------------------------------------------------------------------------
+" solarized
+" ------------------------------------------------------------------------------
 set t_Co=16
 set background=dark
 colorscheme solarized
@@ -248,7 +299,9 @@ colorscheme solarized
 let g:airline_theme='solarized'
 let g:airline_powerline_fonts = 1
 "let g:Powerline_symbols = 'fancy'
-"pymode-----------------------------------------------------------------------
+" ------------------------------------------------------------------------------
+" pymode
+" ------------------------------------------------------------------------------
 let pymode = 1
 let g:pymode_rope_completion = 0
 
@@ -274,21 +327,27 @@ function! ToggleVExplorer()
 endfunction
 map <silent> <leader>n :call ToggleVExplorer()<CR>
 
-"deoplete----------------------------------------------------
+" ------------------------------------------------------------------------------
+" deoplete
+" ------------------------------------------------------------------------------
 "let g:deoplete#enable_at_startup = 1
 "let g:deoplete#enable_smart_case = 1
 "let g:deoplete#sources = {}
 "let g:deoplete#sources._ = ['buffer']
 "clang-complete----------------------------------------------
 
-"unite-------------------------------------------------------
+" ------------------------------------------------------------------------------
+" unite
+" ------------------------------------------------------------------------------
 "nnoremap <m-u> :<c-u>Unite -start-insert file file_rec/neovim buffer file_mru<CR>
 "let g:unite_source_rec_max_cache_files = 50000
 "let g:unite_source_rec_async_command =
 "\ ['ag', '--follow', '--nocolor', '--nogroup',
 "\  '--hidden', '-g', '']
 
-"fzf------------------------------------------------------------
+" ------------------------------------------------------------------------------
+" fzf
+" ------------------------------------------------------------------------------
 let g:fzf_action = {
       \ 'ctrl-t': 'tab split',
       \ 'ctrl-x': 'split',
@@ -322,13 +381,11 @@ nnoremap <c-p><c-s> :Snippets<CR>
 "nnoremap <c-p><c-b>c :BCommits<CR>
 nnoremap <c-p><c-c> :Commands<CR>
 nnoremap <c-p><c-m> :Maps<CR>
-command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
-
 "nnoremap <c-p>h :Helptags<CR>
 "nnoremap <c-p>f :Filetypes<CR>
 
-"command! -nargs=* -complete=file AA :call s:fzf_ag_raw(<q-args>)
 autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
+command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
 
 let s:fzf_btags_cmd = 'ctags -f - --sort=no --excmd=number --c++-kinds=+p '
 let s:fzf_btags_options = {'options' : '--reverse -m -d "\t" --with-nth 1,4.. -n 1,-1 --prompt "BTags> "'}
@@ -357,20 +414,21 @@ function! s:fzf_ag_expand(cmd)
   call s:fzf_ag_raw(ecmd)
 endfunction
 
-"rtags-------------------------
+" ------------------------------------------------------------------------------
+" rtags
+" ------------------------------------------------------------------------------
 let g:rtagsLog = '~/tmp/rtaglog'
 let g:neomake_open_list = 2
 
-"neomake-----------------------------------------
-    let g:neomake_make_maker = {
-        \ 'exe': 'make',
-        \ 'args': ['--build'],
-        \ 'errorformat': '%f:%l:%c: %m',
-        \ }
+" ------------------------------------------------------------------------------
+" neomake
+" ------------------------------------------------------------------------------
+let g:neomake_make_maker = {
+    \ 'exe': 'make',
+    \ 'args': ['--build'],
+    \ 'errorformat': '%f:%l:%c: %m',
+    \ }
 "let g:neomake_cpp_enable_makers = ['clang']
 "let g:neomake_cpp_clang_maker = {
             "\ 'exe' : 'clang'
             "\ }
-"misc terminal----------------------------------
-nnoremap <m-cr> :call misc#term#terminal({"layout":"L", "size":0.5})<CR>
-tnoremap <m-cr> <c-\><c-n>:call misc#term#terminal()<CR>
