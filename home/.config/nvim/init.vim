@@ -1,5 +1,5 @@
 " Remove ALL autocommands for the current group.
-autocmd!
+"autocmd!
 let g:python3_host_prog = "/usr/bin/python3"
 
 " ------------------------------------------------------------------------------
@@ -64,6 +64,10 @@ nnoremap [l :lprev<cr>zz
 nnoremap ]b :bnext<cr>
 nnoremap [b :bprev<cr>
 
+" args
+nnoremap ]a :next<cr>
+nnoremap [a :prev<cr>
+
 " tabs
 nnoremap ]t :tabn<cr>
 nnoremap [t :tabp<cr>
@@ -89,6 +93,7 @@ cnoremap <expr> %t getcmdtype() == ':' ? expand('%:t').'/' : '%t'
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
 " replace word, WORD, use \v regex mode
+" TODO escape \
 nnoremap <Leader>sw :%s/\v<>/
 nnoremap <Leader>sW :%s/\v<>/
 " replace selection, us \V regex mode
@@ -104,6 +109,16 @@ nnoremap <Leader>ww :call <SID>smartSplit()<CR>
 " google
 nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
 vnoremap <Leader>G :<c-u>execute 'Google ' . <SID>getVisual('s')<CR>
+
+" shift
+nnoremap <Leader>[ :call misc#shiftItem({"direction":"h"})<CR>
+nnoremap <Leader>] :call misc#shiftItem({"direction":"l"})<CR>
+
+"arg text object
+vnoremap aa :<C-U>silent! call misc#selCurArg({})<CR>
+vnoremap ia :<C-U>silent! call misc#selCurArg({"excludeSpace":1})<CR>
+onoremap aa :normal vaa<CR>
+onoremap ia :normal via<CR>
 
 " ------------------------------------------------------------------------------
 " small functions
@@ -145,6 +160,8 @@ command! -nargs=0 JrmBlankLines :%s/\v^\s*$\n//ge
 command! -nargs=0 JsaveProject :mksession! script/session.vim
 command! -nargs=+ Google :call <SID>google(<f-args>)
 
+"TODO this setting was overwrited by some plugin, figure out which one.  This
+"job is current done in misc#misc
 autocmd FileType c,cpp,objc,vim setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
 autocmd FileType sh setlocal textwidth=160
 autocmd FileType cmake setlocal textwidth=160
@@ -152,7 +169,7 @@ autocmd FileType cmake setlocal textwidth=160
 " ------------------------------------------------------------------------------
 " plugin
 " ------------------------------------------------------------------------------
-set rtp+=~/.fzf
+"set rtp+=~/.fzf,./vimScript
 call plug#begin('~/.config/nvim/plugged')
 "common
 "Plug 'scrooloose/nerdtree'             "tree resource
@@ -162,7 +179,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'altercation/vim-colors-solarized'   "color scheme
 Plug 'tpope/vim-surround'             " sourounding
 Plug 'jiangmiao/auto-pairs'           " auto close pair
-Plug 'docunext/closetag.vim'          " auto close tag
+"Plug 'docunext/closetag.vim'          " auto close tag
 Plug 'scrooloose/nerdcommenter'       " comment helper
 Plug 'SirVer/ultisnips'               " snippet
 Plug 'honza/vim-snippets'             " snippets
@@ -179,7 +196,7 @@ Plug 'peanutandchestnut/misc'
 "c++ related
 Plug 'Valloric/YouCompleteMe'         " auto complete
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
-Plug 'lyuts/vim-rtags'
+"Plug 'lyuts/vim-rtags'
 "Plug 'Shougo/deoplete.nvim'
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
@@ -189,16 +206,16 @@ Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
 " javascript related
-"Plug 'pangloss/vim-javascript'        " javascript support
-"Plug 'othree/html5.vim'               " html5
+Plug 'pangloss/vim-javascript'        " javascript support
+Plug 'othree/html5.vim'               " html5
 Plug 'elzr/vim-json'                  " json
 "Plug 'marijnh/tern_for_vim'           " javascript autocomplete support
 "syntax
-Plug 'digitaltoad/vim-jade'           " jade syntax
+"Plug 'digitaltoad/vim-jade'           " jade syntax
 Plug 'tikhomirov/vim-glsl'
 call plug#end()
 
-filetype plugin indent on               " required. To ignore plugin indent changes, instead use: filetype plugin on
+"filetype plugin indent on               " required. To ignore plugin indent changes, instead use: filetype plugin on
 
 " ------------------------------------------------------------------------------
 " syntatic
@@ -229,7 +246,7 @@ filetype plugin indent on               " required. To ignore plugin indent chan
 " ------------------------------------------------------------------------------
 " ultisnips
 " ------------------------------------------------------------------------------
-let g:UltiSnipsExpandTrigger="<c-k>"
+let g:UltiSnipsExpandTrigger="<m-k>"
 let g:UltiSnipsJumpForwardTrigger="<Down>"
 let g:UltiSnipsJumpBackwardTrigger="<Up>"
 
@@ -243,13 +260,15 @@ let g:ycm_confirm_extra_conf = 0
 let g:ycm_min_num_of_chars_for_completion = 3
 "let g:ycm_auto_trigger = 0
 "let g:ycm_semantic_triggers = {'c':[], 'cpp':[]}
-"let g:ycm_server_python_interpreter = "/usr/bin/python3.5"
+let g:ycm_server_python_interpreter = "/usr/bin/python3.5"
 nnoremap <SPACE>i :YcmCompleter GoToInclude<CR>
 nnoremap <SPACE>d :YcmCompleter GoToDefinition<CR>
 nnoremap <SPACE>c :YcmCompleter GoToDeclaration<CR>
 " default ycm cfg file
 let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
+
+nnoremap <leader>yd :YcmDiags<CR>
 
 " ------------------------------------------------------------------------------
 " easyalign
@@ -269,7 +288,7 @@ let g:clang_format#style_options = {
       \ "AllowShortLoopsOnASingleLine" : "true",
       \ "AlwaysBreakTemplateDeclarations" : "true",
       \ "AlignAfterOpenBracket" : "false",
-      \ "ContinuationIndentWidth" : 4,
+      \ "ContinuationIndentWidth" : 2,
       \ "IndentWidth" : 2,
       \ "TabWidth" : 2,
       \ "UseTab" : "Never",
@@ -351,7 +370,7 @@ map <silent> <leader>n :call ToggleVExplorer()<CR>
 let g:fzf_action = {
       \ 'ctrl-t': 'tab split',
       \ 'ctrl-x': 'split',
-      \ 'ctrl-v': 'vsplit',
+      \ 'ctrl-v': 'vertical rightbelow split',
       \ 'ctrl-a': 'argedit',
       \ 'ctrl-o': '!gvfs-open'
       \ }
@@ -403,7 +422,10 @@ function! s:fzf(fzf_default_cmd, cmd)
 endfunction
 
 function! s:fzf_ag_raw(cmd)
-  call fzf#vim#ag_raw('--noheading '. a:cmd)
+  "--noheading is needed to display filename for Ag something %
+  "--noheading will add blanklines if you didn't search in a specific file, you
+  "need no break to stop it.
+  call fzf#vim#ag_raw(' --noheading '. a:cmd)
 endfunction
 
 " some path is ignored by git or hg, i need to use absolute path to avoid that.

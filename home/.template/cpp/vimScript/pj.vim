@@ -1,7 +1,7 @@
 "debugger, lldb or gdb
 let g:mycppDebugger = "gdb"
 "build dir, such as ./build/Debug, ./build/RelWithDebInfo
-let g:mycppBuildDir = "./build"
+let g:mycppBuildDir = "./build/Debug"
 "executable make target and path
 "let g:mycppMakes = {}
 "class name prefix
@@ -11,4 +11,4 @@ let g:mycppBuildDir = "./build"
 "files included into newly created src file
 "let g:mycppStable=['pacStable.h']
 
-call mycpp#addDependencies('dependencies')
+"call mycpp#addDependencies('dependencies')

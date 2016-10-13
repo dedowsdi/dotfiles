@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 2.8.12)
-project(__PROJECT__)
+cmake_minimum_required (VERSION 2.6)
+
+project (__PROJECT__)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
+include(util)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG"  )
 
@@ -12,13 +14,30 @@ endif()
 
 #flag
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -Wall -Wno-unused-local-typedef -Wno-overloaded-virtual -Wno-inconsistent-missing-override -Wno-switch-bool -Wno-int-to-void-pointer-cast -Wno-unused-function")
+#SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -v")
+
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(__UC_PROJECT___SRC
-    main.cpp
+FIND_PACKAGE(PkgConfig REQUIRED)
+
+find_package(Boost REQUIRED COMPONENTS program_options filesystem )
+
+set(EXTRA_LIBS
     )
 
-add_executable(__PROJECT__ ${__UC_PROJECT___SRC}  )
+include_directories(
+    ${CMAKE_SOURCE_DIR}/common
+    )
+
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LINUX")
+ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+#generate cfg file
+
+add_subdirectory(common)
+set(COMMON_LIBS common)
+add_subdirectory(demo)

@@ -29,7 +29,7 @@ else
     if [[ $DO_CFG ]]; then
         echo configure vimproject to $dest
         cp -r ${template}/vimScript $dest
-        cp ${template}/pj.sh $dest
+        #cp ${template}/pj.sh $dest   #nolonger needed
     else
         echo init project $dest
         echo copy setting from /${template}
