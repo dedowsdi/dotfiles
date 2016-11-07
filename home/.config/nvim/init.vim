@@ -52,7 +52,18 @@ iab s8 -------------------------------------------------------------------------
 
 " ------------------------------------------------------------------------------
 " map
+" <leader>f start map will be saved for project specific map
 " ------------------------------------------------------------------------------
+
+"nvim cfg 
+nnoremap __ :edit ~/.config/nvim/init.vim<CR>
+
+"vertical block until chop
+nmap _j <c-v>_j
+nmap _k <c-v>_k
+"vertical block with start not at cursor
+vnoremap _j :<c-u>call misc#visualEnd("misc#verticalSearch", {"direction":"j", "greedy":1})<cr>
+vnoremap _k :<c-u>call misc#visualEnd("misc#verticalSearch", {"direction":"k", "greedy":1})<cr>
 
 " quickfix
 nnoremap ]q :cnext<cr>zz
@@ -97,7 +108,7 @@ xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
 nnoremap <Leader>sw :%s/\v<>/
 nnoremap <Leader>sW :%s/\v<>/
 " replace selection, us \V regex mode
-xnoremap <Leader>s :<C-u>%s/\V=<SID>getVisual()/
+xnoremap <Leader>s :<C-u>%s/\V=escape(<SID>getVisual(), '/\')/
 
 " highlight
 nnoremap <Leader>hr :set cursorline!<CR>
@@ -114,11 +125,18 @@ vnoremap <Leader>G :<c-u>execute 'Google ' . <SID>getVisual('s')<CR>
 nnoremap <Leader>[ :call misc#shiftItem({"direction":"h"})<CR>
 nnoremap <Leader>] :call misc#shiftItem({"direction":"l"})<CR>
 
-"arg text object
+" option cycle and toggle
+nnoremap <F10> :call <SID>cycleOption("virtualedit", ['', 'all'])<CR>
+
+"text object
 vnoremap aa :<C-U>silent! call misc#selCurArg({})<CR>
 vnoremap ia :<C-U>silent! call misc#selCurArg({"excludeSpace":1})<CR>
 onoremap aa :normal vaa<CR>
 onoremap ia :normal via<CR>
+vnoremap am :<C-U>silent! call misc#selectSmallWord()<CR>
+onoremap am :normal vam<CR>
+vnoremap im :<C-U>silent! call misc#selectSmallWord()<CR>
+onoremap im :normal vam<CR>
 
 " ------------------------------------------------------------------------------
 " small functions
@@ -128,6 +146,7 @@ function! s:smartSplit()
   exec 'rightbelow ' . direction
 endfunction
 
+"[type:s]
 function! s:getVisual(...)
   let type = get(a:000, 0, ' ')
   let temp = @s|norm! gv"sy
@@ -139,7 +158,7 @@ endfunction
 
 function! s:VSetSearch()
   "record @s, restore later
-  let @/ = '\V' . substitute(escape(s:getVisual(), '/\'), '\n', '\\n', 'g')
+  let @/ = '\V' . escape(s:getVisual(), '/\')
 endfunction
 
 " search in chrome
@@ -147,6 +166,14 @@ function! s:google(...)
   if len(a:000) == 0|return|endif
   let searchItems = join(a:000, "+")
   silent! execute '!google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
+endfunction
+
+function! s:cycleOption(name, list)
+    exec 'let curValue = &'.a:name
+    let [index, numValues] = [match(a:list, curValue), len(a:list)]
+    let newValue = a:list[(index + 1)%numValues]
+    exec 'let &'.a:name.' = newValue '
+    echom a:name . ' : ' . newValue
 endfunction
 
 " ------------------------------------------------------------------------------
@@ -163,13 +190,14 @@ command! -nargs=+ Google :call <SID>google(<f-args>)
 "TODO this setting was overwrited by some plugin, figure out which one.  This
 "job is current done in misc#misc
 autocmd FileType c,cpp,objc,vim setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
+autocmd FileType json setlocal shiftwidth=2 tabstop=2 expandtab
 autocmd FileType sh setlocal textwidth=160
 autocmd FileType cmake setlocal textwidth=160
 
 " ------------------------------------------------------------------------------
 " plugin
 " ------------------------------------------------------------------------------
-"set rtp+=~/.fzf,./vimScript
+set rtp+=~/.fzf,./vimScript
 call plug#begin('~/.config/nvim/plugged')
 "common
 "Plug 'scrooloose/nerdtree'             "tree resource
@@ -269,6 +297,8 @@ let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
 
 nnoremap <leader>yd :YcmDiags<CR>
+"C-F7 
+nnoremap <F31> :YcmDiags<CR>
 
 " ------------------------------------------------------------------------------
 " easyalign
@@ -295,7 +325,8 @@ let g:clang_format#style_options = {
       \ "Standard" : "C++11",
       \ "SortIncludes": "false",
       \}
-noremap <leader>cf :ClangFormat<CR>
+nnoremap <leader>cf :ClangFormat<CR>
+nnoremap <F11> :ClangFormat<CR>
 
 " ------------------------------------------------------------------------------
 " solarized
@@ -405,6 +436,7 @@ nnoremap <c-p><c-m> :Maps<CR>
 
 autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
 command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
+"TODO add map to search visual content
 
 let s:fzf_btags_cmd = 'ctags -f - --sort=no --excmd=number --c++-kinds=+p '
 let s:fzf_btags_options = {'options' : '--reverse -m -d "\t" --with-nth 1,4.. -n 1,-1 --prompt "BTags> "'}
