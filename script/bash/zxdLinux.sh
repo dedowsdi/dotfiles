@@ -114,6 +114,7 @@ if [[ $DO_REPO ]]; then
     done < ${CFG_SCRIPT}/repoRemoteLocal
 fi
 
+# own and grp of downloaded file will be caller
 if [[ $DO_DOWNLOAD ]]; then
     while read link target ; do
         if  [[ -f "$target" ]]; then
@@ -144,22 +145,13 @@ if [[ $DO_CFG ]]; then
     echo init vim
     #mkdir -p ~/.vim/
     mkdir -p ~/.config/nvim
-    if ! [[ -d ~/.config/nvim  ]]; then
-        #statements
-        echo you need to build ~/.config/nvim as a normal user now
-        exit 1
-    fi
+    chown $caller -R ~/.config/nvim
+    chgrp $caller -R ~/.config/nvim
 
     buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
     buildSymbolicLink ${CFG_HOME}/.config/nvim/init.vim ~/.config/nvim/init.vim
-    chmod 777 ${CFG_HOME}/.config/nvim/init.vim
-
-    if ! [[ -f ~/.config/nvim/autoload/plug.vim ]]; then
-        echo init nvim plugin manager
-        curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
-            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        chmod 777 ~/.config/nvim/autoload/plug.vim
-    fi
+    chmod 777 ~/.vimrc
+    chmod 777 ~/.config/nvim/init.vim
 
     #if ! [[ -d ~/.vim/bundle ]]; then
     #echo init vim plugin manager
