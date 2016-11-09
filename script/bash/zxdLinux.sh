@@ -22,6 +22,16 @@ CFG_VIM=${CFG_HOME}/vim
 SCRIPT_INSTALL_DIR=/usr/local/bin
 APACHE_WEB=/var/www/html
 
+if [[ -d ~/.config/nvim/autoload ]]; then
+    mkdir -p ~/.config/nvim/autoload
+    mkdir -p ~/.config/nvim/plugged
+    mkdir ~/.vimbak
+    chown $caller -R ~/.config/nvim
+    chgrp $caller -R ~/.config/nvim
+    chown $caller -R ~/.vimbak
+    chgrp $caller -R ~/.vimbak
+fi
+
 if [[ $# == 0 ]]; then
     #do all by default
     DO_APT=1
@@ -32,9 +42,11 @@ if [[ $# == 0 ]]; then
 fi
 
 #add ppa
-if  ! find /etc/apt/sources.list.d -name "neovim*">/dev/null ; then
-add-apt-repository ppa:neovim-ppa/unstable
-apt update
+ls /etc/apt/sources.list.d/neovim* >/dev/null 2>&1
+if ! [[ $? -eq 0 ]] ; then
+    echo add neovim ppa
+    add-apt-repository ppa:neovim-ppa/unstable
+    apt update
 fi
 
 while getopts ":arcds" Option
@@ -117,11 +129,12 @@ fi
 # own and grp of downloaded file will be caller
 if [[ $DO_DOWNLOAD ]]; then
     while read link target ; do
-        if  [[ -f "$target" ]]; then
+        target=`eval echo $target`
+        if  [[ -f $target ]]; then
             echo $target exists, skip
         else
             echo downloading from $link to $target
-            curl -fLo "$target" --create-dirs $link
+            curl -fLo $target --create-dirs $link
             chown $caller $target
             chgrp $caller $target
         fi
@@ -142,11 +155,6 @@ if [[ $DO_CFG ]]; then
     echo init personal develop template
     buildSymbolicLink ${CFG_HOME}/.template ~/.template
 
-    echo init vim
-    #mkdir -p ~/.vim/
-    mkdir -p ~/.config/nvim
-    chown $caller -R ~/.config/nvim
-    chgrp $caller -R ~/.config/nvim
 
     buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
     buildSymbolicLink ${CFG_HOME}/.config/nvim/init.vim ~/.config/nvim/init.vim
