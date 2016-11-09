@@ -104,6 +104,13 @@ appInstall()
     fi
 }
 
+#get index of string 
+strIndex() 
+{ 
+    x="${1%%$2*}"
+    [[ $x = $1 ]] && echo -1 || echo ${#x}
+}
+
 #test, set__TEST to true to begin test
 
 if ${__TEST} ; then

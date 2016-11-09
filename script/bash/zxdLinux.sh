@@ -1,10 +1,11 @@
 #!/bin/bash
 
-#personal script to init system(cygwin or ubuntu), init ubuntu can be slow, so i divide it into 3 secionts, apt install, repo clone, cfg apt, each part can be
-#called individually
+#personal script to init system(cygwin or ubuntu), init ubuntu can be slow, so i divide it into 5 secionts, apt install, repo clone, resource download, cfg apt,
+#, install script. each part can be called individually
 
 IS_CYGWIN=`uname -a|grep -i cygwin`
 IS_LINUX=`uname -a|grep -i Linux`
+caller=$USER
 
 #get abs real script address
 if [[ -h ${BASH_SOURCE} ]]; then
@@ -24,22 +25,26 @@ APACHE_WEB=/var/www/html
 if [[ $# == 0 ]]; then
     #do all by default
     DO_APT=1
+    DO_SCRIPT=1
     DO_REPO=1
     DO_CFG=1
+    DO_DOWNLOAD=1
 fi
 
-#add neovim repository
+#add ppa
 if  ! find /etc/apt/sources.list.d -name "neovim*">/dev/null ; then
 add-apt-repository ppa:neovim-ppa/unstable
 apt update
 fi
 
-while getopts ":arc" Option
+while getopts ":arcds" Option
 do
     case $Option in
+        s     ) DO_SCRIPT=1  ;;
         a     ) DO_APT=1  ;;
         r     ) DO_REPO=1 ;;
         c     ) DO_CFG=1  ;;
+        d     ) DO_DOWNLOAD=1  ;;
         *     ) echo "Unimplemented option:${Option} " ; exit 1 ;;
     esac
 done
@@ -52,14 +57,16 @@ echo include util
 source ${CFG_SCRIPT}/zxdUtil.sh
 
 if [[ IS_LINUX ]]; then
-    echo found linux
-    if ! [[ -h ${SCRIPT_INSTALL_DIR}/zxdLinux ]]; then
+    if [[ DO_SCRIPT ]]; then
         echo install script
         for item in `ls ${CFG_SCRIPT}/*.sh` ; do
-            buildSymbolicLink $item ${SCRIPT_INSTALL_DIR}/`basename $item .sh`
+            exename=`basename $item .sh`
+            if ! [[ -h "${SCRIPT_INSTALL_DIR}/$exename" ]]; then
+                buildSymbolicLink $item ${SCRIPT_INSTALL_DIR}/$exename
+            fi
         done
-        buildSymbolicLink $CFG_HOME/.template/cpp/pj.sh $SCRIPT_INSTALL_DIR/vpj
     fi
+    echo found linux
 else
     echo found cygwin
     ln -s ${CFG_SCRIPT} ${SCRIPT_INSTALL_DIR}/script
@@ -107,6 +114,18 @@ if [[ $DO_REPO ]]; then
     done < ${CFG_SCRIPT}/repoRemoteLocal
 fi
 
+if [[ $DO_DOWNLOAD ]]; then
+    while read link target ; do
+        if  [[ -f "$target" ]]; then
+            echo $target exists, skip
+        else
+            echo downloading from $link to $target
+            curl -fLo "$target" --create-dirs $link
+            chown $caller $target
+            chgrp $caller $target
+        fi
+    done < ${CFG_SCRIPT}/download
+fi
 
 if [[ $DO_CFG ]]; then
     echo '************************************************************'
@@ -138,17 +157,17 @@ if [[ $DO_CFG ]]; then
     if ! [[ -f ~/.config/nvim/autoload/plug.vim ]]; then
         echo init nvim plugin manager
         curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
-                https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         chmod 777 ~/.config/nvim/autoload/plug.vim
     fi
 
     #if ! [[ -d ~/.vim/bundle ]]; then
-        #echo init vim plugin manager
-        ##echo install pathogen for vim
-        #mkdir -p ~/.vim/autoload ~/.vim/bundle
-        ##curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-        #echo install vundle for vim
-        #git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    #echo init vim plugin manager
+    ##echo install pathogen for vim
+    #mkdir -p ~/.vim/autoload ~/.vim/bundle
+    ##curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+    #echo install vundle for vim
+    #git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     #fi
 
     echo init apache2
@@ -169,6 +188,7 @@ if [[ $DO_CFG ]]; then
     buildSymbolicLink /usr/share/doc/libglfw3-doc/html /var/www/html/glfw3
     buildSymbolicLink /usr/share/doc/opengl-4-html-doc /var/www/html/opengl4
 fi
+
 
 echo done
 
