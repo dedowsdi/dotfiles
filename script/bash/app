@@ -2,6 +2,7 @@ git
 git-gui
 mercurial
 neovim
+python3-pip
 cmake
 cmake-doc
 cmake-qt-gui

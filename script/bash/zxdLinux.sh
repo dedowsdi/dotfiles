@@ -5,7 +5,6 @@
 
 IS_CYGWIN=`uname -a|grep -i cygwin`
 IS_LINUX=`uname -a|grep -i Linux`
-caller=$USER
 
 #get abs real script address
 if [[ -h ${BASH_SOURCE} ]]; then
@@ -26,10 +25,6 @@ if [[ -d ~/.config/nvim/autoload ]]; then
     mkdir -p ~/.config/nvim/autoload
     mkdir -p ~/.config/nvim/plugged
     mkdir ~/.vimbak
-    chown $caller -R ~/.config/nvim
-    chgrp $caller -R ~/.config/nvim
-    chown $caller -R ~/.vimbak
-    chgrp $caller -R ~/.vimbak
 fi
 
 if [[ $# == 0 ]]; then
@@ -45,8 +40,8 @@ fi
 ls /etc/apt/sources.list.d/neovim* >/dev/null 2>&1
 if ! [[ $? -eq 0 ]] ; then
     echo add neovim ppa
-    add-apt-repository ppa:neovim-ppa/unstable
-    apt update
+    sudo add-apt-repository -y ppa:neovim-ppa/unstable
+    sudo apt update
 fi
 
 while getopts ":arcds" Option
@@ -69,16 +64,28 @@ echo include util
 source ${CFG_SCRIPT}/zxdUtil.sh
 
 if [[ IS_LINUX ]]; then
+    echo found linux
     if [[ DO_SCRIPT ]]; then
         echo install script
         for item in `ls ${CFG_SCRIPT}/*.sh` ; do
             exename=`basename $item .sh`
             if ! [[ -h "${SCRIPT_INSTALL_DIR}/$exename" ]]; then
-                buildSymbolicLink $item ${SCRIPT_INSTALL_DIR}/$exename
+                sudo buildSymbolicLink $item 
+                #on a new machine, everything script to be installed before they can be sued, includes buildSymbolicLink
+                fileName=$item
+                linkName=${SCRIPT_INSTALL_DIR}/$exename
+
+                if [[ -h $linkName && `readlink $linkName` == $fileName ]]; then
+                    #do nothing if it already exists
+                    echo symbolic link ${linkName}'->'${fileName} exists
+                    return 0
+                fi
+
+                echo build symbolic link : ${linkName}'->'${fileName}
+                sudo ln -s $fileName $linkName
             fi
         done
     fi
-    echo found linux
 else
     echo found cygwin
     ln -s ${CFG_SCRIPT} ${SCRIPT_INSTALL_DIR}/script
@@ -88,7 +95,7 @@ echo '************************************************************'
 echo init bash
 
 if [[ $IS_LINUX ]]; then
-    buildSymbolicLink ${CFG_HOME}/.zxdLinuxBashrc ~/.zxdBashrc
+    sudo buildSymbolicLink ${CFG_HOME}/.zxdLinuxBashrc ~/.zxdBashrc
 fi
 
 if [[ $IS_CYGWIN ]]; then
@@ -108,7 +115,7 @@ if [[ $IS_LINUX && $DO_APT ]]; then
     echo '************************************************************'
     echo "install app"
     for app in `cat ${CFG_SCRIPT}/app` ; do
-        appInstall $app
+        sudo appInstall $app
     done
 fi
 
@@ -122,11 +129,11 @@ if [[ $DO_REPO ]]; then
     fi
 
     while read cmd remote local ; do
-        repoClone $cmd $remote $local
+        sudo repoClone $cmd $remote $local
     done < ${CFG_SCRIPT}/repoRemoteLocal
 fi
 
-# own and grp of downloaded file will be caller
+# own and grp of downloaded 
 if [[ $DO_DOWNLOAD ]]; then
     while read link target ; do
         target=`eval echo $target`
@@ -135,8 +142,6 @@ if [[ $DO_DOWNLOAD ]]; then
         else
             echo downloading from $link to $target
             curl -fLo $target --create-dirs $link
-            chown $caller $target
-            chgrp $caller $target
         fi
     done < ${CFG_SCRIPT}/download
 fi
@@ -149,17 +154,16 @@ if [[ $DO_CFG ]]; then
     echo init mercurial
     buildSymbolicLink ${CFG_HOME}/.hgignore ~/.hgignore
     echo init git
-    buildSymbolicLink ${CFG_HOME}/.gitconfig ~/.gitconfig
+    #gitconfig will expand ~, it'd better to just copy it
+    cp ${CFG_HOME}/.gitconfig ~/.gitconfig
     buildSymbolicLink ${CFG_HOME}/.gitignore ~/.gitignore
-    git config --global core.excludesfile ~/.gitignore
+    sudo git config --global core.excludesfile ~/.gitignore
     echo init personal develop template
     buildSymbolicLink ${CFG_HOME}/.template ~/.template
-
-
     buildSymbolicLink ${CFG_HOME}/.vimrc ~/.vimrc
     buildSymbolicLink ${CFG_HOME}/.config/nvim/init.vim ~/.config/nvim/init.vim
-    chmod 777 ~/.vimrc
-    chmod 777 ~/.config/nvim/init.vim
+    sudo chmod 777 ~/.vimrc
+    sudo chmod 777 ~/.config/nvim/init.vim
 
     #if ! [[ -d ~/.vim/bundle ]]; then
     #echo init vim plugin manager
@@ -170,25 +174,26 @@ if [[ $DO_CFG ]]; then
     #git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     #fi
 
+    #add localhost servername
     echo init apache2
     if ! [[ -f /etc/apache2/conf-available/fqdn.conf ]]; then
-        echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
-        a2enconf fqdn
-        service apache2 reload
+        echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
+        sudo a2enconf fqdn
+        sudo service apache2 reload
     fi
 
+    #change index.html to apache.html
     if [[ -f ${APACHE_WEB}/index.html ]]; then
-        mv ${APACHE_WEB}/index.html ${APACHE_WEB}/apache.html
+        sudo mv ${APACHE_WEB}/index.html ${APACHE_WEB}/apache.html
     fi
 
-    buildSymbolicLink /usr/share/doc/cmake-doc/html /var/www/html/cmake
-    buildSymbolicLink /usr/share/doc/libstdc++6-4.7-doc/libstdc++/html /var/www/html/c++
-    buildSymbolicLink /usr/share/doc /var/www/html/doc
-    buildSymbolicLink /usr/share/doc/python3-doc/html /var/www/html/python3
-    buildSymbolicLink /usr/share/doc/libglfw3-doc/html /var/www/html/glfw3
-    buildSymbolicLink /usr/share/doc/opengl-4-html-doc /var/www/html/opengl4
+    sudo buildSymbolicLink /usr/share/doc/cmake-doc/html /var/www/html/cmake
+    sudo buildSymbolicLink /usr/share/doc/libstdc++6-4.7-doc/libstdc++/html /var/www/html/c++
+    sudo buildSymbolicLink /usr/share/doc /var/www/html/doc
+    sudo buildSymbolicLink /usr/share/doc/python3-doc/html /var/www/html/python3
+    sudo buildSymbolicLink /usr/share/doc/libglfw3-doc/html /var/www/html/glfw3
+    sudo buildSymbolicLink /usr/share/doc/opengl-4-html-doc /var/www/html/opengl4
 fi
-
 
 echo done
 

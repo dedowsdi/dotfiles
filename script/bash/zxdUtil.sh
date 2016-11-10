@@ -1,4 +1,4 @@
-#common util, fonctuion only
+#common util, fonctuion only, all functions in this fill should not be called with sudo(sodo can not inherite function)
 
 __TEST=false
 
@@ -16,55 +16,6 @@ startsWithUpperCase()
     fi
 
     return 1
-}
-
-repoClone()
-{
-    #clone reposity if it doesn't exists
-    if [ $# -lt 3 ] ; then
-        echo "wrong arg number, excepted format is repoClone vsc remote local"
-        exit 1
-    fi
-
-    vcs=$1
-    remote=$2
-    local=$3
-
-    if [[ $vcs != git && $vcs != hg ]]; then
-        echo vcs must be git or hg, found "${vcs}"
-        exit 0
-    fi
-
-    if [[ -d $local ]]; then
-        echo $local already exists
-        return 0
-    fi
-
-    mkdir -p $local
-    $vcs clone $remote $local
-    return $?
-}
-
-buildSymbolicLink()
-{
-    #build symbolic if it doesn't exits
-    if [ $# -lt 2 ] ; then
-        echo "wrong arg number, excepted format is buildSymbolicLink file link"
-        exit 1
-    fi
-
-    fileName=$1
-    linkName=$2
-
-    if [[ -h $linkName && `readlink $linkName` == $fileName ]]; then
-        #do nothing if it already exists
-        echo symbolic link ${linkName}'->'${fileName} exists
-        return 0
-    fi
-
-    echo build symbolic link : ${linkName}'->'${fileName}
-    ln -s $fileName $linkName
-    return $?
 }
 
 getFileLineNumber()
@@ -117,7 +68,7 @@ if ${__TEST} ; then
 
     __TEST_INDENT="    "
 
-    #--------------------------------------------------------------------------------
+    #--------------------------------------------------------------------------------quoting
     echo test startsWithUpperCase
 
     startsWithUpperCase abc
