@@ -3,6 +3,11 @@
 #personal script to init system(cygwin or ubuntu), init ubuntu can be slow, so i divide it into 5 secionts, apt install, repo clone, resource download, cfg apt,
 #, install script. each part can be called individually
 
+if [[ $USER -eq "root" ]]; then
+    echo $0 should not be called as root
+    exit 1
+fi
+
 IS_CYGWIN=`uname -a|grep -i cygwin`
 IS_LINUX=`uname -a|grep -i Linux`
 
