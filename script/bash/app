@@ -56,3 +56,5 @@ libfreeimageplus-dev
 libglm-dev
 libglm-doc
 python3-doc
+libdevil-dev
+libminizip-dev

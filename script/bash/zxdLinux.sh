@@ -3,7 +3,7 @@
 #personal script to init system(cygwin or ubuntu), init ubuntu can be slow, so i divide it into 5 secionts, apt install, repo clone, resource download, cfg apt,
 #, install script. each part can be called individually
 
-if [[ $USER -eq "root" ]]; then
+if [[ $USER == "root" ]]; then
     echo $0 should not be called as root
     exit 1
 fi
@@ -99,9 +99,6 @@ fi
 echo '************************************************************'
 echo init bash
 
-if [[ $IS_LINUX ]]; then
-    sudo buildSymbolicLink ${CFG_HOME}/.zxdLinuxBashrc ~/.zxdBashrc
-fi
 
 if [[ $IS_CYGWIN ]]; then
     buildSymbolicLink ${CFG_HOME}/.zxdCygwinBashrc ~/.zxdBashrc
@@ -111,10 +108,6 @@ if [[ $IS_CYGWIN ]]; then
     buildSymbolicLink /cygdrive/g/issue ~/issue
 fi
 
-if ! grep zxdBashrc ~/.bashrc ; then
-    echo source ~/.zxdBashrc >> ~/.bashrc
-    source ~/.bashrc
-fi
 
 if [[ $IS_LINUX && $DO_APT ]]; then
     echo '************************************************************'
@@ -153,7 +146,15 @@ fi
 
 if [[ $DO_CFG ]]; then
     echo '************************************************************'
-    echo cfg app
+    echo config
+
+    buildSymbolicLink ${CFG_HOME}/.zxdLinuxBashrc ~/.zxdBashrc
+
+    if ! grep zxdBashrc ~/.bashrc ; then
+        echo source ~/.zxdBashrc >> ~/.bashrc
+        source ~/.bashrc
+    fi
+
     echo init silver light
     buildSymbolicLink ${CFG_HOME}/.agignore ~/.agignore
     echo init mercurial
