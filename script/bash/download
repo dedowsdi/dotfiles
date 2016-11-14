@@ -2,3 +2,4 @@ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim  ~/.config/n
 http://pilotfiber.dl.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.tar.bz2 ~/Downloads/boost_1_58_0.tar.bz2
 http://mirror.bit.edu.cn/qtproject/archive/qt/5.7/5.7.0/qt-opensource-linux-x64-5.7.0.run ~/Downloads/qt-opensource-linux-x64-5.7.0.run
 https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta-64-bit.deb ~/Downloads/lantern64.deb
+http://download.blender.org/release/Blender2.76/blender-2.76b-linux-glibc211-x86_64.tar.bz2 ~/Downloads/blender-2.76b-linux-glibc211-x86_64.tar.bz2
