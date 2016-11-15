@@ -58,3 +58,5 @@ libglm-doc
 python3-doc
 libdevil-dev
 libminizip-dev
+apitrace
+apitrace-gui
