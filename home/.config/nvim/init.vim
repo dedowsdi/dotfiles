@@ -325,8 +325,7 @@ let g:clang_format#style_options = {
       \ "Standard" : "C++11",
       \ "SortIncludes": "false",
       \}
-nnoremap <leader>cf :ClangFormat<CR>
-nnoremap <F11> :ClangFormat<CR>
+noremap <leader>cf :ClangFormat<CR>
 
 " ------------------------------------------------------------------------------
 " solarized

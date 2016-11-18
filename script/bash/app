@@ -60,3 +60,4 @@ libdevil-dev
 libminizip-dev
 apitrace
 apitrace-gui
+gdb-doc
