@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#personal script to init system(cygwin or ubuntu), init ubuntu can be slow, so i divide it into 5 secionts, apt install, repo clone, resource download, cfg apt,
-#, install script. each part can be called individually
-
 if [[ $USER == "root" ]]; then
     echo $0 should not be called as root
     exit 1
@@ -29,7 +26,7 @@ APACHE_WEB=/var/www/html
 if [[ -d ~/.config/nvim/autoload ]]; then
     mkdir -p ~/.config/nvim/autoload
     mkdir -p ~/.config/nvim/plugged
-    mkdir ~/.vimbak
+    mkdir -p ~/.vimbak
 fi
 
 if [[ $# == 0 ]]; then
@@ -39,6 +36,7 @@ if [[ $# == 0 ]]; then
     DO_REPO=1
     DO_CFG=1
     DO_DOWNLOAD=1
+    DO_PIP3=1
 fi
 
 #add ppa
@@ -49,7 +47,7 @@ if ! [[ $? -eq 0 ]] ; then
     sudo apt update
 fi
 
-while getopts ":arcds" Option
+while getopts ":arcdsp" Option
 do
     case $Option in
         s     ) DO_SCRIPT=1  ;;
@@ -57,6 +55,7 @@ do
         r     ) DO_REPO=1 ;;
         c     ) DO_CFG=1  ;;
         d     ) DO_DOWNLOAD=1  ;;
+        p     ) DO_PIP3=1  ;;
         *     ) echo "Unimplemented option:${Option} " ; exit 1 ;;
     esac
 done
@@ -199,6 +198,20 @@ if [[ $DO_CFG ]]; then
     sudo buildSymbolicLink /usr/share/doc/python3-doc/html /var/www/html/python3
     sudo buildSymbolicLink /usr/share/doc/libglfw3-doc/html /var/www/html/glfw3
     sudo buildSymbolicLink /usr/share/doc/opengl-4-html-doc /var/www/html/opengl4
+fi
+
+if [[ $DO_PIP3 ]]; then
+    echo '************************************************************'
+    echo pip3
+    piplist=`pip3 list`
+    for pkg in `cat ${CFG_SCRIPT}/pip3` ; do
+        elemIn $pkg $piplist
+        if [[ $? == 0 ]]; then
+            echo $pkg exists, skip
+        else
+            pip3 install $pkg
+        fi
+    done
 fi
 
 echo done
