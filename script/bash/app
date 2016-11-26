@@ -53,6 +53,7 @@ tree
 minizip
 libdevil-dev
 libfreeimageplus-dev
+libfreeimageplus-doc
 libglm-dev
 libglm-doc
 python3-doc
