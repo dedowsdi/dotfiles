@@ -44,6 +44,7 @@ ls /etc/apt/sources.list.d/neovim* >/dev/null 2>&1
 if ! [[ $? -eq 0 ]] ; then
     echo add neovim ppa
     sudo add-apt-repository -y ppa:neovim-ppa/unstable
+    sudo add-apt-repository -y ppa:graphics-drivers/ppa
     sudo apt update
 fi
 
