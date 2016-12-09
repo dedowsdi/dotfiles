@@ -402,7 +402,8 @@ let g:fzf_action = {
       \ 'ctrl-x': 'split',
       \ 'ctrl-v': 'vertical rightbelow split',
       \ 'ctrl-a': 'argedit',
-      \ 'ctrl-o': '!gvfs-open'
+      \ 'ctrl-o': '!gvfs-open',
+      \ 'ctrl-q': '!qapitrace'
       \ }
 let g:fzf_layout = {"up":'~40%'}
 nnoremap <c-p><c-p> :Files<CR>
