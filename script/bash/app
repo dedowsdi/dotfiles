@@ -32,6 +32,7 @@ libstdc++6-4.7-doc
 libtinyxml-dev
 libxaw7-dev
 libzzip-dev
+libgif-dev
 lldb
 lua5.3
 mesa-utils
@@ -62,3 +63,4 @@ libminizip-dev
 apitrace
 apitrace-gui
 gdb-doc
+graphviz

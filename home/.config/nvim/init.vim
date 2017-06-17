@@ -45,6 +45,7 @@ set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(ex
 let &backup = !has("vms")       "set auto backup
 set cpoptions+=d                "let tags use current dir
 set wildignore=*.o,tags,TAGS            "ignore obj files
+set wildmode=longest,list       "just like bash
 set mps+=<:>                    "add match pair for < and >
 set pastetoggle=<F9>
 let g:terminal_scrollback_buffer_size=5000
@@ -138,6 +139,9 @@ onoremap am :normal vam<CR>
 vnoremap im :<C-U>silent! call misc#selectSmallWord()<CR>
 onoremap im :normal vam<CR>
 
+"some cpp head file has no extension
+:nnoremap <leader>t :set filetype=cpp<CR>
+
 " ------------------------------------------------------------------------------
 " small functions
 " ------------------------------------------------------------------------------
@@ -186,13 +190,16 @@ command! -nargs=0 JrmBlankLines :%s/\v^\s*$\n//ge
 "save project information
 command! -nargs=0 JsaveProject :mksession! script/session.vim
 command! -nargs=+ Google :call <SID>google(<f-args>)
+"super write
+command! -nargs=0 SW :w !sudo tee % > /dev/null
 
 "TODO this setting was overwrited by some plugin, figure out which one.  This
 "job is current done in misc#misc
-autocmd FileType c,cpp,objc,vim setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
+autocmd FileType c,cpp,objc,vim,glsl setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
 autocmd FileType json setlocal shiftwidth=2 tabstop=2 expandtab
 autocmd FileType sh setlocal textwidth=160
 autocmd FileType cmake setlocal textwidth=160
+
 
 " ------------------------------------------------------------------------------
 " plugin
@@ -438,12 +445,16 @@ autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-ar
 command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
 "TODO add map to search visual content
 
-let s:fzf_btags_cmd = 'ctags -f - --sort=no --excmd=number --c++-kinds=+p '
+"add function prototype to c++. language-force is needed when c++ head has no
+"extension
+let s:fzf_btags_cmd = 'ctags -f - --sort=no --excmd=number --c++-kinds=+p  --language-force='
 let s:fzf_btags_options = {'options' : '--reverse -m -d "\t" --with-nth 1,4.. -n 1,-1 --prompt "BTags> "'}
 function! s:fzf_cpp_tags()
-call fzf#vim#buffer_tags(
-      \ "",[s:fzf_btags_cmd . expand('%:S')],
-      \ extend(copy(g:fzf_layout), s:fzf_btags_options))
+  let ft = &filetype 
+  if ft == 'cpp' | let ft = 'c++'  | endif
+  call fzf#vim#buffer_tags(
+        \ "",[s:fzf_btags_cmd . ft . ' ' . expand('%:S')],
+        \ extend(copy(g:fzf_layout), s:fzf_btags_options))
 endfunction
 
 function! s:fzf(fzf_default_cmd, cmd)

@@ -1,6 +1,15 @@
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 eval `dircolors ~/.dir_colors/dircolors`
 export PATH=${PATH}:/usr/local/bin/script:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
 export PYTHONPATH=${PYTHONPATH}:~/study/python/util
 # let C-x C-e call nvim
 export EDITOR=nvim
+export OSG_DIR=/usr/local
+export OSGDIR=/usr/local
+export OSG_FILE_PATH=/usr/local/source/OpenSceneGraph-Data
+export OSG_LIBRARY_PATH=/usr/local/lib64/osgPlugins-3.4.0
+export FZF_DEFAULT_COMMAND='find .'
+export OSG_NOTIFY_LEVEL=NOTICE
+
 alias go=gvfs-open
