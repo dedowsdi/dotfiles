@@ -48,6 +48,7 @@ set wildignore=*.o,tags,TAGS            "ignore obj files
 set wildmode=longest,list       "just like bash
 set mps+=<:>                    "add match pair for < and >
 set pastetoggle=<F9>
+set nrformats=octal,hex,bin
 let g:terminal_scrollback_buffer_size=5000
 iab s8 --------------------------------------------------------------------------------
 
@@ -213,7 +214,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }  "awesommmmmmm
 Plug 'junegunn/fzf.vim'
 Plug 'altercation/vim-colors-solarized'   "color scheme
 Plug 'tpope/vim-surround'             " sourounding
-Plug 'jiangmiao/auto-pairs'           " auto close pair
+"Plug 'jiangmiao/auto-pairs'           " auto close pair
 "Plug 'docunext/closetag.vim'          " auto close tag
 Plug 'scrooloose/nerdcommenter'       " comment helper
 Plug 'SirVer/ultisnips'               " snippet
