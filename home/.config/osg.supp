@@ -1,0 +1,19 @@
+{
+   osg graphics window 0 
+   Memcheck:Param
+   writev(vector[...])
+   fun:__writev_nocancel
+   obj:/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0
+   obj:/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0
+   fun:xcb_writev
+   fun:_XSend
+   fun:_XReply
+   fun:XInternAtom
+   fun:_ZN9osgViewer17GraphicsWindowX1133setWindowDecorationImplementationEb
+   fun:_ZN9osgViewer14GraphicsWindow19setWindowDecorationEb
+   fun:_ZN9osgViewer17GraphicsWindowX1112createWindowEv
+   fun:_ZN9osgViewer17GraphicsWindowX114initEv
+   fun:_ZN9osgViewer17GraphicsWindowX11C1EPN3osg15GraphicsContext6TraitsE
+   fun:_ZN27X11WindowingSystemInterface21createGraphicsContextEPN3osg15GraphicsContext6TraitsE
+   fun:_ZN3osg15GraphicsContext21createGraphicsContextEPNS0_6TraitsE
+}

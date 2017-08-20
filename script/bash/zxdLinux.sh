@@ -45,6 +45,7 @@ if ! [[ $? -eq 0 ]] ; then
     echo add neovim ppa
     sudo add-apt-repository -y ppa:neovim-ppa/stable
     sudo add-apt-repository -y ppa:graphics-drivers/ppa
+    sudo add-apt-repository -y ppa:zeal-developers/ppa
     sudo apt update
 fi
 
@@ -57,7 +58,7 @@ do
         c     ) DO_CFG=1  ;;
         d     ) DO_DOWNLOAD=1  ;;
         p     ) DO_PIP3=1  ;;
-        *     ) echo "Unimplemented option:${Option} " ; exit 1 ;;
+        *     ) echo "Unimplemented option:$Option" ; exit 1 ;;
     esac
 done
 shift $((OPTIND-1))
@@ -71,6 +72,13 @@ source ${CFG_SCRIPT}/zxdUtil.sh
 if [[ IS_LINUX ]]; then
     echo found linux
     if [[ DO_SCRIPT ]]; then
+        if [[ -f ~/.bash_aliases ]]; then
+            echo create ~/.bash_aliases
+            touch ~/.bash_aliases
+        fi
+        if ! grep glvalgrind ~/.bash_aliases ; then
+            echo "alias glvalgrind='valgrind --gen-suppressions=all --leak-check=full --num-callers=40 --log-file=valgrind.txt --suppressions="`echo ~`"/.config/opengl.supp  --suppressions="`echo ~`"/.config/osg.supp  --error-limit=no -v'">>~/.bash_aliases
+        fi
         echo install script
         for item in `ls ${CFG_SCRIPT}/*.sh` ; do
             exename=`basename $item .sh`

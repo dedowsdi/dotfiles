@@ -49,6 +49,7 @@ set wildmode=longest,list       "just like bash
 set mps+=<:>                    "add match pair for < and >
 set pastetoggle=<F9>
 set nrformats=octal,hex,bin
+set cinoptions=l1               " case indent
 let g:terminal_scrollback_buffer_size=5000
 iab s8 --------------------------------------------------------------------------------
 
@@ -143,6 +144,25 @@ onoremap im :normal vam<CR>
 "some cpp head file has no extension
 :nnoremap <leader>t :set filetype=cpp<CR>
 
+"it should be \tv, but v is not convinent
+noremap <leader>tt :call <SID>tagSplit('', 'v')<CR>
+noremap <leader>th :call <SID>tagSplit('', 'h')<CR>
+
+" split open first exact match
+" itemName, 'v'|'h'
+function! s:tagSplit(itemName, splitType)
+  let items = taglist('^'.a:itemName.'$')
+  if len(items) < 1
+    echo itemName . ' not found'    
+    return
+  endif
+  let splitCmd = a:splitType == 'v' ? 'rightbelow vsplit' : 'sp'
+  exec splitCmd items[0].filename
+  exec items[0].cmd
+  normal! zz
+endfunction
+
+
 " ------------------------------------------------------------------------------
 " small functions
 " ------------------------------------------------------------------------------
@@ -200,7 +220,6 @@ autocmd FileType c,cpp,objc,vim,glsl setlocal shiftwidth=2 tabstop=2 expandtab t
 autocmd FileType json setlocal shiftwidth=2 tabstop=2 expandtab
 autocmd FileType sh setlocal textwidth=160
 autocmd FileType cmake setlocal textwidth=160
-
 
 " ------------------------------------------------------------------------------
 " plugin
@@ -414,8 +433,13 @@ let g:fzf_action = {
       \ 'ctrl-q': '!qapitrace'
       \ }
 let g:fzf_layout = {"up":'~40%'}
-nnoremap <c-p><c-p> :Files<CR>
-nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*"', ':Files') <CR>
+" project file, exclude hg, git, build
+nnoremap <c-p><c-p> :call <SID>fzf('find  . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <CR>
+" all project file
+nnoremap <c-p><c-e> :call <SID>fzf('find  . -type f ', ':Files') <CR>
+" project file, exclude hg, git, build. Follow symbolic.
+nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <CR>
+" all project file. Follow symbolic.
 nnoremap <c-p><c-a> :call <SID>fzf('find -L . -type f', ':Files') <CR>
 nnoremap <c-p><c-g> :GitFiles<CR>
 "nnoremap <c-p><c-g>? :GitFiles?<CR>
@@ -425,8 +449,10 @@ nnoremap <c-p><c-b> :Buffers<CR>
 "nnoremap <c-p><c-l> :Lines<CR>
 nnoremap <c-p><c-l> :BLines<CR>
 nnoremap <c-p><c-t> :Tags<CR>
+command! -nargs=* Ctags :call <SID>fzf_cpp_tags(<q-args>)
+nnoremap <c-p><c-k> :Ctags<CR>
 nnoremap <c-p><c-j> :BTags<CR>
-autocmd! FileType cpp  nnoremap <buffer> <c-p><c-j> : call <SID>fzf_cpp_tags()<CR>
+autocmd! FileType cpp  nnoremap <buffer> <c-p><c-j> :call <SID>fzf_cpp_btags()<CR>
 "nnoremap <c-p><c-j> :BTags<CR>
 "nnoremap <c-p><c-m> :Marks<CR>
 nnoremap <c-p><c-w> :Windows<CR>
@@ -442,21 +468,35 @@ nnoremap <c-p><c-m> :Maps<CR>
 "nnoremap <c-p>h :Helptags<CR>
 "nnoremap <c-p>f :Filetypes<CR>
 
+
 autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
 command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
 "TODO add map to search visual content
 
-"add function prototype to c++. language-force is needed when c++ head has no
-"extension
-let s:fzf_btags_cmd = 'ctags -f - --sort=no --excmd=number --c++-kinds=+p  --language-force='
-let s:fzf_btags_options = {'options' : '--reverse -m -d "\t" --with-nth 1,4.. -n 1,-1 --prompt "BTags> "'}
-function! s:fzf_cpp_tags()
-  let ft = &filetype 
-  if ft == 'cpp' | let ft = 'c++'  | endif
+"type, scope, signagure, inheritance
+let s:fzf_btags_cmd = 'ctags -f - --excmd=number --sort=no --fields=KsSi --kinds-c++=+p --links=yes --language-force=c++'
+"ignore filename. Be careful here, -1 is tag file name, must added by fzf somehow.
+let s:fzf_btags_options = {'options' : '--no-reverse -m -d "\t" --tiebreak=begin --with-nth 1,4.. -n .. --prompt "Ctags> "'}
+"there exists an extra field which i don't know how to control in fzf#vim#tags,
+"that's why it use 1,4..-2
+let s:fzf_tags_options = {'options' : '--no-reverse -m -d "\t" --tiebreak=begin --with-nth 1,4..-2 -n .. --prompt "Ctags> "'}
+
+function! s:fzf_cpp_btags()
   call fzf#vim#buffer_tags(
-        \ "",[s:fzf_btags_cmd . ft . ' ' . expand('%:S')],
+        \ "",[s:fzf_btags_cmd . ' ' . expand('%:S')],
         \ extend(copy(g:fzf_layout), s:fzf_btags_options))
 endfunction
+
+function! s:fzf_cpp_tags(...)
+  let query = get(a:000, 0, '')
+  "if query == ''
+     "let query = expand('<cword>') 
+  "endif
+  call fzf#vim#tags(
+        \ query, 
+        \ extend(copy(g:fzf_layout), s:fzf_tags_options))
+endfunction
+
 
 function! s:fzf(fzf_default_cmd, cmd)
   let oldcmds = $FZF_DEFAULT_COMMAND | try
