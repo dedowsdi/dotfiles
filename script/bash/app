@@ -64,3 +64,5 @@ apitrace
 apitrace-gui
 gdb-doc
 graphviz
+autoconf
+shellcheck

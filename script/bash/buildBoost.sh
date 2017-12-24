@@ -7,4 +7,4 @@
     --with-thread \
     --with-atomic \
     --with-chrono
-ln -s `pwd` /var/www/html/boost 
+ln -s "$(pwd)" /var/www/html/boost 

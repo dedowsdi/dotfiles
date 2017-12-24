@@ -8,12 +8,6 @@ fi
 fileName=$1
 linkName=$2
 
-if [[ -h $linkName && `readlink $linkName` == $fileName ]]; then
-    #do nothing if it already exists
-    echo symbolic link ${linkName}'->'${fileName} exists
-    exit 0
-fi
-
-echo build symbolic link : ${linkName}'->'${fileName}
-ln -s $fileName $linkName
+echo build symbolic link : "${linkName}"'->'"${fileName}"
+ln -fs "$fileName" "$linkName"
 exit $?

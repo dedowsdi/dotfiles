@@ -2,7 +2,6 @@ TAGS
 tags
 build
 dependencies
-vimScript
 *.swp
 __pycache__
 .ropeproject

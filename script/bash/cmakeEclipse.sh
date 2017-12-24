@@ -6,4 +6,4 @@ if [ $# -lt 1 ] ; then
 fi
 
 src=$1
-cmake -G"Eclipse CDT4 - Unix Makefiles" $src
+cmake -G"Eclipse CDT4 - Unix Makefiles" "$src"

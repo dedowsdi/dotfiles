@@ -1,11 +1,11 @@
 " Remove ALL autocommands for the current group.
 "autocmd!
-let g:python3_host_prog = "/usr/bin/python3"
+let g:python3_host_prog = '/usr/bin/python3'
 
 " ------------------------------------------------------------------------------
 " basic setting
 " ------------------------------------------------------------------------------
-if has("Win32")
+if has('Win32')
    let &shada = "!,'200,<50,s10,h,rA:,rB:"
 else
    let &shada="!,'200,<50,s10,h"
@@ -42,7 +42,7 @@ set hidden                      "allow hidden without trailing #
 set path+=/usr/local/include,**/**          "set up find path, find in all subdirectories
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
-let &backup = !has("vms")       "set auto backup
+let &backup = !has('vms')       "set auto backup
 set cpoptions+=d                "let tags use current dir
 set wildignore=*.o,tags,TAGS            "ignore obj files
 set wildmode=longest,list       "just like bash
@@ -65,8 +65,8 @@ nnoremap __ :edit ~/.config/nvim/init.vim<CR>
 nmap _j <c-v>_j
 nmap _k <c-v>_k
 "vertical block with start not at cursor
-vnoremap _j :<c-u>call misc#visualEnd("misc#verticalSearch", {"direction":"j", "greedy":1})<cr>
-vnoremap _k :<c-u>call misc#visualEnd("misc#verticalSearch", {"direction":"k", "greedy":1})<cr>
+vnoremap _j :<c-u>call misc#visualEnd("misc#verticalSearch", {'direction':'j', 'greedy':1})<cr>
+vnoremap _k :<c-u>call misc#visualEnd("misc#verticalSearch", {'direction':'k', 'greedy':1})<cr>
 
 " quickfix
 nnoremap ]q :cnext<cr>zz
@@ -96,8 +96,26 @@ nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
-nnoremap <m-cr> :call misc#term#terminal({"layout":"L", "size":0.5})<CR>
-tnoremap <m-cr> <c-\><c-n>:call misc#term#terminal()<CR>
+nnoremap <m-cr> :call <SID>toggleNeoterm()<CR>
+tnoremap <m-cr> <C-\><C-n>:call <SID>toggleNeoterm()<CR>
+
+" close neoterm or start insert at neoterm
+function! s:toggleNeoterm()
+  if g:neoterm.open == 1
+    Ttoggle 
+    return
+  endif
+
+  try
+    let oldinsert = g:neoterm_autoinsert
+    let g:neoterm_autoinsert = 1
+    Ttoggle
+  finally 
+    let g:neoterm_autoinsert = oldinsert
+  endtry
+endfunction
+let g:neoterm_autoscroll = 1
+
 
 " %% as parent directory of current active file
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
@@ -125,15 +143,15 @@ nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
 vnoremap <Leader>G :<c-u>execute 'Google ' . <SID>getVisual('s')<CR>
 
 " shift
-nnoremap <Leader>[ :call misc#shiftItem({"direction":"h"})<CR>
-nnoremap <Leader>] :call misc#shiftItem({"direction":"l"})<CR>
+nnoremap <Leader>[ :call misc#shiftItem({'direction':'h'})<CR>
+nnoremap <Leader>] :call misc#shiftItem({'direction':'l'})<CR>
 
 " option cycle and toggle
-nnoremap <F10> :call <SID>cycleOption("virtualedit", ['', 'all'])<CR>
+nnoremap <F10> :call <SID>cycleOption('virtualedit', ['', 'all'])<CR>
 
 "text object
 vnoremap aa :<C-U>silent! call misc#selCurArg({})<CR>
-vnoremap ia :<C-U>silent! call misc#selCurArg({"excludeSpace":1})<CR>
+vnoremap ia :<C-U>silent! call misc#selCurArg({'excludeSpace':1})<CR>
 onoremap aa :normal vaa<CR>
 onoremap ia :normal via<CR>
 vnoremap am :<C-U>silent! call misc#selectSmallWord()<CR>
@@ -153,10 +171,10 @@ noremap <leader>th :call <SID>tagSplit('', 'h')<CR>
 function! s:tagSplit(itemName, splitType)
   let items = taglist('^'.a:itemName.'$')
   if len(items) < 1
-    echo itemName . ' not found'    
+    echo a:itemName . ' not found'    
     return
   endif
-  let splitCmd = a:splitType == 'v' ? 'rightbelow vsplit' : 'sp'
+  let splitCmd = a:splitType ==# 'v' ? 'rightbelow vsplit' : 'sp'
   exec splitCmd items[0].filename
   exec items[0].cmd
   normal! zz
@@ -175,7 +193,7 @@ endfunction
 function! s:getVisual(...)
   let type = get(a:000, 0, ' ')
   let temp = @s|norm! gv"sy
-  if type == 's'
+  if type ==# 's'
     let temp = substitute(temp, '\n', ' ', 'g')
   endif
   let [str,@s] = [@s,temp] | return str
@@ -189,11 +207,12 @@ endfunction
 " search in chrome
 function! s:google(...)
   if len(a:000) == 0|return|endif
-  let searchItems = join(a:000, "+")
+  let searchItems = join(a:000, '+')
   silent! execute '!google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
 endfunction
 
 function! s:cycleOption(name, list)
+    let curValue = '' " for vint only
     exec 'let curValue = &'.a:name
     let [index, numValues] = [match(a:list, curValue), len(a:list)]
     let newValue = a:list[(index + 1)%numValues]
@@ -213,28 +232,27 @@ command! -nargs=0 JsaveProject :mksession! script/session.vim
 command! -nargs=+ Google :call <SID>google(<f-args>)
 "super write
 command! -nargs=0 SW :w !sudo tee % > /dev/null
+"view pdf
+:command! -complete=file -nargs=1 Rpdf :r !pdftotext -nopgbrk -layout <q-args> -
+:command! -complete=file -nargs=1 Rpdffmt :r !pdftotext -nopgbrk -layout <q-args> - |fmt -csw78
 
-"TODO this setting was overwrited by some plugin, figure out which one.  This
-"job is current done in misc#misc
-autocmd FileType c,cpp,objc,vim,glsl setlocal shiftwidth=2 tabstop=2 expandtab textwidth=80
-autocmd FileType json setlocal shiftwidth=2 tabstop=2 expandtab
-autocmd FileType sh setlocal textwidth=160
-autocmd FileType cmake setlocal textwidth=160
+autocmd CmdwinEnter * noremap <buffer> <CR> <CR>q:
 
 " ------------------------------------------------------------------------------
 " plugin
 " ------------------------------------------------------------------------------
-set rtp+=~/.fzf,./vimScript
+set rtp+=~/.fzf,./vimScript,~/plugged/cdef
 call plug#begin('~/.config/nvim/plugged')
 "common
 "Plug 'scrooloose/nerdtree'             "tree resource
-"Plug 'scrooloose/syntastic'            "syntatic check
+Plug 'scrooloose/syntastic'            "syntatic check
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }  "awesommmmmmmmmmmmmmmme
 Plug 'junegunn/fzf.vim'
 Plug 'altercation/vim-colors-solarized'   "color scheme
 Plug 'tpope/vim-surround'             " sourounding
 "Plug 'jiangmiao/auto-pairs'           " auto close pair
 "Plug 'docunext/closetag.vim'          " auto close tag
+Plug 'kassio/neoterm'
 Plug 'scrooloose/nerdcommenter'       " comment helper
 Plug 'SirVer/ultisnips'               " snippet
 Plug 'honza/vim-snippets'             " snippets
@@ -268,6 +286,8 @@ Plug 'elzr/vim-json'                  " json
 "syntax
 "Plug 'digitaltoad/vim-jade'           " jade syntax
 Plug 'tikhomirov/vim-glsl'
+Plug 'peanutandchestnut/cdef'
+Plug 'lervag/vimtex'
 call plug#end()
 
 "filetype plugin indent on               " required. To ignore plugin indent changes, instead use: filetype plugin on
@@ -275,38 +295,44 @@ call plug#end()
 " ------------------------------------------------------------------------------
 " syntatic
 " ------------------------------------------------------------------------------
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 
-"it's annoyint to check when write, i preffer manual check, especially for javascript
-"let g:syntastic_mode_map = {
-"\ "mode": "passive",
-"\ "active_filetypes": [],
-"\ "passive_filetypes": [] }
+"disable check when write
+let g:syntastic_mode_map = {
+\ 'mode': 'passive',
+\ 'active_filetypes': ['glsl', 'sh'],
+\ 'passive_filetypes': [] }
 
-"let g:syntastic_always_populate_loc_list = 1
-"let g:syntastic_auto_loc_list = 1
-"let g:syntastic_check_on_open = 1
-"let g:syntastic_check_on_wq = 0
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 0
 "let g:syntastic_auto_jump = 1
 
 "let g:syntastic_javascript_closurecompiler_path = '/usr/bin/compiler.jar'
 "autocmd FileType javascript let b:syntastic_checkers = ['closurecompiler','jshint']
-""autocmd FileType cpp let b:syntastic_checkers = ['gcc']
-"nnoremap <F7> :w<CR>:SyntasticCheck<CR>
-"nnoremap <space>j :lnext<CR>
-"nnoremap <space>k :lprevious<CR>
+
+let g:syntastic_shl_checkers = ['shellcheck']
+let g:syntastic_vim_checkers = ['vint']
+let g:syntastic_glsl_checkers = ['glslang']
+let g:syntastic_glsl_extensions = {
+            \ 'vs.glsl': 'gpu_vp',
+            \ 'fs.glsl': 'gpu_fp'
+            \ }
+
+nnoremap <F31> :w <bar> call SyntasticCheck()<CR>
 
 " ------------------------------------------------------------------------------
 " ultisnips
 " ------------------------------------------------------------------------------
-let g:UltiSnipsExpandTrigger="<m-k>"
-let g:UltiSnipsJumpForwardTrigger="<Down>"
-let g:UltiSnipsJumpBackwardTrigger="<Up>"
+let g:UltiSnipsExpandTrigger='<m-k>'
+let g:UltiSnipsJumpForwardTrigger='<Down>'
+let g:UltiSnipsJumpBackwardTrigger='<Up>'
 
 " If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
+let g:UltiSnipsEditSplit='vertical'
 
 " ------------------------------------------------------------------------------
 " ycm
@@ -315,7 +341,7 @@ let g:ycm_confirm_extra_conf = 0
 let g:ycm_min_num_of_chars_for_completion = 3
 "let g:ycm_auto_trigger = 0
 "let g:ycm_semantic_triggers = {'c':[], 'cpp':[]}
-let g:ycm_server_python_interpreter = "/usr/bin/python3.5"
+let g:ycm_server_python_interpreter = '/usr/bin/python3.5'
 nnoremap <SPACE>i :YcmCompleter GoToInclude<CR>
 nnoremap <SPACE>d :YcmCompleter GoToDefinition<CR>
 nnoremap <SPACE>c :YcmCompleter GoToDeclaration<CR>
@@ -324,8 +350,7 @@ let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
 
 nnoremap <leader>yd :YcmDiags<CR>
-"C-F7 
-nnoremap <F31> :YcmDiags<CR>
+"nnoremap <F31> :YcmDiags<CR>
 
 " ------------------------------------------------------------------------------
 " easyalign
@@ -339,18 +364,18 @@ nmap ga <Plug>(EasyAlign)
 " vim-clang-format
 " ------------------------------------------------------------------------------
 let g:clang_format#style_options = {
-      \ "AccessModifierOffset" : -2,
-      \ "AllowShortFunctionsOnASingleLine" : "true",
-      \ "AllowShortIfStatementsOnASingleLine" : "true",
-      \ "AllowShortLoopsOnASingleLine" : "true",
-      \ "AlwaysBreakTemplateDeclarations" : "true",
-      \ "AlignAfterOpenBracket" : "false",
-      \ "ContinuationIndentWidth" : 2,
-      \ "IndentWidth" : 2,
-      \ "TabWidth" : 2,
-      \ "UseTab" : "Never",
-      \ "Standard" : "C++11",
-      \ "SortIncludes": "false",
+      \ 'AccessModifierOffset' : -2,
+      \ 'AllowShortFunctionsOnASingleLine' : 'true',
+      \ 'AllowShortIfStatementsOnASingleLine' : 'true',
+      \ 'AllowShortLoopsOnASingleLine' : 'true',
+      \ 'AlwaysBreakTemplateDeclarations' : 'true',
+      \ 'AlignAfterOpenBracket' : 'false',
+      \ 'ContinuationIndentWidth' : 2,
+      \ 'IndentWidth' : 2,
+      \ 'TabWidth' : 2,
+      \ 'UseTab' : 'Never',
+      \ 'Standard' : 'C++11',
+      \ 'SortIncludes': 'false',
       \}
 noremap <leader>cf :ClangFormat<CR>
 
@@ -366,7 +391,7 @@ colorscheme solarized
 "let g:NERDTreeBookmarksFile=$HOME.'/.cache/.NERDTreeBookmarks'
 "let g:NERDTreeShowBookmarks=1
 "let g:NERDTreeShowHidden=1
-"let g:NERDTreeWinPos = "left"
+"let g:NERDTreeWinPos = 'left'
 "let NERDTreeIgnore=['\.swp$', '\~$', '\.pyproj$']
 
 "noremap <Leader>nt :NERDTreeToggle<CR>
@@ -384,7 +409,7 @@ let g:pymode_rope_completion = 0
 "netrw
 "Toggle Vexplore with Ctrl-E
 function! ToggleVExplorer()
-  if exists("t:expl_buf_num")
+  if exists('t:expl_buf_num')
     let expl_win_num = bufwinnr(t:expl_buf_num)
     if expl_win_num != -1
       let cur_win_nr = winnr()
@@ -398,7 +423,7 @@ function! ToggleVExplorer()
   else
     exec '1wincmd w'
     Vexplore
-    let t:expl_buf_num = bufnr("%")
+    let t:expl_buf_num = bufnr('%')
   endif
 endfunction
 map <silent> <leader>n :call ToggleVExplorer()<CR>
@@ -432,7 +457,7 @@ let g:fzf_action = {
       \ 'ctrl-o': '!gvfs-open',
       \ 'ctrl-q': '!qapitrace'
       \ }
-let g:fzf_layout = {"up":'~40%'}
+let g:fzf_layout = {'up':'~40%'}
 " project file, exclude hg, git, build
 nnoremap <c-p><c-p> :call <SID>fzf('find  . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <CR>
 " all project file
@@ -474,7 +499,7 @@ command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
 "TODO add map to search visual content
 
 "type, scope, signagure, inheritance
-let s:fzf_btags_cmd = 'ctags -f - --excmd=number --sort=no --fields=KsSi --kinds-c++=+p --links=yes --language-force=c++'
+let s:fzf_btags_cmd = 'ctags -f - --excmd=number --sort=no --fields=KsSi --kinds-c++=+pUN --links=yes --language-force=c++'
 "ignore filename. Be careful here, -1 is tag file name, must added by fzf somehow.
 let s:fzf_btags_options = {'options' : '--no-reverse -m -d "\t" --tiebreak=begin --with-nth 1,4.. -n .. --prompt "Ctags> "'}
 "there exists an extra field which i don't know how to control in fzf#vim#tags,
@@ -483,7 +508,7 @@ let s:fzf_tags_options = {'options' : '--no-reverse -m -d "\t" --tiebreak=begin 
 
 function! s:fzf_cpp_btags()
   call fzf#vim#buffer_tags(
-        \ "",[s:fzf_btags_cmd . ' ' . expand('%:S')],
+        \ '',[s:fzf_btags_cmd . ' ' . expand('%:S')],
         \ extend(copy(g:fzf_layout), s:fzf_btags_options))
 endfunction
 
@@ -516,7 +541,7 @@ endfunction
 function! s:fzf_ag_expand(cmd)
   let matches = matchlist(a:cmd, '\v(.{-})(\S*)\s*$')
   " readlink, remove trailing linebreak
-  let ecmd = matches[1] . system("readlink -f " . matches[2])[0:-2]
+  let ecmd = matches[1] . system('readlink -f ' . matches[2])[0:-2]
   call s:fzf_ag_raw(ecmd)
 endfunction
 
@@ -538,3 +563,12 @@ let g:neomake_make_maker = {
 "let g:neomake_cpp_clang_maker = {
             "\ 'exe' : 'clang'
             "\ }
+
+" ------------------------------------------------------------------------------
+" cdef
+" ------------------------------------------------------------------------------
+
+" ------------------------------------------------------------------------------
+" vimtex
+" ------------------------------------------------------------------------------
+let g:tex_flavor = 'latex'

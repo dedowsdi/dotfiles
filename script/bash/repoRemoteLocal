@@ -12,4 +12,6 @@ git https://github.com/assimp/assimp.git                             /usr/local/
 git https://github.com/cyrus-and/gdb-dashboard                       /usr/local/source/gdb-dashboard
 git https://github.com/openscenegraph/OpenSceneGraph                 /usr/local/source/OpenSceneGraph
 git https://github.com/openscenegraph/OpenSceneGraph-Data            /usr/local/source/OpenSceneGraph-Data
+git https://github.com/universal-ctags/ctags                         /usr/local/source/ctags
+git https://github.com/g-truc                                        /glm /usr/local/source/glm
 hg  https://bitbucket.org/sinbad/ogre                                /usr/local/source/ogre/ogre2.1

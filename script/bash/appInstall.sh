@@ -5,12 +5,12 @@ if [ $# -lt 1 ] ; then
     exit 1
 fi
 appName=$1
-dse=`dpkg -l $appName | tail -1 | cut -d ' ' -f 1`
+dse=$(dpkg -l "$appName" | tail -1 | cut -d ' ' -f 1)
 if  [[ $dse == ii ]] ; then
-    echo $appName already installed
+    echo "$appName" already installed
     exit 0
 else
-    echo installing $appName
-    apt -y install $appName
+    echo installing "$appName"
+    apt -y install "$appName"
 fi
 exit 0;

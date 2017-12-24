@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tar cpzf /bakup/root`date +%Y%m%d_%H%M`.tgz \
+tar cpzf /bakup/root"$(date +%Y%m%d_%H%M)".tgz \
 	--exclude=/proc \
 	--exclude=/lost+found \
 	--exclude=/bakup \
@@ -18,7 +18,7 @@ tar cpzf /bakup/root`date +%Y%m%d_%H%M`.tgz \
 	--exclude=/tmp \
 	--one-file-system  /
 
-tar cpzf /bakup/boot`date +%Y%m%d_%H%M`.tgz --one-file-system  /boot
+    tar cpzf /bakup/boot"$(date +%Y%m%d_%H%M)".tgz --one-file-system  /boot
 
 #you can retore as :
 # tar -xpzf /path/to/root.tar.gz -C / --numeric-owner
