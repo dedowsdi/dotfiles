@@ -1,0 +1,7 @@
+/usr/share/doc                                   /var/www/html/doc
+/usr/share/doc/cmake-doc/html                    /var/www/html/cmake
+/usr/share/doc/libstdc++6-4.7-doc/libstdc++/html /var/www/html/libstdc++
+/usr/share/doc/python3-doc/html                  /var/www/html/python3
+/usr/share/doc/libglfw3-doc/html                 /var/www/html/glfw3
+/usr/share/doc/opengl-4-html-doc                 /var/www/html/opengl4
+/usr/share/doc/gdb-doc/html/gdb                  /var/www/html/gdb

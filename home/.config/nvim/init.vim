@@ -65,8 +65,8 @@ nnoremap __ :edit ~/.config/nvim/init.vim<CR>
 nmap _j <c-v>_j
 nmap _k <c-v>_k
 "vertical block with start not at cursor
-vnoremap _j :<c-u>call misc#visualEnd("misc#verticalSearch", {'direction':'j', 'greedy':1})<cr>
-vnoremap _k :<c-u>call misc#visualEnd("misc#verticalSearch", {'direction':'k', 'greedy':1})<cr>
+vnoremap _j :<c-u>call myvim#visualEnd("myvim#verticalSearch", {'direction':'j', 'greedy':1})<cr>
+vnoremap _k :<c-u>call myvim#visualEnd("myvim#verticalSearch", {'direction':'k', 'greedy':1})<cr>
 
 " quickfix
 nnoremap ]q :cnext<cr>zz
@@ -101,20 +101,35 @@ tnoremap <m-cr> <C-\><C-n>:call <SID>toggleNeoterm()<CR>
 
 " close neoterm or start insert at neoterm
 function! s:toggleNeoterm()
-  if g:neoterm.open == 1
-    Ttoggle 
+  if neoterm#tab_has_neoterm()
+    call CloseNeoterm()
+  else
+    call OpenNeoterm(1)
+  endif
+endfunction
+let g:neoterm_autoscroll = 1
+
+function! OpenNeoterm(...)
+  let insert = get(a:000, 0, 0)
+  if neoterm#tab_has_neoterm()
     return
   endif
 
-  try
-    let oldinsert = g:neoterm_autoinsert
-    let g:neoterm_autoinsert = 1
-    Ttoggle
-  finally 
-    let g:neoterm_autoinsert = oldinsert
-  endtry
+  let s:neoterm_winrest = winrestcmd()
+  Topen
+  if insert == 1
+    let winid = bufwinid(g:neoterm.last().buffer_id)
+    call win_gotoid(winid)
+    normal! i
+  endif
 endfunction
-let g:neoterm_autoscroll = 1
+
+function! CloseNeoterm()
+  Tclose
+  if has_key(s:, 'neoterm_winrest')
+    exec s:neoterm_winrest
+  endif
+endfunction
 
 
 " %% as parent directory of current active file
@@ -143,20 +158,20 @@ nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
 vnoremap <Leader>G :<c-u>execute 'Google ' . <SID>getVisual('s')<CR>
 
 " shift
-nnoremap <Leader>[ :call misc#shiftItem({'direction':'h'})<CR>
-nnoremap <Leader>] :call misc#shiftItem({'direction':'l'})<CR>
+nnoremap <Leader>[ :call myvim#shiftItem({'direction':'h'})<CR>
+nnoremap <Leader>] :call myvim#shiftItem({'direction':'l'})<CR>
 
 " option cycle and toggle
 nnoremap <F10> :call <SID>cycleOption('virtualedit', ['', 'all'])<CR>
 
 "text object
-vnoremap aa :<C-U>silent! call misc#selCurArg({})<CR>
-vnoremap ia :<C-U>silent! call misc#selCurArg({'excludeSpace':1})<CR>
+vnoremap aa :<C-U>silent! call myvim#selCurArg({})<CR>
+vnoremap ia :<C-U>silent! call myvim#selCurArg({'excludeSpace':1})<CR>
 onoremap aa :normal vaa<CR>
 onoremap ia :normal via<CR>
-vnoremap am :<C-U>silent! call misc#selectSmallWord()<CR>
+vnoremap am :<C-U>silent! call myvim#selectSmallWord()<CR>
 onoremap am :normal vam<CR>
-vnoremap im :<C-U>silent! call misc#selectSmallWord()<CR>
+vnoremap im :<C-U>silent! call myvim#selectSmallWord()<CR>
 onoremap im :normal vam<CR>
 
 "some cpp head file has no extension

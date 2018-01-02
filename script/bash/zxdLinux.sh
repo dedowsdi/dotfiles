@@ -21,12 +21,6 @@ USER_HOME=~
 SCRIPT_INSTALL_DIR=/usr/local/bin
 APACHE_WEB=/var/www/html
 
-if [[ -d ~/.config/nvim/autoload ]]; then
-    mkdir -p ~/.config/nvim/autoload
-    mkdir -p ~/.config/nvim/plugged
-    mkdir -p ~/.vimbak
-fi
-
 if [[ $# == 0 ]]; then
     #do all by default
     DO_APT=
@@ -37,18 +31,7 @@ if [[ $# == 0 ]]; then
     DO_PIP3=
 fi
 
-#add ppa
-ls /etc/apt/sources.list.d/neovim* >/dev/null 2>&1
-if ! [[ $? -eq 0 ]] ; then
-    echo add neovim ppa
-    sudo add-apt-repository -y ppa:neovim-ppa/stable
-    sudo add-apt-repository -y ppa:graphics-drivers/ppa
-    sudo add-apt-repository -y ppa:zeal-developers/ppa
-    sudo apt update
-fi
-
-while getopts ":arcdsp" Option
-do
+while getopts ":arcdsp" Option ; do
     case $Option in
         s     ) DO_SCRIPT=''  ;;
         a     ) DO_APT=''  ;;
@@ -64,62 +47,59 @@ shift $((OPTIND-1))
 echo '************************************************************'
 echo preparing
 
+mkdir -p ~/.config/nvim/autoload
+mkdir -p ~/.config/nvim/plugged
+mkdir -p ~/.vimbak
+
+#add ppa
+while read ppaAddress ppaPattern ; do
+    if [[ -z "$(find /etc/apt/sources.list.d/ -maxdepth 1 -name "$ppaPattern" -print -quit)"  ]] ; then
+        sudo add-apt-repository -y "$ppaAddress"
+        needUpdate=
+    fi
+    if [[ -v needUpdate ]] ; then
+        sudo apt update
+    fi
+done<"${CFG_SCRIPT}/ppa"
+
 echo include util
 source "${CFG_SCRIPT}/zxdUtil.sh"
 
-    echo found linux
-    if [[ -v DO_SCRIPT ]]; then
-        if [[ -f ~/.bash_aliases ]]; then
-            echo create ~/.bash_aliases
-            touch ~/.bash_aliases
-        fi
-        if ! grep glvalgrind ~/.bash_aliases ; then
-            echo "alias glvalgrind='valgrind --gen-suppressions=all --leak-check=full --num-callers=40 --log-file=valgrind.txt
-            --suppressions=$USER_HOME/.config/opengl.supp  --suppressions=$USER_HOME/.config/osg.supp  --error-limit=no -v'">>~/.bash_aliases
-        fi
-        echo install script
-        for item in $(globs "${CFG_SCRIPT}"/*.sh) ; do
-            exename=$(basename "$item" .sh)
-            if ! [[ -h "${SCRIPT_INSTALL_DIR}/$exename" ]]; then
-                sudo buildSymbolicLink "$item" 
-                #on a new machine, everything script to be installed before they can be sued, includes buildSymbolicLink
-                fileName=$item
-                linkName=${SCRIPT_INSTALL_DIR}/$exename
-
-                if [[ -h $linkName && $(readlink "$linkName") == "$fileName" ]]; then
-                    #do nothing if it already exists
-                    echo symbolic link "${linkName}"'->'"${fileName}" exists
-                    return 0
-                fi
-
-                echo build symbolic link : "${linkName}"'->'"${fileName}"
-                sudo ln -s "$fileName" "$linkName"
-            fi
-        done
+if [[ -v DO_SCRIPT ]]; then
+    if [[ ! -e ~/.bash_aliases ]]; then
+        echo create ~/.bash_aliases
+        touch ~/.bash_aliases
     fi
+    if ! grep glvalgrind ~/.bash_aliases ; then
+        echo "alias glvalgrind='valgrind --gen-suppressions=all --leak-check=full --num-callers=40 --log-file=valgrind.txt
+        --suppressions=$USER_HOME/.config/opengl.supp  --suppressions=$USER_HOME/.config/osg.supp  --error-limit=no -v'">>~/.bash_aliases
+    fi
+    echo install script
+    for item in  "${CFG_SCRIPT}"/*.sh ; do
+        fileName=$item
+        linkName=${SCRIPT_INSTALL_DIR}/$(basename "$item" .sh)
+        sudo ln -vfs "$fileName" "$linkName"
+    done
+fi
 
 echo '************************************************************'
 echo init bash
 
-
-if [[ $IS_CYGWIN ]]; then
-    buildSymbolicLink "${CFG_HOME}"/.zxdCygwinBashrc ~/.zxdBashrc
-    echo create symbolic links to windows
-    buildSymbolicLink /cygdrive/f ~/study
-    buildSymbolicLink /cygdrive/g/doc ~/doc
-    buildSymbolicLink /cygdrive/g/issue ~/issue
-fi
-
-
-if [[ $IS_LINUX && $DO_APT ]]; then
+if [[ -v DO_APT ]]; then
     echo '************************************************************'
     echo "install app"
     while read app ; do
-        sudo appInstall "$app"
+        dse=$(dpkg -l "$app" | tail -1 | cut -d ' ' -f 1)
+        if  [[ $dse == ii ]] ; then
+            echo "$app" already installed
+        else
+            echo installing "$app"
+            apt -y install "$app"
+        fi
     done < "${CFG_SCRIPT}"/app
 fi
 
-if [[ $DO_REPO ]]; then
+if [[ -v DO_REPO ]]; then
     echo '************************************************************'
     echo get source
     if ! [[ -f ${CFG_SCRIPT}/repoRemoteLocal ]]; then
@@ -128,15 +108,20 @@ if [[ $DO_REPO ]]; then
     fi
 
     while read cmd remote local ; do
-        sudo repoClone "$cmd $remote $local"
+        if [[ -d $local ]]; then
+            echo "$local" exists
+        else
+            sudo "$cmd" clone "$remote" "$local"
+        fi
     done < "${CFG_SCRIPT}"/repoRemoteLocal
 fi
 
 # own and grp of downloaded 
-if [[ $DO_DOWNLOAD ]]; then
+if [[ -v DO_DOWNLOAD ]]; then
     while read link target ; do
+        # --create-dirs doesn't work if target starts with ~, i have to expan it
         target=$(eval echo "$target")
-        if  [[ -f $target ]]; then
+        if  [[ -e $target ]]; then
             echo "$target exists"
         else
             echo "downloading from $link to $target"
@@ -145,32 +130,30 @@ if [[ $DO_DOWNLOAD ]]; then
     done < "${CFG_SCRIPT}"/download
 fi
 
-if [[ $DO_CFG ]]; then
+if [[ -v DO_CFG ]]; then
     echo '************************************************************'
     echo config
 
-    buildSymbolicLink "${CFG_HOME}"/.zxdLinuxBashrc ~/.zxdBashrc
+    for item in "${CFG_HOME}"/* ; do
+        filename="${item##*/}"
+        if [[ -f $item && $filename != ".gitconfig" ]]; then
+            ln -vfs "$item" ~/"${item##*/}"
+        fi
+    done
 
     if ! grep zxdBashrc ~/.bashrc ; then
-        echo source ~/.zxdBashrc >> ~/.bashrc
+        echo source ~/.zxdBashrc>>~/.bashrc
         source ~/.bashrc
     fi
 
-    echo init silver light
-    buildSymbolicLink "${CFG_HOME}"/.agignore ~/.agignore
-    echo init mercurial
-    buildSymbolicLink "${CFG_HOME}"/.hgignore ~/.hgignore
     echo init git
-    #gitconfig will expand ~, it'd better to just copy it
+    #gitconfig will need to expand ~, it'd better to just copy it
     cp "${CFG_HOME}"/.gitconfig ~/.gitconfig
-    buildSymbolicLink "${CFG_HOME}"/.gitignore ~/.gitignore
     sudo git config --global core.excludesfile ~/.gitignore
-    echo init personal develop template
-    buildSymbolicLink "${CFG_HOME}"/.template ~/.template
-    buildSymbolicLink "${CFG_HOME}"/.vimrc ~/.vimrc
-    buildSymbolicLink "${CFG_HOME}"/.config/nvim/init.vim ~/.config/nvim/init.vim
-    sudo chmod 777 ~/.vimrc
-    sudo chmod 777 ~/.config/nvim/init.vim
+
+    ln -vfs "${CFG_HOME}"/.config/nvim/init.vim ~/.config/nvim/init.vim
+    sudo chmod 755 ~/.vimrc
+    sudo chmod 755 ~/.config/nvim/init.vim
 
     #add localhost servername
     echo init apache2
@@ -185,15 +168,14 @@ if [[ $DO_CFG ]]; then
         sudo mv ${APACHE_WEB}/index.html ${APACHE_WEB}/apache.html
     fi
 
-    sudo buildSymbolicLink /usr/share/doc/cmake-doc/html /var/www/html/cmake
-    sudo buildSymbolicLink /usr/share/doc/libstdc++6-4.7-doc/libstdc++/html /var/www/html/c++
-    sudo buildSymbolicLink /usr/share/doc /var/www/html/doc
-    sudo buildSymbolicLink /usr/share/doc/python3-doc/html /var/www/html/python3
-    sudo buildSymbolicLink /usr/share/doc/libglfw3-doc/html /var/www/html/glfw3
-    sudo buildSymbolicLink /usr/share/doc/opengl-4-html-doc /var/www/html/opengl4
+    while read filename link; do
+        #statements
+        sudo ln -vfs "$filename" "$link"
+    done<"${CFG_SCRIPT}"/apache
+
 fi
 
-if [[ $DO_PIP3 ]]; then
+if [[ -v DO_PIP3 ]]; then
     echo '************************************************************'
     echo pip3
     piplist=$(pip3 list)
@@ -204,7 +186,7 @@ if [[ $DO_PIP3 ]]; then
         else
             pip3 install "$pkg"
         fi
-    done
+    done<"${CFG_SCRIPT}/"pip3
 fi
 
 echo "done"

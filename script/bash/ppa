@@ -1,0 +1,3 @@
+ppa:neovim-ppa/stable     neovim*.list
+ppa:graphics-drivers/ppa  graphics-drivers*.list
+ppa:zeal-developers/ppa   zeal-developers*.list
