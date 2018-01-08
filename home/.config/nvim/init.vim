@@ -96,41 +96,6 @@ nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
-nnoremap <m-cr> :call <SID>toggleNeoterm()<CR>
-tnoremap <m-cr> <C-\><C-n>:call <SID>toggleNeoterm()<CR>
-
-" close neoterm or start insert at neoterm
-function! s:toggleNeoterm()
-  if neoterm#tab_has_neoterm()
-    call CloseNeoterm()
-  else
-    call OpenNeoterm(1)
-  endif
-endfunction
-let g:neoterm_autoscroll = 1
-
-function! OpenNeoterm(...)
-  let insert = get(a:000, 0, 0)
-  if neoterm#tab_has_neoterm()
-    return
-  endif
-
-  let s:neoterm_winrest = winrestcmd()
-  Topen
-  if insert == 1
-    let winid = bufwinid(g:neoterm.last().buffer_id)
-    call win_gotoid(winid)
-    normal! i
-  endif
-endfunction
-
-function! CloseNeoterm()
-  Tclose
-  if has_key(s:, 'neoterm_winrest')
-    exec s:neoterm_winrest
-  endif
-endfunction
-
 
 " %% as parent directory of current active file
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
@@ -174,12 +139,9 @@ onoremap am :normal vam<CR>
 vnoremap im :<C-U>silent! call myvim#selectSmallWord()<CR>
 onoremap im :normal vam<CR>
 
-"some cpp head file has no extension
-:nnoremap <leader>t :set filetype=cpp<CR>
-
 "it should be \tv, but v is not convinent
-noremap <leader>tt :call <SID>tagSplit('', 'v')<CR>
-noremap <leader>th :call <SID>tagSplit('', 'h')<CR>
+"noremap <leader>tt :call <SID>tagSplit('', 'v')<CR>
+"noremap <leader>th :call <SID>tagSplit('', 'h')<CR>
 
 " split open first exact match
 " itemName, 'v'|'h'
@@ -194,7 +156,6 @@ function! s:tagSplit(itemName, splitType)
   exec items[0].cmd
   normal! zz
 endfunction
-
 
 " ------------------------------------------------------------------------------
 " small functions
@@ -267,7 +228,6 @@ Plug 'altercation/vim-colors-solarized'   "color scheme
 Plug 'tpope/vim-surround'             " sourounding
 "Plug 'jiangmiao/auto-pairs'           " auto close pair
 "Plug 'docunext/closetag.vim'          " auto close tag
-Plug 'kassio/neoterm'
 Plug 'scrooloose/nerdcommenter'       " comment helper
 Plug 'SirVer/ultisnips'               " snippet
 Plug 'honza/vim-snippets'             " snippets
@@ -294,9 +254,10 @@ Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
 " javascript related
-Plug 'pangloss/vim-javascript'        " javascript support
-Plug 'othree/html5.vim'               " html5
-Plug 'elzr/vim-json'                  " json
+Plug 'pangloss/vim-javascript'        
+Plug 'othree/html5.vim'               
+Plug 'elzr/vim-json'                  
+Plug 'mattn/emmet-vim'
 "Plug 'marijnh/tern_for_vim'           " javascript autocomplete support
 "syntax
 "Plug 'digitaltoad/vim-jade'           " jade syntax
@@ -357,9 +318,9 @@ let g:ycm_min_num_of_chars_for_completion = 3
 "let g:ycm_auto_trigger = 0
 "let g:ycm_semantic_triggers = {'c':[], 'cpp':[]}
 let g:ycm_server_python_interpreter = '/usr/bin/python3.5'
-nnoremap <SPACE>i :YcmCompleter GoToInclude<CR>
-nnoremap <SPACE>d :YcmCompleter GoToDefinition<CR>
-nnoremap <SPACE>c :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>ygi :YcmCompleter GoToInclude<CR>
+nnoremap <leader>ygd :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>ygc :YcmCompleter GoToDeclaration<CR>
 " default ycm cfg file
 let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1

@@ -94,7 +94,7 @@ if [[ -v DO_APT ]]; then
             echo "$app" already installed
         else
             echo installing "$app"
-            apt -y install "$app"
+            sudo apt -y install "$app"
         fi
     done < "${CFG_SCRIPT}"/app
 fi
@@ -134,10 +134,10 @@ if [[ -v DO_CFG ]]; then
     echo '************************************************************'
     echo config
 
-    for item in "${CFG_HOME}"/* ; do
+    for item in $(shopt -s dotglob && echo "${CFG_HOME}"/*) ; do
         filename="${item##*/}"
         if [[ -f $item && $filename != ".gitconfig" ]]; then
-            ln -vfs "$item" ~/"${item##*/}"
+            ln -vfs "$item" ~/"$filename"
         fi
     done
 
@@ -152,8 +152,8 @@ if [[ -v DO_CFG ]]; then
     sudo git config --global core.excludesfile ~/.gitignore
 
     ln -vfs "${CFG_HOME}"/.config/nvim/init.vim ~/.config/nvim/init.vim
-    sudo chmod 755 ~/.vimrc
-    sudo chmod 755 ~/.config/nvim/init.vim
+    sudo chmod 777 ~/.vimrc
+    sudo chmod 777 ~/.config/nvim/init.vim
 
     #add localhost servername
     echo init apache2
