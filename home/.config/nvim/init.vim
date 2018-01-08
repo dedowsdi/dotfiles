@@ -217,7 +217,7 @@ autocmd CmdwinEnter * noremap <buffer> <CR> <CR>q:
 " ------------------------------------------------------------------------------
 " plugin
 " ------------------------------------------------------------------------------
-set rtp+=~/.fzf,./vimScript,~/plugged/cdef
+set rtp+=~/.fzf
 call plug#begin('~/.config/nvim/plugged')
 "common
 "Plug 'scrooloose/nerdtree'             "tree resource
@@ -239,6 +239,7 @@ Plug 'junegunn/vim-easy-align'         " align
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'peanutandchestnut/misc'
+Plug 'peanutandchestnut/cdef'
 "git
 "Plug 'tpope/vim-fugitive'             " git wrapper
 "c++ related
@@ -249,7 +250,6 @@ Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
 Plug 'peanutandchestnut/mycpp'        "c++ implement , reorder, function objects
-Plug 'peanutandchestnut/ogre2script'
 Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
