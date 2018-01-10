@@ -53,6 +53,15 @@ set cinoptions=l1               " case indent
 let g:terminal_scrollback_buffer_size=5000
 iab s8 --------------------------------------------------------------------------------
 
+set grepprg=ag\ --vimgrep\ $*
+set grepformat=%f:%l:%c:%m
+
+vnoremap LG  y:call LiteralGrep(@")<CR>
+
+function! LiteralGrep(str)
+  exec printf('grep -F %s', myvim#literalize(a:str, 0))
+endfunction
+
 " ------------------------------------------------------------------------------
 " map
 " <leader>f start map will be saved for project specific map
@@ -109,7 +118,7 @@ xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
 nnoremap <Leader>sw :%s/\v<>/
 nnoremap <Leader>sW :%s/\v<>/
 " replace selection, us \V regex mode
-xnoremap <Leader>s :<C-u>%s/\V=escape(<SID>getVisual(), '/\')/
+xnoremap <Leader>s :<C-u>%s/\V=escape(myvim#getVisualString(), '/\')/
 
 " highlight
 nnoremap <Leader>hr :set cursorline!<CR>
@@ -120,7 +129,7 @@ nnoremap <Leader>ww :call <SID>smartSplit()<CR>
 
 " google
 nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
-vnoremap <Leader>G :<c-u>execute 'Google ' . <SID>getVisual('s')<CR>
+vnoremap <Leader>G :<c-u>execute 'Google ' . myvim#getVisualString()<CR>
 
 " shift
 nnoremap <Leader>[ :call myvim#shiftItem({'direction':'h'})<CR>
@@ -165,19 +174,9 @@ function! s:smartSplit()
   exec 'rightbelow ' . direction
 endfunction
 
-"[type:s]
-function! s:getVisual(...)
-  let type = get(a:000, 0, ' ')
-  let temp = @s|norm! gv"sy
-  if type ==# 's'
-    let temp = substitute(temp, '\n', ' ', 'g')
-  endif
-  let [str,@s] = [@s,temp] | return str
-endfunction
-
 function! s:VSetSearch()
   "record @s, restore later
-  let @/ = '\V' . escape(s:getVisual(), '/\')
+  let @/ = '\V' . myvim#literalize(myvim#getVisualString(), 2)
 endfunction
 
 " search in chrome
@@ -249,7 +248,6 @@ Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 "Plug 'Shougo/deoplete.nvim'
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
-Plug 'peanutandchestnut/mycpp'        "c++ implement , reorder, function objects
 Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
@@ -429,7 +427,7 @@ let g:fzf_action = {
       \ 'ctrl-t': 'tab split',
       \ 'ctrl-x': 'split',
       \ 'ctrl-v': 'vertical rightbelow split',
-      \ 'ctrl-a': 'argedit',
+      \ 'ctrl-a': 'argadd',
       \ 'ctrl-o': '!gvfs-open',
       \ 'ctrl-q': '!qapitrace'
       \ }
@@ -472,6 +470,9 @@ nnoremap <c-p><c-m> :Maps<CR>
 
 autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
 command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
+command! -nargs=* -complete=file LF :call LiteralFzf(<q-args>)
+command! -nargs=* -complete=file FF :call s:fzf_file(<q-args>)
+vnoremap LF y:call LiteralFzf(@")<CR>
 "TODO add map to search visual content
 
 "type, scope, signagure, inheritance
@@ -498,7 +499,6 @@ function! s:fzf_cpp_tags(...)
         \ extend(copy(g:fzf_layout), s:fzf_tags_options))
 endfunction
 
-
 function! s:fzf(fzf_default_cmd, cmd)
   let oldcmds = $FZF_DEFAULT_COMMAND | try
     let $FZF_DEFAULT_COMMAND = a:fzf_default_cmd
@@ -519,6 +519,21 @@ function! s:fzf_ag_expand(cmd)
   " readlink, remove trailing linebreak
   let ecmd = matches[1] . system('readlink -f ' . matches[2])[0:-2]
   call s:fzf_ag_raw(ecmd)
+endfunction
+
+function! s:fzf_file(cmd)
+  let opts = {
+  \ 'source':  a:cmd,
+  \ 'options': ['--ansi', 
+  \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
+  \             '--color', 'hl:68,hl+:110']
+  \}
+  call fzf#run(fzf#wrap(opts))
+endfunction
+
+function! LiteralFzf(str)
+  let cmd = printf('-F %s', myvim#literalize(a:str, 1))
+  call s:fzf_ag_raw(cmd)
 endfunction
 
 " ------------------------------------------------------------------------------
