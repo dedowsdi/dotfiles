@@ -71,3 +71,5 @@ libboost-filesystem-dev
 libboost-datetime-dev
 libboost-program-options-dev
 libboost-log-dev
+except
+jq

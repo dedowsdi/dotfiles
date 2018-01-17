@@ -25,9 +25,9 @@ if [[ $# == 0 ]]; then
     #do all by default
     DO_APT=
     DO_SCRIPT=
-    DO_REPO=
+    #DO_DOWNLOAD=
+    #DO_REPO=
     DO_CFG=
-    DO_DOWNLOAD=
     DO_PIP3=
 fi
 
@@ -147,9 +147,15 @@ if [[ -v DO_CFG ]]; then
     fi
 
     echo init git
-    #gitconfig will need to expand ~, it'd better to just copy it
+    #gitconfig will  expand ~, it'd better to just copy it
     cp "${CFG_HOME}"/.gitconfig ~/.gitconfig
-    sudo git config --global core.excludesfile ~/.gitignore
+    git config --global core.excludesfile ~/.gitignore
+    if [[  -e ~/.config/nvim/autoload/plug.vim ]]; then
+        echo plug.vim exists
+    else
+        curl -fLo  ~/.config/nvim/autoload/plug.vim \
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    fi
 
     ln -vfs "${CFG_HOME}"/.config/nvim/init.vim ~/.config/nvim/init.vim
     sudo chmod 777 ~/.vimrc

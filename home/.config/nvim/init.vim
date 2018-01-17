@@ -50,15 +50,16 @@ set mps+=<:>                    "add match pair for < and >
 set pastetoggle=<F9>
 set nrformats=octal,hex,bin
 set cinoptions=l1               " case indent
+set mouse=a
 let g:terminal_scrollback_buffer_size=5000
 iab s8 --------------------------------------------------------------------------------
 
 set grepprg=ag\ --vimgrep\ $*
 set grepformat=%f:%l:%c:%m
 
-vnoremap LG  y:call LiteralGrep(@")<CR>
+vnoremap GL y:call GrepLiteral(@")<CR>
 
-function! LiteralGrep(str)
+function! GrepLiteral(str)
   exec printf('grep -F %s', myvim#literalize(a:str, 0))
 endfunction
 
@@ -100,11 +101,12 @@ tnoremap <A-h> <C-\><C-n><C-w>h
 tnoremap <A-j> <C-\><C-n><C-w>j
 tnoremap <A-k> <C-\><C-n><C-w>k
 tnoremap <A-l> <C-\><C-n><C-w>l
-tnoremap <C-\><C-n> <C-\><C-n>?\S<CR>
+"tnoremap <C-\><C-n> <C-\><C-n>?\S<CR>
 nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
+tnoremap <C-n> <C-\><C-n>
 
 " %% as parent directory of current active file
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
@@ -276,7 +278,7 @@ set statusline+=%*
 "disable check when write
 let g:syntastic_mode_map = {
 \ 'mode': 'passive',
-\ 'active_filetypes': ['glsl', 'sh'],
+\ 'active_filetypes': ['sh'],
 \ 'passive_filetypes': [] }
 
 let g:syntastic_always_populate_loc_list = 1
@@ -318,7 +320,7 @@ let g:ycm_min_num_of_chars_for_completion = 3
 let g:ycm_server_python_interpreter = '/usr/bin/python3.5'
 nnoremap <leader>ygi :YcmCompleter GoToInclude<CR>
 nnoremap <leader>ygd :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>ygc :YcmCompleter GoToDeclaration<CR>
+nnoremap <F12> :YcmCompleter GoToDeclaration<CR>
 " default ycm cfg file
 let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
@@ -451,7 +453,7 @@ nnoremap <c-p><c-t> :Tags<CR>
 command! -nargs=* Ctags :call <SID>fzf_cpp_tags(<q-args>)
 nnoremap <c-p><c-k> :Ctags<CR>
 nnoremap <c-p><c-j> :BTags<CR>
-autocmd! FileType cpp  nnoremap <buffer> <c-p><c-j> :call <SID>fzf_cpp_btags()<CR>
+autocmd! FileType cpp,glsl nnoremap <buffer> <c-p><c-j> :call <SID>fzf_cpp_btags()<CR>
 "nnoremap <c-p><c-j> :BTags<CR>
 "nnoremap <c-p><c-m> :Marks<CR>
 nnoremap <c-p><c-w> :Windows<CR>
@@ -466,13 +468,14 @@ nnoremap <c-p><c-c> :Commands<CR>
 nnoremap <c-p><c-m> :Maps<CR>
 "nnoremap <c-p>h :Helptags<CR>
 "nnoremap <c-p>f :Filetypes<CR>
+nnoremap <F36> :call <SID>fzf_search_tag(expand('<cword>'), {'kind':'p'})<CR>
 
-
-autocmd! VimEnter * command! -nargs=* -complete=file Ag :call s:fzf_ag_raw(<q-args>)
-command! -nargs=* -complete=file Ae :call s:fzf_ag_expand(<q-args>)
-command! -nargs=* -complete=file LF :call LiteralFzf(<q-args>)
-command! -nargs=* -complete=file FF :call s:fzf_file(<q-args>)
-vnoremap LF y:call LiteralFzf(@")<CR>
+autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<q-args>)
+command! -nargs=* -complete=file Fae :call s:fzf_ag_expand(<q-args>)
+command! -nargs=+ -complete=file Fal :call s:fzf_ag_literal(<f-args>)
+command! -nargs=* -complete=file Ff :call s:fzf_file(<q-args>)
+command! -nargs=1 -complete=file Ftp :call s:fzf_search_tag(<f-args>, {'kind':'p'})
+vnoremap FL y:call <SID>fzf_ag_literal(@")<CR>
 "TODO add map to search visual content
 
 "type, scope, signagure, inheritance
@@ -531,7 +534,44 @@ function! s:fzf_file(cmd)
   call fzf#run(fzf#wrap(opts))
 endfunction
 
-function! LiteralFzf(str)
+function! s:fzf_tag_sink(line)
+  let items = split(a:line, '\t')
+  call myvim#open(items[-2])
+  exec items[-1]
+endfunction
+
+" name, [{"kind":,}]
+function! s:fzf_search_tag(name, ...)
+
+  if a:name =~# '\v^\s*$'
+    echom 'tag name should not has only blank'
+    return
+  endif
+
+  let tagOpts = get(a:000, 0, {})
+  let tags = taglist(printf('\v^%s$', a:name))
+  if has_key(tagOpts, 'kind')
+    call filter(tags, printf('v:val.kind =~# ''\v^%s''', tagOpts.kind))
+  endif
+
+  let source = []
+  for tag in tags
+    let source += [printf("%s\t%s\t%s\t%s\t%s", 
+                \ tag.name, tag.kind, get(tag, 'signature', ''), tag.filename, tag.cmd)]
+  endfor
+
+  let opts = {
+  \ 'source':  source,
+  \ 'options': ['--ansi', 
+  \             '--color', 'hl:68,hl+:110',
+  \             '--with-nth=..-3'],
+  \ 'sink' : function("s:fzf_tag_sink")
+  \}
+
+  call fzf#run(fzf#wrap(opts))
+endfunction
+
+function! s:fzf_ag_literal(str)
   let cmd = printf('-F %s', myvim#literalize(a:str, 1))
   call s:fzf_ag_raw(cmd)
 endfunction
