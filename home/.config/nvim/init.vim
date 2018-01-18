@@ -39,7 +39,7 @@ set expandtab           "always expand tab, tab is evil
 set sessionoptions+=unix,slash  "use unix /, so the session can be open by both windows and unix
 set hidden                      "allow hidden without trailing #
 "set nowrap                     " no line wrap
-set path+=/usr/local/include,**/**          "set up find path, find in all subdirectories
+set path+=/usr/local/include,**     "set up find path, find in all subdirectories
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 let &backup = !has('vms')       "set auto backup
@@ -62,6 +62,10 @@ vnoremap GL y:call GrepLiteral(@")<CR>
 function! GrepLiteral(str)
   exec printf('grep -F %s', myvim#literalize(a:str, 0))
 endfunction
+
+vnoremap <leader>lv y:let @"=myvim#literalize(@", 0)<CR>
+vnoremap <leader>lg y:let @"=myvim#literalize(@", 1)<CR>
+vnoremap <leader>lf y:let @"=myvim#literalize(@", 2)<CR>
 
 " ------------------------------------------------------------------------------
 " map
@@ -470,13 +474,12 @@ nnoremap <c-p><c-m> :Maps<CR>
 "nnoremap <c-p>f :Filetypes<CR>
 nnoremap <F36> :call <SID>fzf_search_tag(expand('<cword>'), {'kind':'p'})<CR>
 
-autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<q-args>)
+autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<f-args>)
 command! -nargs=* -complete=file Fae :call s:fzf_ag_expand(<q-args>)
 command! -nargs=+ -complete=file Fal :call s:fzf_ag_literal(<f-args>)
 command! -nargs=* -complete=file Ff :call s:fzf_file(<q-args>)
 command! -nargs=1 -complete=file Ftp :call s:fzf_search_tag(<f-args>, {'kind':'p'})
 vnoremap FL y:call <SID>fzf_ag_literal(@")<CR>
-"TODO add map to search visual content
 
 "type, scope, signagure, inheritance
 let s:fzf_btags_cmd = 'ctags -f - --excmd=number --sort=no --fields=KsSi --kinds-c++=+pUN --links=yes --language-force=c++'
