@@ -1,18 +1,16 @@
 " Remove ALL autocommands for the current group.
 "autocmd!
-let g:python3_host_prog = '/usr/bin/python3'
 
 " ------------------------------------------------------------------------------
 " basic setting
 " ------------------------------------------------------------------------------
-if has('Win32')
-   let &shada = "!,'200,<50,s10,h,rA:,rB:"
-else
-   let &shada="!,'200,<50,s10,h"
+if has('nvim')
+  let g:python3_host_prog = '/usr/bin/python3'
 endif
+let &shada="'200,<50,s10,h"
 set autoindent                  " set auto-indenting on for programming
 set showmatch                   " autoshow matching brackets. works like it does in bbedit.
-set vb                          " turn on "visual bell" - which is much quieter than "audio blink"
+set visualbell                  " turn on "visual bell" - which is much quieter than "audio blink"
 set ruler                       " show the cursor position all the time
 set laststatus=2                " make the last line where the status is two lines deep so you can see status always
 set cmdheight=2
@@ -27,8 +25,8 @@ set incsearch                   "toggle increment search
 set number                      "show line number
 set ignorecase
 set smartcase                   "smart case
-set matchtime=3      "stop at matching of something for 0.25 second
-set fileencodings=utf-8,gbk,cp936       "add chinese support
+set matchtime=3                 "stop at matching of something for 0.3 second
+set fileencodings=ucs-bom,utf-8,utf-16,gbk,big5,gb18030,latin1
 set textwidth=80
 "set termencoding=utf-8
 "set encoding=utf-8
@@ -50,12 +48,13 @@ set mps+=<:>                    "add match pair for < and >
 set pastetoggle=<F9>
 set nrformats=octal,hex,bin
 set cinoptions=l1               " case indent
-set mouse=a
-let g:terminal_scrollback_buffer_size=5000
-iab s8 --------------------------------------------------------------------------------
-
+set mouse=a                     " always use mouse
 set grepprg=ag\ --vimgrep\ $*
 set grepformat=%f:%l:%c:%m
+
+if has('nvim')
+  let g:terminal_scrollback_buffer_size=5000
+endif
 
 vnoremap GL y:call GrepLiteral(@")<CR>
 
@@ -69,11 +68,14 @@ vnoremap <leader>lf y:let @"=myvim#literalize(@", 2)<CR>
 
 " ------------------------------------------------------------------------------
 " map
-" <leader>f start map will be saved for project specific map
 " ------------------------------------------------------------------------------
 
 "nvim cfg 
-nnoremap __ :edit ~/.config/nvim/init.vim<CR>
+if has('nvim')
+  nnoremap __ :edit ~/.config/nvim/init.vim<CR>
+else
+  nnoremap __ :edit ~/.vimrc<CR>
+endif
 
 "vertical block until chop
 nmap _j <c-v>_j
@@ -189,7 +191,12 @@ endfunction
 function! s:google(...)
   if len(a:000) == 0|return|endif
   let searchItems = join(a:000, '+')
-  silent! execute '!google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
+  let cmd = 'google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
+  if has('nvim')
+    call jobstart(cmd)
+  else
+    silent! execute '!' . cmd
+  endif
 endfunction
 
 function! s:cycleOption(name, list)
@@ -224,32 +231,30 @@ autocmd CmdwinEnter * noremap <buffer> <CR> <CR>q:
 " ------------------------------------------------------------------------------
 set rtp+=~/.fzf
 call plug#begin('~/.config/nvim/plugged')
-"common
-"Plug 'scrooloose/nerdtree'             "tree resource
-Plug 'scrooloose/syntastic'            "syntatic check
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }  "awesommmmmmmmmmmmmmmme
+" common
+Plug 'scrooloose/syntastic'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'altercation/vim-colors-solarized'   "color scheme
-Plug 'tpope/vim-surround'             " sourounding
-"Plug 'jiangmiao/auto-pairs'           " auto close pair
-"Plug 'docunext/closetag.vim'          " auto close tag
-Plug 'scrooloose/nerdcommenter'       " comment helper
-Plug 'SirVer/ultisnips'               " snippet
-Plug 'honza/vim-snippets'             " snippets
-Plug 'terryma/vim-multiple-cursors'   " multi curosr
-Plug 'triglav/vim-visual-increment'   " number sequence
+Plug 'junegunn/vim-easy-align'
+Plug 'altercation/vim-colors-solarized'
+Plug 'tpope/vim-surround'
+Plug 'scrooloose/nerdcommenter'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'             " snippets used in ultisnips
+Plug 'terryma/vim-multiple-cursors'
+Plug 'triglav/vim-visual-increment'
 "Plug 'tpope/vim-abolish'              " never used
-Plug 'junegunn/vim-easy-align'         " align
 "Plug 'kana/vim-operator-user'         " recomanded by vim-clang-format
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'peanutandchestnut/misc'
-Plug 'peanutandchestnut/cdef'
-"git
-"Plug 'tpope/vim-fugitive'             " git wrapper
-"c++ related
 Plug 'Valloric/YouCompleteMe'         " auto complete
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+" my own
+Plug 'peanutandchestnut/misc'
+Plug 'peanutandchestnut/cdef'
+" git
+"Plug 'tpope/vim-fugitive'             " git wrapper
+"c++ related
 "Plug 'lyuts/vim-rtags'
 "Plug 'Shougo/deoplete.nvim'
 "Plug 'Shougo/neco-syntax'
@@ -266,11 +271,8 @@ Plug 'mattn/emmet-vim'
 "syntax
 "Plug 'digitaltoad/vim-jade'           " jade syntax
 Plug 'tikhomirov/vim-glsl'
-Plug 'peanutandchestnut/cdef'
-Plug 'lervag/vimtex'
+Plug 'lervag/vimtex'                   " latex
 call plug#end()
-
-"filetype plugin indent on               " required. To ignore plugin indent changes, instead use: filetype plugin on
 
 " ------------------------------------------------------------------------------
 " syntatic
@@ -336,7 +338,7 @@ nnoremap <leader>yd :YcmDiags<CR>
 " easyalign
 " ------------------------------------------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
-vmap <Enter> <Plug>(EasyAlign)
+vmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
@@ -365,48 +367,19 @@ noremap <leader>cf :ClangFormat<CR>
 set t_Co=16
 set background=dark
 colorscheme solarized
-"nerdtree
-"autocmd vimenter * NERDTree
-"autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-"let g:NERDTreeBookmarksFile=$HOME.'/.cache/.NERDTreeBookmarks'
-"let g:NERDTreeShowBookmarks=1
-"let g:NERDTreeShowHidden=1
-"let g:NERDTreeWinPos = 'left'
-"let NERDTreeIgnore=['\.swp$', '\~$', '\.pyproj$']
 
-"noremap <Leader>nt :NERDTreeToggle<CR>
-"noremap <Leader>nf :NERDTreeFind<CR>
-"airline----------------------------------------------------------------------
+" ------------------------------------------------------------------------------
+" airline
+" ------------------------------------------------------------------------------
 let g:airline_theme='solarized'
 let g:airline_powerline_fonts = 1
 "let g:Powerline_symbols = 'fancy'
+
 " ------------------------------------------------------------------------------
 " pymode
 " ------------------------------------------------------------------------------
 let pymode = 1
 let g:pymode_rope_completion = 0
-
-"netrw
-"Toggle Vexplore with Ctrl-E
-function! ToggleVExplorer()
-  if exists('t:expl_buf_num')
-    let expl_win_num = bufwinnr(t:expl_buf_num)
-    if expl_win_num != -1
-      let cur_win_nr = winnr()
-      exec expl_win_num . 'wincmd w'
-      close
-      exec cur_win_nr . 'wincmd w'
-      unlet t:expl_buf_num
-    else
-      unlet t:expl_buf_num
-    endif
-  else
-    exec '1wincmd w'
-    Vexplore
-    let t:expl_buf_num = bufnr('%')
-  endif
-endfunction
-map <silent> <leader>n :call ToggleVExplorer()<CR>
 
 " ------------------------------------------------------------------------------
 " deoplete
@@ -474,7 +447,7 @@ nnoremap <c-p><c-m> :Maps<CR>
 "nnoremap <c-p>f :Filetypes<CR>
 nnoremap <F36> :call <SID>fzf_search_tag(expand('<cword>'), {'kind':'p'})<CR>
 
-autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<f-args>)
+autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<q-args>)
 command! -nargs=* -complete=file Fae :call s:fzf_ag_expand(<q-args>)
 command! -nargs=+ -complete=file Fal :call s:fzf_ag_literal(<f-args>)
 command! -nargs=* -complete=file Ff :call s:fzf_file(<q-args>)
@@ -582,8 +555,8 @@ endfunction
 " ------------------------------------------------------------------------------
 " rtags
 " ------------------------------------------------------------------------------
-let g:rtagsLog = '~/tmp/rtaglog'
-let g:neomake_open_list = 2
+"let g:rtagsLog = '~/tmp/rtaglog'
+"let g:neomake_open_list = 2
 
 " ------------------------------------------------------------------------------
 " neomake
@@ -603,6 +576,6 @@ let g:neomake_make_maker = {
 " ------------------------------------------------------------------------------
 
 " ------------------------------------------------------------------------------
-" vimtex
+" tex
 " ------------------------------------------------------------------------------
 let g:tex_flavor = 'latex'
