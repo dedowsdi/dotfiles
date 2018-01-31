@@ -87,6 +87,7 @@ vnoremap _k :<c-u>call myvim#visualEnd("myvim#verticalSearch", {'direction':'k',
 " quickfix
 nnoremap ]q :cnext<cr>zz
 nnoremap [q :cprev<cr>zz
+nnoremap ]d :call <sid>rm_qf_item()<cr>
 nnoremap ]l :lnext<cr>zz
 nnoremap [l :lprev<cr>zz
 
@@ -208,6 +209,22 @@ function! s:cycleOption(name, list)
     echom a:name . ' : ' . newValue
 endfunction
 
+function! s:reverse_qf_list()
+  call setqflist(reverse(getqflist()))
+endfunction
+
+function! s:rm_qf_item(...)
+  let idx = get(a:000, 0, line('.') - 1)
+  let l = getqflist()
+  if idx >= len(l)
+    echoe 'index overflow'
+    return
+  endif
+  call remove(l, idx)
+  call setqflist(l)
+  call cursor(idx+1, 1)
+endfunction
+
 " ------------------------------------------------------------------------------
 " command
 " ------------------------------------------------------------------------------
@@ -220,6 +237,7 @@ command! -nargs=0 JsaveProject :mksession! script/session.vim
 command! -nargs=+ Google :call <SID>google(<f-args>)
 "super write
 command! -nargs=0 SW :w !sudo tee % > /dev/null
+command! -nargs=0 CreverseQuickfixList call <SID>reverse_qf_list()
 "view pdf
 :command! -complete=file -nargs=1 Rpdf :r !pdftotext -nopgbrk -layout <q-args> -
 :command! -complete=file -nargs=1 Rpdffmt :r !pdftotext -nopgbrk -layout <q-args> - |fmt -csw78
@@ -259,6 +277,8 @@ Plug 'peanutandchestnut/cdef'
 "Plug 'Shougo/deoplete.nvim'
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
+Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'arakashic/chromatica.nvim'
 Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
