@@ -8,6 +8,15 @@ if has('nvim')
   let g:python3_host_prog = '/usr/bin/python3'
 endif
 let &shada="'200,<50,s10,h"
+
+let g:is_wsl = 0
+if has('unix')
+  call system('grep -q "Microsoft" /proc/version')
+  if v:shell_error == 0
+    let g:is_wsl = 1
+  endif
+endif
+
 set autoindent                  " set auto-indenting on for programming
 set showmatch                   " autoshow matching brackets. works like it does in bbedit.
 set visualbell                  " turn on "visual bell" - which is much quieter than "audio blink"
@@ -257,6 +266,8 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'altercation/vim-colors-solarized'
+Plug 'junegunn/seoul256.vim'
+Plug 'dracula/vim'
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdcommenter'
 Plug 'SirVer/ultisnips'
@@ -344,7 +355,7 @@ let g:ycm_confirm_extra_conf = 0
 let g:ycm_min_num_of_chars_for_completion = 3
 "let g:ycm_auto_trigger = 0
 "let g:ycm_semantic_triggers = {'c':[], 'cpp':[]}
-let g:ycm_server_python_interpreter = '/usr/bin/python3.5'
+let g:ycm_server_python_interpreter = '/usr/bin/python3'
 nnoremap <leader>ygi :YcmCompleter GoToInclude<CR>
 nnoremap <leader>ygd :YcmCompleter GoToDefinition<CR>
 nnoremap <F12> :YcmCompleter GoToDeclaration<CR>
@@ -385,18 +396,30 @@ noremap <leader>cf :ClangFormat<CR>
 " ------------------------------------------------------------------------------
 " solarized
 " ------------------------------------------------------------------------------
-" set t_Co=256
-set background=dark
-colorscheme solarized
+if $TERM != 'linux'
+  set t_Co=256
+endif
+
+" use seoul256 in wsl
+if g:is_wsl == 1
+  let g:seoul256_background=235  
+  colorscheme seoul256
+  "colorscheme dracula
+endif
+
+" use solarized in others
+if g:colors_name ==# 'default'
+  colorscheme solarized
+endif
 
 " ------------------------------------------------------------------------------
 " airline
 " ------------------------------------------------------------------------------
-let g:airline_theme='solarized'
 "let g:Powerline_symbols = 'fancy'
-if has('gui_running') || $TERM =~ 'linux'
+if has('gui_running') || $TERM =~ 'linux' || g:is_wsl == 1
   let g:airline_symbols_ascii = 1
 else
+  let g:airline_theme='solarized'
   let g:airline_powerline_fonts = 1
 endif
 " ------------------------------------------------------------------------------
