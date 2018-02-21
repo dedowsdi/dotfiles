@@ -73,3 +73,9 @@ libboost-program-options-dev
 libboost-log-dev
 except
 jq
+dict
+dictd
+dict-gcide
+dict-wn
+dict-devil
+dict-moby-thesaurus

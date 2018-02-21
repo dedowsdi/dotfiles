@@ -56,7 +56,7 @@ if has('nvim')
   let g:terminal_scrollback_buffer_size=5000
 endif
 
-vnoremap GL y:call GrepLiteral(@")<CR>
+" vnoremap GL y:call GrepLiteral(@")<CR>
 
 function! GrepLiteral(str)
   exec printf('grep -F %s', myvim#literalize(a:str, 0))
@@ -69,6 +69,8 @@ vnoremap <leader>lf y:let @"=myvim#literalize(@", 2)<CR>
 " ------------------------------------------------------------------------------
 " map
 " ------------------------------------------------------------------------------
+
+nnoremap Y y$
 
 "nvim cfg 
 if has('nvim')
@@ -185,7 +187,7 @@ endfunction
 
 function! s:VSetSearch()
   "record @s, restore later
-  let @/ = '\V' . myvim#literalize(myvim#getVisualString(), 2)
+  let @/ = '\V' . myvim#literalize(myvim#getVisualString(), 0)
 endfunction
 
 " search in chrome
@@ -278,7 +280,6 @@ Plug 'peanutandchestnut/cdef'
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
 Plug 'octol/vim-cpp-enhanced-highlight'
-Plug 'arakashic/chromatica.nvim'
 Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 "python
 Plug 'klen/python-mode'
@@ -286,7 +287,7 @@ Plug 'klen/python-mode'
 Plug 'pangloss/vim-javascript'        
 Plug 'othree/html5.vim'               
 Plug 'elzr/vim-json'                  
-Plug 'mattn/emmet-vim'
+"Plug 'mattn/emmet-vim'
 "Plug 'marijnh/tern_for_vim'           " javascript autocomplete support
 "syntax
 "Plug 'digitaltoad/vim-jade'           " jade syntax
@@ -351,7 +352,7 @@ nnoremap <F12> :YcmCompleter GoToDeclaration<CR>
 let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
 
-nnoremap <leader>yd :YcmDiags<CR>
+nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
 "nnoremap <F31> :YcmDiags<CR>
 
 " ------------------------------------------------------------------------------
@@ -384,7 +385,7 @@ noremap <leader>cf :ClangFormat<CR>
 " ------------------------------------------------------------------------------
 " solarized
 " ------------------------------------------------------------------------------
-set t_Co=16
+" set t_Co=256
 set background=dark
 colorscheme solarized
 
@@ -392,9 +393,12 @@ colorscheme solarized
 " airline
 " ------------------------------------------------------------------------------
 let g:airline_theme='solarized'
-let g:airline_powerline_fonts = 1
 "let g:Powerline_symbols = 'fancy'
-
+if has('gui_running') || $TERM =~ 'linux'
+  let g:airline_symbols_ascii = 1
+else
+  let g:airline_powerline_fonts = 1
+endif
 " ------------------------------------------------------------------------------
 " pymode
 " ------------------------------------------------------------------------------
