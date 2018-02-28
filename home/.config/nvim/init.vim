@@ -282,6 +282,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'altercation/vim-colors-solarized'
+Plug 'lifepillar/vim-solarized8'
 Plug 'junegunn/seoul256.vim'
 Plug 'dracula/vim'
 Plug 'tpope/vim-surround'
@@ -420,6 +421,9 @@ endif
 
 if s:term ==# 'linux' || s:term ==# 'unix_xterm'
   colorscheme solarized
+elseif s:term ==# 'wsl_xterm'
+  set termguicolors
+  colorscheme solarized8_dark
 else
   let g:seoul256_background=236
   colorscheme seoul256
