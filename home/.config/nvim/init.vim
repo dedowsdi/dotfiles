@@ -9,11 +9,18 @@ if has('nvim')
 endif
 let &shada="'200,<50,s10,h"
 
-let g:is_wsl = 0
-if has('unix')
-  call system('grep -q "Microsoft" /proc/version')
-  if v:shell_error == 0
-    let g:is_wsl = 1
+if 'linux' ==# $TERM
+  let s:term = 'linux'
+else
+  if has('unix')
+    call system('grep -q "Microsoft" /proc/version')
+    if v:shell_error == 0
+      let s:term = 'wsl_xterm'
+    else
+      let s:term = 'unix_xterm'
+    endif
+  else
+    let s:term = "unknown"
   endif
 endif
 
@@ -168,6 +175,10 @@ onoremap am :normal vam<CR>
 vnoremap im :<C-U>silent! call myvim#selectSmallWord()<CR>
 onoremap im :normal vam<CR>
 
+if $TERM == 'linux'
+  vnoremap \y y:call <SID>set_clipboard(@")<CR>
+endif
+
 "it should be \tv, but v is not convinent
 "noremap <leader>tt :call <SID>tagSplit('', 'v')<CR>
 "noremap <leader>th :call <SID>tagSplit('', 'h')<CR>
@@ -234,6 +245,11 @@ function! s:rm_qf_item(...)
   call remove(l, idx)
   call setqflist(l)
   call cursor(idx+1, 1)
+endfunction
+
+function! s:set_clipboard(str)
+  let s = myvim#literalize(a:str, 2)
+  call system(printf("echo '%s' | DISPLAY=:0 xsel -i", s))
 endfunction
 
 " ------------------------------------------------------------------------------
@@ -400,27 +416,24 @@ if $TERM != 'linux'
   set t_Co=256
 endif
 
-" use seoul256 in wsl
-if g:is_wsl == 1
-  let g:seoul256_background=235  
-  colorscheme seoul256
-  "colorscheme dracula
-endif
+" only use solarized in linux
 
-" use solarized in others
-if g:colors_name ==# 'default'
+if s:term ==# 'linux' || s:term ==# 'unix_xterm'
   colorscheme solarized
+else
+  let g:seoul256_background=236
+  colorscheme seoul256
 endif
 
 " ------------------------------------------------------------------------------
 " airline
 " ------------------------------------------------------------------------------
 "let g:Powerline_symbols = 'fancy'
-if has('gui_running') || $TERM =~ 'linux' || g:is_wsl == 1
-  let g:airline_symbols_ascii = 1
-else
+if s:term ==# 'unix_xterm' || s:term ==# 'linux'
   let g:airline_theme='solarized'
   let g:airline_powerline_fonts = 1
+else
+  let g:airline_symbols_ascii = 1
 endif
 " ------------------------------------------------------------------------------
 " pymode
