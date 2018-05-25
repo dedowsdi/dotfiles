@@ -1,5 +1,5 @@
 " Remove ALL autocommands for the current group.
-"autocmd!
+autocmd!
 
 " ------------------------------------------------------------------------------
 " basic setting
@@ -14,18 +14,15 @@ if 'linux' ==# $TERM
 else
   if has('unix')
     call system('grep -q "Microsoft" /proc/version')
-    if v:shell_error == 0
-      let s:term = 'wsl_xterm'
-    else
-      let s:term = 'unix_xterm'
-    endif
+    let s:term = v:shell_error == 0 ?'wsl_xterm' :'unix_xterm'
   else
     let s:term = "unknown"
   endif
 endif
 
 set autoindent                  " set auto-indenting on for programming
-set showmatch                   " autoshow matching brackets. works like it does in bbedit.
+set showmatch                   " autoshow matching brackets.
+set matchtime=3                 " stop at matching of something for 0.3 second
 set visualbell                  " turn on "visual bell" - which is much quieter than "audio blink"
 set ruler                       " show the cursor position all the time
 set laststatus=2                " make the last line where the status is two lines deep so you can see status always
@@ -34,43 +31,36 @@ set backspace=indent,eol,start  " make that backspace key work the way it should
 set background=dark             " Use colours that work well on a dark background (Console is usually black)
 set showmode                    " show the current mode
 syntax enable                   " turn syntax highlighting on by default
-set backupdir=~/.vimbak             "set backup dir
-set history=500                         "keep 500 commands
-set showcmd                     "display incomplete command in low right corner
-set incsearch                   "toggle increment search
-set number                      "show line number
+set backupdir=~/.vimbak         " set backup dir
+"set history=500                " keep 500 commands
+set showcmd                     " display incomplete command in low right corner
+set incsearch                   " toggle increment search
+set number                      " show line number
 set ignorecase
-set smartcase                   "smart case
-set matchtime=3                 "stop at matching of something for 0.3 second
-set fileencodings=ucs-bom,utf-8,utf-16,gbk,big5,gb18030,latin1
+set smartcase
+set fileencodings=ucs-bom,utf-8,gbk,cp936,utf-16,big5,gb18030,latin1
 set textwidth=80
-"set termencoding=utf-8
-"set encoding=utf-8
-"set softtabstop=4              "set tab width to 4
 set tabstop=4
-set shiftwidth=4                "set shift width to 4
-set expandtab           "always expand tab, tab is evil
-set sessionoptions+=unix,slash  "use unix /, so the session can be open by both windows and unix
-set hidden                      "allow hidden without trailing #
+set shiftwidth=4                " set shift width to 4
+set expandtab                   " always expand tab, tab is evil
+set sessionoptions+=unix,slash  " use unix /, so the session can be open by both windows and unix
+set hidden                      " allow hidden without trailing #
 "set nowrap                     " no line wrap
-set path+=/usr/local/include,**     "set up find path, find in all subdirectories
+set path+=/usr/local/include,** " set up find path
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
-let &backup = !has('vms')       "set auto backup
-set cpoptions+=d                "let tags use current dir
-set wildignore=*.o,tags,TAGS            "ignore obj files
-set wildmode=longest,list       "just like bash
-set mps+=<:>                    "add match pair for < and >
+let &backup = !has('vms')       " set auto backup
+set cpoptions+=d                " let tags use current dir
+set wildignore=*.o,tags,TAGS    " ignore obj files
+set wildmode=longest,list       " just like bash
+set mps+=<:>                    " add match pair for < and >
 set pastetoggle=<F9>
 set nrformats=octal,hex,bin
-set cinoptions=l1               " case indent
+" case indent, no accessor indent
+set cinoptions&
 set mouse=a                     " always use mouse
 set grepprg=ag\ --vimgrep\ $*
 set grepformat=%f:%l:%c:%m
-
-if has('nvim')
-  let g:terminal_scrollback_buffer_size=5000
-endif
 
 " vnoremap GL y:call GrepLiteral(@")<CR>
 
@@ -88,12 +78,13 @@ vnoremap <leader>lf y:let @"=myvim#literalize(@", 2)<CR>
 
 nnoremap Y y$
 
-"nvim cfg 
 if has('nvim')
   nnoremap __ :edit ~/.config/nvim/init.vim<CR>
 else
   nnoremap __ :edit ~/.vimrc<CR>
 endif
+
+inoremap <c-e> <c-v><space><esc>x
 
 "vertical block until chop
 nmap _j <c-v>_j
@@ -135,17 +126,17 @@ tnoremap <C-n> <C-\><C-n>
 
 " %% as parent directory of current active file
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
-cnoremap <expr> %t getcmdtype() == ':' ? expand('%:t').'/' : '%t'
+cnoremap <expr> %t getcmdtype() == ':' ? expand('%:t') : '%t'
 
 " visual search
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
 " replace word, WORD, use \v regex mode
 " TODO escape \
-nnoremap <Leader>sw :%s/\v<>/
-nnoremap <Leader>sW :%s/\v<>/
+nnoremap <Leader>sw :%s/\v<<C-R><C-W>>/
+nnoremap <Leader>sW :%s/<C-R>=myvim#literalize(expand('<cWORD>'),0)<CR>/
 " replace selection, us \V regex mode
-xnoremap <Leader>s :<C-u>%s/\V=escape(myvim#getVisualString(), '/\')/
+xnoremap <Leader>s :<C-u>call <SID>VSetSearch()<CR>:%s/<C-R>=@/<CR>/
 
 " highlight
 nnoremap <Leader>hr :set cursorline!<CR>
@@ -156,7 +147,7 @@ nnoremap <Leader>ww :call <SID>smartSplit()<CR>
 
 " google
 nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
-vnoremap <Leader>G :<c-u>execute 'Google ' . myvim#getVisualString()<CR>
+vnoremap <Leader>G :call <SID>google(myvim#getVisualString())<CR>
 
 " shift
 nnoremap <Leader>[ :call myvim#shiftItem({'direction':'h'})<CR>
@@ -213,7 +204,7 @@ endfunction
 " search in chrome
 function! s:google(...)
   if len(a:000) == 0|return|endif
-  let searchItems = join(a:000, '+')
+  let searchItems = shellescape(join(a:000, '+'))
   let cmd = 'google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
   if has('nvim')
     call jobstart(cmd)
@@ -223,12 +214,12 @@ function! s:google(...)
 endfunction
 
 function! s:cycleOption(name, list)
-    let curValue = '' " for vint only
-    exec 'let curValue = &'.a:name
-    let [index, numValues] = [match(a:list, curValue), len(a:list)]
-    let newValue = a:list[(index + 1)%numValues]
-    exec 'let &'.a:name.' = newValue '
-    echom a:name . ' : ' . newValue
+  let curValue = '' " for vint only
+  exec 'let curValue = &'.a:name
+  let [index, numValues] = [match(a:list, curValue), len(a:list)]
+  let newValue = a:list[(index + 1)%numValues]
+  exec 'let &'.a:name.' = newValue '
+  echom a:name . ' : ' . newValue
 endfunction
 
 function! s:reverse_qf_list()
@@ -252,25 +243,27 @@ function! s:set_clipboard(str)
   call system(printf("echo '%s' | DISPLAY=:0 xsel -i", s))
 endfunction
 
+function! s:on_dir_change()
+  if filereadable('.vim/init.vim')
+    source .vim/init.vim
+  endif
+endfunction
+
 " ------------------------------------------------------------------------------
 " command
 " ------------------------------------------------------------------------------
-command! -nargs=0 JrmTrailingSpace :%s/\v\s*$//g
-command! -nargs=0 JrmConsecutiveBlankLines :%s/\v%(^\s*\n){1,}/\r/ge
-command! -nargs=0 JrmGarbages :JrmTrailingSpace | JrmConsecutiveBlankLines
-command! -nargs=0 JrmBlankLines :%s/\v^\s*$\n//ge
 "save project information
 command! -nargs=0 JsaveProject :mksession! script/session.vim
 command! -nargs=+ Google :call <SID>google(<f-args>)
 "super write
 command! -nargs=0 SW :w !sudo tee % > /dev/null
-command! -nargs=0 CreverseQuickfixList call <SID>reverse_qf_list()
+command! -nargs=0 ReverseQuickfixList call <SID>reverse_qf_list()
 "view pdf
 :command! -complete=file -nargs=1 Rpdf :r !pdftotext -nopgbrk -layout <q-args> -
 :command! -complete=file -nargs=1 Rpdffmt :r !pdftotext -nopgbrk -layout <q-args> - |fmt -csw78
 
 autocmd CmdwinEnter * noremap <buffer> <CR> <CR>q:
-
+autocmd DirChanged * call <SID>on_dir_change()
 " ------------------------------------------------------------------------------
 " plugin
 " ------------------------------------------------------------------------------
@@ -284,6 +277,8 @@ Plug 'junegunn/vim-easy-align'
 Plug 'altercation/vim-colors-solarized'
 Plug 'lifepillar/vim-solarized8'
 Plug 'junegunn/seoul256.vim'
+Plug 'chriskempson/base16'
+Plug 'chriskempson/tomorrow-theme'
 Plug 'dracula/vim'
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdcommenter'
@@ -408,7 +403,7 @@ let g:clang_format#style_options = {
       \ 'Standard' : 'C++11',
       \ 'SortIncludes': 'false',
       \}
-noremap <leader>cf :ClangFormat<CR>
+vnoremap <leader>cf :ClangFormat<CR>
 
 " ------------------------------------------------------------------------------
 " solarized
@@ -481,6 +476,8 @@ nnoremap <c-p><c-p> :call <SID>fzf('find  . -type f ! -path "*.hg/*" ! -path "*.
 nnoremap <c-p><c-e> :call <SID>fzf('find  . -type f ', ':Files') <CR>
 " project file, exclude hg, git, build. Follow symbolic.
 nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <CR>
+nnoremap <C-p><C-w> :call fzf#vim#files('.', {'options':'--query '.expand('<cword>')})<CR>
+
 " all project file. Follow symbolic.
 nnoremap <c-p><c-a> :call <SID>fzf('find -L . -type f', ':Files') <CR>
 nnoremap <c-p><c-g> :GitFiles<CR>
@@ -497,7 +494,7 @@ nnoremap <c-p><c-j> :BTags<CR>
 autocmd! FileType cpp,glsl nnoremap <buffer> <c-p><c-j> :call <SID>fzf_cpp_btags()<CR>
 "nnoremap <c-p><c-j> :BTags<CR>
 "nnoremap <c-p><c-m> :Marks<CR>
-nnoremap <c-p><c-w> :Windows<CR>
+"nnoremap <c-p><c-w> :Windows<CR>
 "nnoremap <c-p><c-l> :Locate<CR>
 nnoremap <c-p><c-h> :History<CR>
 "nnoremap <c-p><c-;> :History:<CR>
@@ -509,13 +506,13 @@ nnoremap <c-p><c-c> :Commands<CR>
 nnoremap <c-p><c-m> :Maps<CR>
 "nnoremap <c-p>h :Helptags<CR>
 "nnoremap <c-p>f :Filetypes<CR>
-nnoremap <F36> :call <SID>fzf_search_tag(expand('<cword>'), {'kind':'p'})<CR>
+nnoremap <F36> :call <SID>fzf_search_tag(expand('<cword>'), {'kinds':['c', 's', 'p']})<CR>
 
 autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<q-args>)
 command! -nargs=* -complete=file Fae :call s:fzf_ag_expand(<q-args>)
 command! -nargs=+ -complete=file Fal :call s:fzf_ag_literal(<f-args>)
-command! -nargs=* -complete=file Ff :call s:fzf_file(<q-args>)
-command! -nargs=1 -complete=file Ftp :call s:fzf_search_tag(<f-args>, {'kind':'p'})
+command! -nargs=+ -complete=file Ff :call s:fzf_file(<q-args>)
+command! -nargs=+ Ft :call <SID>fzf_search_tag_kinds(<f-args>)
 vnoremap FL y:call <SID>fzf_ag_literal(@")<CR>
 
 "type, scope, signagure, inheritance
@@ -580,7 +577,11 @@ function! s:fzf_tag_sink(line)
   exec items[-1]
 endfunction
 
-" name, [{"kind":,}]
+function! s:fzf_search_tag_kinds(name, ...)
+   call s:fzf_search_tag(a:name, {'kinds':a:000}) 
+endfunction
+
+" name, [{"kinds":[],}]
 function! s:fzf_search_tag(name, ...)
 
   if a:name =~# '\v^\s*$'
@@ -590,8 +591,9 @@ function! s:fzf_search_tag(name, ...)
 
   let tagOpts = get(a:000, 0, {})
   let tags = taglist(printf('\v^%s$', a:name))
-  if has_key(tagOpts, 'kind')
-    call filter(tags, printf('v:val.kind =~# ''\v^%s''', tagOpts.kind))
+  if has_key(tagOpts, 'kinds')
+    let kinds = join(tagOpts.kinds, '')
+    call filter(tags, printf('v:val.kind =~# ''\v^[%s]''', kinds))
   endif
 
   let source = []
@@ -604,7 +606,7 @@ function! s:fzf_search_tag(name, ...)
   \ 'source':  source,
   \ 'options': ['--ansi', 
   \             '--color', 'hl:68,hl+:110',
-  \             '--with-nth=..-3'],
+  \             '--with-nth=..-2'],
   \ 'sink' : function("s:fzf_tag_sink")
   \}
 
@@ -643,3 +645,6 @@ let g:neomake_make_maker = {
 " tex
 " ------------------------------------------------------------------------------
 let g:tex_flavor = 'latex'
+
+" finish mark
+let g:init_finished = 1

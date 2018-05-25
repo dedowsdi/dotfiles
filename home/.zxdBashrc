@@ -1,4 +1,5 @@
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -z "$ZSH_NAME" ] && [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -n "$ZSH_NAME" ] && [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 eval `dircolors ~/.dir_colors/dircolors`
 export PATH=${PATH}:/usr/local/bin/script:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
@@ -11,6 +12,8 @@ export OSG_FILE_PATH=/usr/local/source/OpenSceneGraph-Data
 export OSG_LIBRARY_PATH=/usr/local/lib64/osgPlugins-3.4.0
 export FZF_DEFAULT_COMMAND='find .'
 export OSG_NOTIFY_LEVEL=NOTICE
+export ESM_DATA="/usr/local/source/openmw/data/Morrowind.esm"
+export BSA_DATA="/usr/local/source/openmw/data/Morrowind.bsa"
 
 alias go=gvfs-open
 

@@ -47,6 +47,10 @@ shift $((OPTIND-1))
 echo '************************************************************'
 echo preparing
 
+if ! [[ -d ~/.oh_my_zsh ]]; then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+fi
+
 mkdir -p ~/.config/nvim/autoload
 mkdir -p ~/.config/nvim/plugged
 mkdir -p ~/.vimbak

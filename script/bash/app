@@ -1,3 +1,4 @@
+zsh
 git
 git-gui
 mercurial
@@ -11,7 +12,6 @@ clang
 clang-format
 dos2unix
 doxygen
-exuberant-ctags
 fcitx-sunpinyin
 ibus-sunpinyin
 freeglut3-dev
@@ -79,3 +79,10 @@ dict-gcide
 dict-wn
 dict-devil
 dict-moby-thesaurus
+qt4-dev-tools
+qt4-doc
+qt4-doc-html
+qt4-qtconfig
+qt4-demos
+qt4-designer
+qt4-qmlviewer
