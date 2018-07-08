@@ -1,5 +1,8 @@
-" Remove ALL autocommands for the current group.
+"a Remove ALL autocommands for the current group.
 autocmd!
+
+" languageClient is still quite rough, ycm is much mutter.
+let g:use_cquery = 0
 
 " ------------------------------------------------------------------------------
 " basic setting
@@ -8,6 +11,7 @@ if has('nvim')
   let g:python3_host_prog = '/usr/bin/python3'
 endif
 let &shada="'200,<50,s10,h"
+let s:emulator = ''
 
 if 'linux' ==# $TERM
   let s:term = 'linux'
@@ -15,8 +19,12 @@ else
   if has('unix')
     call system('grep -q "Microsoft" /proc/version')
     let s:term = v:shell_error == 0 ?'wsl_xterm' :'unix_xterm'
+    let desktopFile = system('printenv GIO_LAUNCHED_DESKTOP_FILE')
+    if desktopFile =~# 'hyper'
+      let s:emulator = 'hyper'
+    endif
   else
-    let s:term = "unknown"
+    let s:term = 'unknown'
   endif
 endif
 
@@ -54,7 +62,6 @@ set cpoptions+=d                " let tags use current dir
 set wildignore=*.o,tags,TAGS    " ignore obj files
 set wildmode=longest,list       " just like bash
 set mps+=<:>                    " add match pair for < and >
-set pastetoggle=<F9>
 set nrformats=octal,hex,bin
 " case indent, no accessor indent
 set cinoptions&
@@ -62,192 +69,15 @@ set mouse=a                     " always use mouse
 set grepprg=ag\ --vimgrep\ $*
 set grepformat=%f:%l:%c:%m
 
-" vnoremap GL y:call GrepLiteral(@")<CR>
-
-function! GrepLiteral(str)
-  exec printf('grep -F %s', myvim#literalize(a:str, 0))
-endfunction
-
-vnoremap <leader>lv y:let @"=myvim#literalize(@", 0)<CR>
-vnoremap <leader>lg y:let @"=myvim#literalize(@", 1)<CR>
-vnoremap <leader>lf y:let @"=myvim#literalize(@", 2)<CR>
-
-" ------------------------------------------------------------------------------
-" map
-" ------------------------------------------------------------------------------
-
-nnoremap Y y$
-
-if has('nvim')
-  nnoremap __ :edit ~/.config/nvim/init.vim<CR>
-else
-  nnoremap __ :edit ~/.vimrc<CR>
-endif
-
-inoremap <c-e> <c-v><space><esc>x
-
-"vertical block until chop
-nmap _j <c-v>_j
-nmap _k <c-v>_k
-"vertical block with start not at cursor
-vnoremap _j :<c-u>call myvim#visualEnd("myvim#verticalSearch", {'direction':'j', 'greedy':1})<cr>
-vnoremap _k :<c-u>call myvim#visualEnd("myvim#verticalSearch", {'direction':'k', 'greedy':1})<cr>
-
-" quickfix
-nnoremap ]q :cnext<cr>zz
-nnoremap [q :cprev<cr>zz
-nnoremap ]d :call <sid>rm_qf_item()<cr>
-nnoremap ]l :lnext<cr>zz
-nnoremap [l :lprev<cr>zz
-
-" buffers
-nnoremap ]b :bnext<cr>
-nnoremap [b :bprev<cr>
-
-" args
-nnoremap ]a :next<cr>
-nnoremap [a :prev<cr>
-
-" tabs
-nnoremap ]t :tabn<cr>
-nnoremap [t :tabp<cr>
-
-"terminal
-tnoremap <A-h> <C-\><C-n><C-w>h
-tnoremap <A-j> <C-\><C-n><C-w>j
-tnoremap <A-k> <C-\><C-n><C-w>k
-tnoremap <A-l> <C-\><C-n><C-w>l
-"tnoremap <C-\><C-n> <C-\><C-n>?\S<CR>
-nnoremap <A-h> <C-w>h
-nnoremap <A-j> <C-w>j
-nnoremap <A-k> <C-w>k
-nnoremap <A-l> <C-w>l
-tnoremap <C-n> <C-\><C-n>
-
-" %% as parent directory of current active file
-cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
-cnoremap <expr> %t getcmdtype() == ':' ? expand('%:t') : '%t'
-
-" visual search
-xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR>
-xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
-" replace word, WORD, use \v regex mode
-" TODO escape \
-nnoremap <Leader>sw :%s/\v<<C-R><C-W>>/
-nnoremap <Leader>sW :%s/<C-R>=myvim#literalize(expand('<cWORD>'),0)<CR>/
-" replace selection, us \V regex mode
-xnoremap <Leader>s :<C-u>call <SID>VSetSearch()<CR>:%s/<C-R>=@/<CR>/
-
-" highlight
-nnoremap <Leader>hr :set cursorline!<CR>
-nnoremap <Leader>hc :set cursorcolumn!<CR>
-noremap <F3> :set hlsearch! hlsearch?<CR>
-
-nnoremap <Leader>ww :call <SID>smartSplit()<CR>
-
-" google
-nnoremap <Leader>G :call <SID>google(expand('<cword>'))<CR>
-vnoremap <Leader>G :call <SID>google(myvim#getVisualString())<CR>
-
-" shift
-nnoremap <Leader>[ :call myvim#shiftItem({'direction':'h'})<CR>
-nnoremap <Leader>] :call myvim#shiftItem({'direction':'l'})<CR>
-
-" option cycle and toggle
-nnoremap <F10> :call <SID>cycleOption('virtualedit', ['', 'all'])<CR>
-
 "text object
-vnoremap aa :<C-U>silent! call myvim#selCurArg({})<CR>
-vnoremap ia :<C-U>silent! call myvim#selCurArg({'excludeSpace':1})<CR>
-onoremap aa :normal vaa<CR>
-onoremap ia :normal via<CR>
-vnoremap am :<C-U>silent! call myvim#selectSmallWord()<CR>
-onoremap am :normal vam<CR>
-vnoremap im :<C-U>silent! call myvim#selectSmallWord()<CR>
-onoremap im :normal vam<CR>
-
-if $TERM == 'linux'
-  vnoremap \y y:call <SID>set_clipboard(@")<CR>
-endif
-
-"it should be \tv, but v is not convinent
-"noremap <leader>tt :call <SID>tagSplit('', 'v')<CR>
-"noremap <leader>th :call <SID>tagSplit('', 'h')<CR>
-
-" split open first exact match
-" itemName, 'v'|'h'
-function! s:tagSplit(itemName, splitType)
-  let items = taglist('^'.a:itemName.'$')
-  if len(items) < 1
-    echo a:itemName . ' not found'    
-    return
-  endif
-  let splitCmd = a:splitType ==# 'v' ? 'rightbelow vsplit' : 'sp'
-  exec splitCmd items[0].filename
-  exec items[0].cmd
-  normal! zz
-endfunction
-
-" ------------------------------------------------------------------------------
-" small functions
-" ------------------------------------------------------------------------------
-function! s:smartSplit()
-  let direction = str2float(winwidth(0))/winheight(0) >= 204.0/59 ? 'vsplit':'split'
-  exec 'rightbelow ' . direction
-endfunction
-
-function! s:VSetSearch()
-  "record @s, restore later
-  let @/ = '\V' . myvim#literalize(myvim#getVisualString(), 0)
-endfunction
-
-" search in chrome
-function! s:google(...)
-  if len(a:000) == 0|return|endif
-  let searchItems = shellescape(join(a:000, '+'))
-  let cmd = 'google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
-  if has('nvim')
-    call jobstart(cmd)
-  else
-    silent! execute '!' . cmd
-  endif
-endfunction
-
-function! s:cycleOption(name, list)
-  let curValue = '' " for vint only
-  exec 'let curValue = &'.a:name
-  let [index, numValues] = [match(a:list, curValue), len(a:list)]
-  let newValue = a:list[(index + 1)%numValues]
-  exec 'let &'.a:name.' = newValue '
-  echom a:name . ' : ' . newValue
-endfunction
-
-function! s:reverse_qf_list()
-  call setqflist(reverse(getqflist()))
-endfunction
-
-function! s:rm_qf_item(...)
-  let idx = get(a:000, 0, line('.') - 1)
-  let l = getqflist()
-  if idx >= len(l)
-    echoe 'index overflow'
-    return
-  endif
-  call remove(l, idx)
-  call setqflist(l)
-  call cursor(idx+1, 1)
-endfunction
-
-function! s:set_clipboard(str)
-  let s = myvim#literalize(a:str, 2)
-  call system(printf("echo '%s' | DISPLAY=:0 xsel -i", s))
-endfunction
-
-function! s:on_dir_change()
-  if filereadable('.vim/init.vim')
-    source .vim/init.vim
-  endif
-endfunction
+vnoremap aa :<C-U>silent! call myvim#selCurArg({})<cr>
+vnoremap ia :<C-U>silent! call myvim#selCurArg({'excludeSpace':1})<cr>
+onoremap aa :normal vaa<cr>
+onoremap ia :normal via<cr>
+vnoremap am :<C-U>silent! call myvim#selectSmallWord()<cr>
+onoremap am :normal vam<cr>
+vnoremap im :<C-U>silent! call myvim#selectSmallWord()<cr>
+onoremap im :normal vam<cr>
 
 " ------------------------------------------------------------------------------
 " command
@@ -262,7 +92,6 @@ command! -nargs=0 ReverseQuickfixList call <SID>reverse_qf_list()
 :command! -complete=file -nargs=1 Rpdf :r !pdftotext -nopgbrk -layout <q-args> -
 :command! -complete=file -nargs=1 Rpdffmt :r !pdftotext -nopgbrk -layout <q-args> - |fmt -csw78
 
-autocmd CmdwinEnter * noremap <buffer> <CR> <CR>q:
 autocmd DirChanged * call <SID>on_dir_change()
 " ------------------------------------------------------------------------------
 " plugin
@@ -270,36 +99,47 @@ autocmd DirChanged * call <SID>on_dir_change()
 set rtp+=~/.fzf
 call plug#begin('~/.config/nvim/plugged')
 " common
-Plug 'scrooloose/syntastic'
+"Plug 'scrooloose/syntastic'
+Plug 'w0rp/ale'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vim-easy-align'
+Plug 'junegunn/goyo.vim'
+Plug 'Yggdroot/indentLine'
 Plug 'altercation/vim-colors-solarized'
 Plug 'lifepillar/vim-solarized8'
-Plug 'junegunn/seoul256.vim'
-Plug 'chriskempson/base16'
-Plug 'chriskempson/tomorrow-theme'
-Plug 'dracula/vim'
+Plug 'chriskempson/base16-vim'
 Plug 'tpope/vim-surround'
+Plug 'tommcdo/vim-exchange'
 Plug 'scrooloose/nerdcommenter'
+" Plug 'tpope/vim-commentary'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'             " snippets used in ultisnips
 Plug 'terryma/vim-multiple-cursors'
 Plug 'triglav/vim-visual-increment'
+Plug 'tpope/vim-unimpaired'
 "Plug 'tpope/vim-abolish'              " never used
 "Plug 'kana/vim-operator-user'         " recomanded by vim-clang-format
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'Valloric/YouCompleteMe'         " auto complete
+Plug 'itchyny/lightline.vim'
+"Plug 'vim-airline/vim-airline'
+"Plug 'vim-airline/vim-airline-themes'
+if g:use_cquery
+  Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+else
+  Plug 'Valloric/YouCompleteMe'         " auto complete
+endif
+"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"Plug 'Shougo/neosnippet.vim'
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 " my own
-Plug 'peanutandchestnut/misc'
-Plug 'peanutandchestnut/cdef'
+Plug 'dedowsdi/misc'
+Plug 'dedowsdi/cdef'
 " git
-"Plug 'tpope/vim-fugitive'             " git wrapper
+Plug 'tpope/vim-fugitive'             " git wrapper
 "c++ related
-"Plug 'lyuts/vim-rtags'
-"Plug 'Shougo/deoplete.nvim'
 "Plug 'Shougo/neco-syntax'
 "Plug 'Shougo/neco-vim'
 Plug 'octol/vim-cpp-enhanced-highlight'
@@ -321,9 +161,9 @@ call plug#end()
 " ------------------------------------------------------------------------------
 " syntatic
 " ------------------------------------------------------------------------------
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
 
 "disable check when write
 let g:syntastic_mode_map = {
@@ -348,14 +188,37 @@ let g:syntastic_glsl_extensions = {
             \ 'fs.glsl': 'gpu_fp'
             \ }
 
-nnoremap <F31> :w <bar> call SyntasticCheck()<CR>
+" ------------------------------------------------------------------------------
+" ale
+" ------------------------------------------------------------------------------
+"
+" Only run linters named in ale_linters settings.
+let g:ale_vim_vint_show_style_issues = 0
+let g:ale_linters_explicit = 1
+
+" you can not disable lint while enable language server, so i turn off auto
+" lint.
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_save = 0
+let g:ale_lint_on_filetype_changed = 0
+
+let g:ale_linters = {
+\   'vim': ['vint'],
+\   'sh': ['shellcheck'],
+\   'glsl' : ['glslang'],
+\   'cpp'  : ['cquery']
+\}
+
+
+
 
 " ------------------------------------------------------------------------------
 " ultisnips
 " ------------------------------------------------------------------------------
-let g:UltiSnipsExpandTrigger='<m-k>'
-let g:UltiSnipsJumpForwardTrigger='<Down>'
-let g:UltiSnipsJumpBackwardTrigger='<Up>'
+let g:UltiSnipsExpandTrigger='<c-s>'
+let g:UltiSnipsJumpForwardTrigger='<c-n>'
+let g:UltiSnipsJumpBackwardTrigger='<c-p>'
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit='vertical'
@@ -368,23 +231,41 @@ let g:ycm_min_num_of_chars_for_completion = 3
 "let g:ycm_auto_trigger = 0
 "let g:ycm_semantic_triggers = {'c':[], 'cpp':[]}
 let g:ycm_server_python_interpreter = '/usr/bin/python3'
-nnoremap <leader>ygi :YcmCompleter GoToInclude<CR>
-nnoremap <leader>ygd :YcmCompleter GoToDefinition<CR>
-nnoremap <F12> :YcmCompleter GoToDeclaration<CR>
 " default ycm cfg file
 let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 let g:ycm_seed_identifiers_with_syntax = 1
 
-nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
-"nnoremap <F31> :YcmDiags<CR>
+" ------------------------------------------------------------------------------
+" languageClient-neovim
+" ------------------------------------------------------------------------------
+let g:LanguageClient_autoStart = 1
+"let g:LanguageClient_loggingLevel = 'DEBUG'
+"let g:LanguageClient_loggingFile = '/tmp/lc_client.log'
+"set completefunc=LanguageClient#complete
+let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings 
+let g:LanguageClient_settingsPath = $HOME.'/.config/nvim/settings.json'
+let g:LanguageClient_serverCommands = {
+    \ 'cpp': ['cquery', ],
+    \ }
+let g:LanguageClient_fzfOptions = ['--ansi', 
+  \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
+  \             '--color', 'hl:68,hl+:110']
+
+" ------------------------------------------------------------------------------
+" deoplete
+" ------------------------------------------------------------------------------
+let g:deoplete#enable_at_startup = 1
+
+" ------------------------------------------------------------------------------
+" neocomplete
+" ------------------------------------------------------------------------------
+"imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+"smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+"xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 " ------------------------------------------------------------------------------
 " easyalign
 " ------------------------------------------------------------------------------
-" Start interactive EasyAlign in visual mode (e.g. vip<Enter>)
-vmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
 
 " ------------------------------------------------------------------------------
 " vim-clang-format
@@ -403,25 +284,34 @@ let g:clang_format#style_options = {
       \ 'Standard' : 'C++11',
       \ 'SortIncludes': 'false',
       \}
-vnoremap <leader>cf :ClangFormat<CR>
 
 " ------------------------------------------------------------------------------
 " solarized
 " ------------------------------------------------------------------------------
-if $TERM != 'linux'
+if $TERM !=# 'linux'
   set t_Co=256
 endif
 
 " only use solarized in linux
 
-if s:term ==# 'linux' || s:term ==# 'unix_xterm'
+if s:emulator ==# 'hyper'
+  "let g:solarized_termcolors=256
+  "set termguicolors
   colorscheme solarized
-elseif s:term ==# 'wsl_xterm'
-  set termguicolors
-  colorscheme solarized8_dark
+  "colorscheme solarized8_dark
+  "let base16colorspace=256
+  "colorscheme base16-solarized-dark
+  "set t_Co=256
 else
-  let g:seoul256_background=236
-  colorscheme seoul256
+  if s:term ==# 'linux' || s:term ==# 'unix_xterm'
+    colorscheme solarized
+  elseif s:term ==# 'wsl_xterm'
+    set termguicolors
+    colorscheme solarized8_dark
+  else
+    let g:seoul256_background=236
+    colorscheme seoul256
+  endif
 endif
 
 " ------------------------------------------------------------------------------
@@ -434,10 +324,25 @@ if s:term ==# 'unix_xterm' || s:term ==# 'linux'
 else
   let g:airline_symbols_ascii = 1
 endif
+
+" ------------------------------------------------------------------------------
+" lightline
+" ------------------------------------------------------------------------------
+let g:lightline = {
+      \ 'colorscheme': 'solarized',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified'] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'fugitive#head'
+      \ },
+      \ }
+
 " ------------------------------------------------------------------------------
 " pymode
 " ------------------------------------------------------------------------------
-let pymode = 1
+"let pymode = 1
 let g:pymode_rope_completion = 0
 
 " ------------------------------------------------------------------------------
@@ -452,7 +357,7 @@ let g:pymode_rope_completion = 0
 " ------------------------------------------------------------------------------
 " unite
 " ------------------------------------------------------------------------------
-"nnoremap <m-u> :<c-u>Unite -start-insert file file_rec/neovim buffer file_mru<CR>
+"nnoremap <m-u> :<c-u>Unite -start-insert file file_rec/neovim buffer file_mru<cr>
 "let g:unite_source_rec_max_cache_files = 50000
 "let g:unite_source_rec_async_command =
 "\ ['ag', '--follow', '--nocolor', '--nogroup',
@@ -471,49 +376,44 @@ let g:fzf_action = {
       \ }
 let g:fzf_layout = {'up':'~40%'}
 " project file, exclude hg, git, build
-nnoremap <c-p><c-p> :call <SID>fzf('find  . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <CR>
 " all project file
-nnoremap <c-p><c-e> :call <SID>fzf('find  . -type f ', ':Files') <CR>
+"nnoremap <c-p><c-e> :call <SID>fzf('find  . -type f ', ':Files') <cr>
 " project file, exclude hg, git, build. Follow symbolic.
-nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <CR>
-nnoremap <C-p><C-w> :call fzf#vim#files('.', {'options':'--query '.expand('<cword>')})<CR>
-
+"nnoremap <c-p><c-f> :call <SID>fzf('find -L . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*"', ':Files') <cr>
 " all project file. Follow symbolic.
-nnoremap <c-p><c-a> :call <SID>fzf('find -L . -type f', ':Files') <CR>
-nnoremap <c-p><c-g> :GitFiles<CR>
-"nnoremap <c-p><c-g>? :GitFiles?<CR>
-nnoremap <c-p><c-b> :Buffers<CR>
-"nnoremap <c-p><c-c> :Colors<CR>
-"nnoremap <c-p><c-a> :Ag<CR>
-"nnoremap <c-p><c-l> :Lines<CR>
-nnoremap <c-p><c-l> :BLines<CR>
-nnoremap <c-p><c-t> :Tags<CR>
-command! -nargs=* Ctags :call <SID>fzf_cpp_tags(<q-args>)
-nnoremap <c-p><c-k> :Ctags<CR>
-nnoremap <c-p><c-j> :BTags<CR>
-autocmd! FileType cpp,glsl nnoremap <buffer> <c-p><c-j> :call <SID>fzf_cpp_btags()<CR>
-"nnoremap <c-p><c-j> :BTags<CR>
-"nnoremap <c-p><c-m> :Marks<CR>
-"nnoremap <c-p><c-w> :Windows<CR>
-"nnoremap <c-p><c-l> :Locate<CR>
-nnoremap <c-p><c-h> :History<CR>
-"nnoremap <c-p><c-;> :History:<CR>
-"nnoremap <c-p><c-/> :History/<CR>
-nnoremap <c-p><c-s> :Snippets<CR>
-"nnoremap <c-p><c-c> :Commits<CR>
-"nnoremap <c-p><c-b>c :BCommits<CR>
-nnoremap <c-p><c-c> :Commands<CR>
-nnoremap <c-p><c-m> :Maps<CR>
-"nnoremap <c-p>h :Helptags<CR>
-"nnoremap <c-p>f :Filetypes<CR>
-nnoremap <F36> :call <SID>fzf_search_tag(expand('<cword>'), {'kinds':['c', 's', 'p']})<CR>
+"nnoremap <c-p><c-a> :call <SID>fzf('find -L . -type f', ':Files') <cr>
+"nnoremap <C-p><C-w> :call fzf#vim#files('.', {'options':'--query '.expand('<cword>')})<cr>
 
+"nnoremap <c-p><c-g> :GitFiles<cr>
+"nnoremap <c-p><c-g>? :GitFiles?<cr>
+"nnoremap <c-p><c-c> :Colors<cr>
+"nnoremap <c-p><c-a> :Ag<cr>
+"nnoremap <c-p><c-l> :Lines<cr>
+"nnoremap <c-p><c-l> :BLines<cr>
+"nnoremap <c-p><c-t> :Tags<cr>
+command! -nargs=* Ctags :call <SID>fzf_cpp_tags(<q-args>)
+"nnoremap <c-p><c-k> :Ctags<cr>
+" autocmd! FileType cpp,glsl nnoremap <buffer> <c-j> :call <SID>fzf_cpp_btags()<cr>
+"nnoremap <c-p><c-m> :Marks<cr>
+"nnoremap <c-p><c-w> :Windows<cr>
+"nnoremap <c-p><c-;> :History:<cr>
+"nnoremap <c-p><c-/> :History/<cr>
+"nnoremap <c-p><c-s> :Snippets<cr>
+"nnoremap <c-p><c-c> :Commits<cr>
+"nnoremap <c-p><c-b>c :BCommits<cr>
+"nnoremap <c-p><c-c> :Commands<cr>
+"nnoremap <c-p><c-m> :Maps<cr>
+"nnoremap <c-p>h :Helptags<cr>
+"nnoremap <c-p>f :Filetypes<cr>
+
+augroup zxd
 autocmd! VimEnter * command! -nargs=* -complete=file Fag :call s:fzf_ag_raw(<q-args>)
+augroup end
 command! -nargs=* -complete=file Fae :call s:fzf_ag_expand(<q-args>)
 command! -nargs=+ -complete=file Fal :call s:fzf_ag_literal(<f-args>)
 command! -nargs=+ -complete=file Ff :call s:fzf_file(<q-args>)
 command! -nargs=+ Ft :call <SID>fzf_search_tag_kinds(<f-args>)
-vnoremap FL y:call <SID>fzf_ag_literal(@")<CR>
+vnoremap FL y:call <SID>fzf_ag_literal(@")<cr>
 
 "type, scope, signagure, inheritance
 let s:fzf_btags_cmd = 'ctags -f - --excmd=number --sort=no --fields=KsSi --kinds-c++=+pUN --links=yes --language-force=c++'
@@ -523,7 +423,7 @@ let s:fzf_btags_options = {'options' : '--no-reverse -m -d "\t" --tiebreak=begin
 "that's why it use 1,4..-2
 let s:fzf_tags_options = {'options' : '--no-reverse -m -d "\t" --tiebreak=begin --with-nth 1,4..-2 -n .. --prompt "Ctags> "'}
 
-function! s:fzf_cpp_btags()
+function! G_fzf_cpp_btags()
   call fzf#vim#buffer_tags(
         \ '',[s:fzf_btags_cmd . ' ' . expand('%:S')],
         \ extend(copy(g:fzf_layout), s:fzf_btags_options))
@@ -539,7 +439,7 @@ function! s:fzf_cpp_tags(...)
         \ extend(copy(g:fzf_layout), s:fzf_tags_options))
 endfunction
 
-function! s:fzf(fzf_default_cmd, cmd)
+function! G_fzf(fzf_default_cmd, cmd)
   let oldcmds = $FZF_DEFAULT_COMMAND | try
     let $FZF_DEFAULT_COMMAND = a:fzf_default_cmd
     execute a:cmd
@@ -578,11 +478,11 @@ function! s:fzf_tag_sink(line)
 endfunction
 
 function! s:fzf_search_tag_kinds(name, ...)
-   call s:fzf_search_tag(a:name, {'kinds':a:000}) 
+   call G_fzf_search_tag(a:name, {'kinds':a:000}) 
 endfunction
 
 " name, [{"kinds":[],}]
-function! s:fzf_search_tag(name, ...)
+function! G_fzf_search_tag(name, ...)
 
   if a:name =~# '\v^\s*$'
     echom 'tag name should not has only blank'
@@ -607,7 +507,7 @@ function! s:fzf_search_tag(name, ...)
   \ 'options': ['--ansi', 
   \             '--color', 'hl:68,hl+:110',
   \             '--with-nth=..-2'],
-  \ 'sink' : function("s:fzf_tag_sink")
+  \ 'sink' : function('s:fzf_tag_sink')
   \}
 
   call fzf#run(fzf#wrap(opts))
@@ -617,6 +517,21 @@ function! s:fzf_ag_literal(str)
   let cmd = printf('-F %s', myvim#literalize(a:str, 1))
   call s:fzf_ag_raw(cmd)
 endfunction
+
+" close everything except normal buffer
+function! G_focus()
+  call misc#term#hideall()
+  pclose
+  cclose
+  lclose
+endfunction
+
+" ------------------------------------------------------------------------------
+" goyo
+" ------------------------------------------------------------------------------
+
+let g:goyo_width = 120 
+let g:goyo_height = '100%'
 
 " ------------------------------------------------------------------------------
 " rtags
@@ -648,3 +563,213 @@ let g:tex_flavor = 'latex'
 
 " finish mark
 let g:init_finished = 1
+
+" ------------------------------------------------------------------------------
+" small functions
+" ------------------------------------------------------------------------------
+
+"it should be \tv, but v is not convinent
+"noremap <leader>tt :call <SID>tagSplit('', 'v')<cr>
+"noremap <leader>th :call <SID>tagSplit('', 'h')<cr>
+
+" split open first exact match
+" itemName, 'v'|'h'
+function! s:tagSplit(itemName, splitType)
+  let items = taglist('^'.a:itemName.'$')
+  if len(items) < 1
+    echo a:itemName . ' not found'    
+    return
+  endif
+  let splitCmd = a:splitType ==# 'v' ? 'rightbelow vsplit' : 'sp'
+  exec splitCmd items[0].filename
+  exec items[0].cmd
+  normal! zz
+endfunction
+
+function! G_smartSplit()
+  let direction = str2float(winwidth(0))/winheight(0) >= 204.0/59 ? 'vsplit':'split'
+  exec 'rightbelow ' . direction
+endfunction
+
+function! G_visualSearch()
+  "record @s, restore later
+  let @/ = '\V' . myvim#literalize(myvim#getVisualString(), 0)
+endfunction
+
+" search in chrome
+function! G_google(...)
+  if len(a:000) == 0|return|endif
+  let searchItems = shellescape(join(a:000, '+'))
+  let cmd = 'google-chrome https://www.google.com/\#q=' . searchItems . '>/dev/null'
+  if has('nvim')
+    call jobstart(cmd)
+  else
+    silent! execute '!' . cmd
+  endif
+endfunction
+
+function! G_cycleOption(name, list)
+  let curValue = '' " for vint only
+  exec 'let curValue = &'.a:name
+  let [index, numValues] = [match(a:list, curValue), len(a:list)]
+  let newValue = a:list[(index + 1)%numValues]
+  exec 'let &'.a:name.' = newValue '
+  echom a:name . ' : ' . newValue
+endfunction
+
+function! s:reverse_qf_list()
+  call setqflist(reverse(getqflist()))
+endfunction
+
+function! G_rm_qf_item(...)
+  let idx = get(a:000, 0, line('.') - 1)
+  let l = getqflist()
+  if idx >= len(l)
+    echoe 'index overflow'
+    return
+  endif
+  call remove(l, idx)
+  call setqflist(l)
+  call cursor(idx+1, 1)
+endfunction
+
+function! s:set_clipboard(str)
+  let s = myvim#literalize(a:str, 2)
+  call system(printf("echo '%s' | DISPLAY=:0 xsel -i", s))
+endfunction
+
+function! s:on_dir_change()
+  if filereadable('.vim/init.vim')
+    source .vim/init.vim
+  endif
+endfunction
+
+let s:fzf_file_project = 'find  . -type f ! -path "*.hg/*" ! -path "*.git/*" ! -path "*/build/*" ! -path "*.vscode/*"'
+
+let s:maps = [
+   \ ['<f1>',        'n',  1, [],           ''],
+   \ ['<f2>',        'n',  0, ['c'],        '<Plug>CdefRename'],
+   \ ['<f3>',        'n',  1, [],           ':set hlsearch!<cr>'],
+   \ ['<f4>',        'n',  1, [],           ':ALEHover<cr>'],
+   \ ['<f5>',        'n',  1, [],           ':Cmr<cr>'],
+   \ ['<f6>',        'n',  1, [],           ':call myvim#updateTags()<cr>'],
+   \ ['<f7>',        'n',  1, [],           ':Cm<cr>'],
+   \ ['<F31>',       'n',  1, [],           ':ALELint<cr>'],
+   \ ['<F31>',       'n',  1, ['c'],        ':YcmDiags<cr>'],
+   \ ['<f8>',        'n',  0, ['c'],        '<Plug>CdefSwitchBetProtoAndFunc'],
+   \ ['<f9>',        'n',  1, ['c'],        ':call mycpp#toggleBreakpoint()<cr>'],
+   \ ['<F33>',       'n',  1, ['c'],        ':call mycpp#singleLineBreak()<cr>'],
+   \ ['<f10>',       'n',  1, [],           ':call G_cycleOption("virtualedit", ["", "all"])<cr>'],
+   \ ['<f11>',       'n',  1, [],           ''],
+   \ ['<f12>',       'n',  1, [],           ':YcmCompleter GoToDefinition<cr>'],
+   \ ['<f36>',       'n',  1, [],           ':YcmCompleter GoToDeclaration<cr>'],
+   \ ['<F24>',       'n',  1, [],           ':ALEFindReferences<cr>'],
+   \
+   \ ['Y',           'n',  1, [],           'y$'],
+   \ ['<a-o>',       'n',  0, ['c'],        '<Plug>CdefSwitchFile'],
+   \ ['<a-o>',       'n',  1, ['glsl'],     ':call myglsl#alternate()<cr>'],
+   \ ['<a-d>',       'n',  0, ['c'],        '<Plug>CdefDefineTag'],
+   \ ['<a-d>',       'v',  0, ['c'],        '<Plug>CdefDefineRange'],
+   \ ['g6',          'n',  1, [],           ':b#<cr>'],
+   \ ['<c-p>',       'n',  1, [],           printf(':call G_fzf(''%s'', ":Files") <cr>', s:fzf_file_project)],
+   \ ['<c-j>',       'n',  1, [],           ':BTags<cr>'],
+   \ ['<c-j>',       'n',  1, ['c','glsl'], ':call G_fzf_cpp_btags()<cr>'],
+   \ ['<c-h>',       'n',  1, [],           ':History<cr>'],
+   \ ['<c-b>',       'n',  1, [],           ':Buffers<cr>'],
+   \ ['<c-k>',       'n',  1, [],           ':call G_focus()<cr>'],
+   \ ['<a-h>',       'n',  1, [],           '<c-w>h'],
+   \ ['<a-j>',       'n',  1, [],           '<c-w>j'],
+   \ ['<a-k>',       'n',  1, [],           '<c-w>k'],
+   \ ['<a-l>',       'n',  1, [],           '<c-w>l'],
+   \ ['<a-h>',       't',  1, [],           '<c-\><c-n><c-w>h'],
+   \ ['<a-j>',       't',  1, [],           '<c-\><c-n><c-w>j'],
+   \ ['<a-k>',       't',  1, [],           '<c-\><c-n><c-w>k'],
+   \ ['<a-l>',       't',  1, [],           '<c-\><c-n><c-w>l'],
+   \ ['<expr> %%',   'c',  1, [],           'getcmdtype() == ":" ? expand("%:h")."/" : "%%"'],
+   \ ['<expr> %t',          'c',  1, [],           'getcmdtype() == ":" ? expand("%:t") : "%t"'],
+   \ ['*',           'x',  1, [],           ':<C-u>call G_visualSearch()<cr>/<C-R>=@/<cr><cr>'],
+   \ ['#',           'x',  1, [],           ':<C-u>call G_visualSearch()<cr>?<C-R>=@/<cr><cr>'],
+   \
+   \ ['<c-l>l',      'n',  1, [],           ':call G_focus()<cr>'],
+   \ ['<c-l>l',      't',  1, [],           '<c-\><c-n>:call G_focus()<cr>'],
+   \ ['<c-l>r',      'n',  1, [],           ':redraw<cr>'],
+   \ ['<c-l>m',      'n',  1, [],           ':call misc#term#toggleGterm()<cr>'],
+   \ ['<c-l>m',      't',  1, [],           '<c-\><c-n>:call misc#term#toggleGterm()<cr>'],
+   \ ['<c-l>j',      'n',  1, [],           ':call misc#term#hideall()<cr>'],
+   \ ['<c-l>j',      't',  1, [],           '<c-\><c-n>:call misc#term#hideall()<cr>'],
+   \ ['<c-l>s',      'n',  1, [],           ':call G_smartSplit()<cr>'],
+   \ ['<c-l>g',      'n',  1, [],           ':Goyo<cr>'],
+   \
+   \ ['<c-f>p',      'n',  1, [],           ':call G_fzf("find -L . -type f", ":Files") <cr>'],
+   \ ['<c-f>i',      'n',  1, ['c'],        ':call mycpp#findIncludes()<cr>'],
+   \ ['<c-f>d',      'n',  1, ['c'],        ':call mycpp#searchDerived()<cr>'],
+   \ ['<c-f>l',      'n',  1, [],           ':Locate '],
+   \ ['<c-f>tt',     'n',  1, [],           ':Ctags <cr>'],
+   \ ['<c-f>td',     'n',  1, [],           ':call G_fzf_search_tag(expand("<cword>"), {"kinds":["c", "s", "p"]})<cr>'],
+   \
+   \ ['<leader>dd',  'n',  1, ['c'],        ':silent call mycpp#makeDebug("")<cr>'],
+   \ ['<leader>db',  'n',  1, ['c'],        ':call mycpp#singleLineBreak()<cr>'],
+   \ ['<leader>dq',  'n',  1, ['qf'],       ':call mycpp#makeQuickfix()<cr>'],
+   \ ['<leader>ds',  'n',  1, [],        ':call mycpp#openDebugScript()<cr>'],
+   \ ['<leader>dp',  'n',  1, [],        ':call mycpp#openProjectFile()<cr>'],
+   \
+   \ ['<leader>aa',  'n',  1, ['c'],        ':call mycpp#doTarget("apitrace trace", "", ''<bar>& tee trace.log && qapitrace `grep -oP "(?<=tracing to ).*$" trace.log`'')<cr>'],
+   \ ['<leader>al',  'n',  1, ['c'],        ':call mycpp#openLastApitrace()<cr>'],
+   \ ['<leader>ar',  'n',  1, ['c'],        ':Crenderdoc<cr>'],
+   \ ['<leader>an',  'n',  1, ['c'],        ':CnvidiaGfxDebugger<cr>'],
+   \ ['<leader>ag',  'n',  1, [],           ':call G_google(expand("<cword>"))<cr>'],
+   \ ['<leader>ag',  'v',  1, [],           ':call G_google(myvim#getVisualString())<cr>'],
+   \ ['<leader>am',  'n',  1, [],           ':Cmake<cr>'],
+   \
+   \ ['<c-s>s',      'v',  1, [],           ':<c-u>call G_visualSearch()<cr>:%s/<C-R>=@/<cr>/'],
+   \ ['<c-s>w',      'n',  1, [],           ':%s/\v<<C-R><C-W>>/'],
+   \ ['<c-s>W',      'n',  1, [],           ':%s/<C-R>=myvim#literalize(expand("<cWORD>"),0)<cr>/'],
+   \ ['<c-s>lv',     'n',  1, [],           ':let @"=myvim#literalize(@", 0)<cr>'],
+   \ ['<c-s>lg',     'n',  1, [],           ':let @"=myvim#literalize(@", 1)<cr>'],
+   \ ['<c-s>lf',     'n',  1, [],           ':let @"=myvim#literalize(@", 2)<cr>'],
+   \ ['<c-s>j',      'n',  0, [],           '<c-v><c-s>j'],
+   \ ['<c-s>k',      'n',  0, [],           '<c-v><c-s>k'],
+   \ ['<c-s>j',      'v',  1, [],           ':<c-u>call myvim#visualEnd("myvim#verticalSearch", {"direction":"j", "greedy":1})<cr>'],
+   \ ['<c-s>k',      'v',  1, [],           ':<c-u>call myvim#visualEnd("myvim#verticalSearch", {"direction":"k", "greedy":1})<cr>'],
+   \ 
+   \ ['dd',          'n',  1, ['quickfix'], ':call G_rm_qf_item()<cr>'],
+   \
+   \ ['<c-e>e',      'i',  1, [],           '<c-v><space><esc>x'],
+   \ ['<c-e>o',      'n',  1, ['c'],        ':call mycpp#autoInclude()<cr>'],
+   \ ['<c-e>i',      'n',  1, ['c'],        ':call mycpp#manualInclude()<cr>'],
+   \ ['<c-e>g',      'n',  1, ['c'],        ':call cdef#addHeadGuard()<cr>'],
+   \ ['<c-e>de',     'n',  0, ['c'],        '<Plug>CdefDefineTag'],
+   \ ['<c-e>de',     'v',  0, ['c'],        '<Plug>CdefDefineRange'],
+   \ ['<c-e>df',     'n',  0, ['c'],        '<Plug>CdefDefineFile'],
+   \ ['<c-e>du',     'n',  0, ['c'],        '<Plug>CdefUpdatePrototype'],
+   \ ['<c-e>f',      'v',  1, ['c', 'glsl'],':ClangFormat<cr>'],
+   \ ['<c-e>]',      'n',  1, [],           ':call myvim#shiftItem({"direction":"l"})<cr>'],
+   \ ['<c-e>[',      'n',  1, [],           ':call myvim#shiftItem({"direction":"h"})<cr>'],
+   \ ['<c-e>j',      'n',  1, ['vim'], 'A <bar><esc>J'],
+   \ ['<c-e>s',      'n',  1, ['vim'], ':call myvim#sourceBlock(line("''<"),line("''>"))<CR>'],
+   \
+   \ ['<leader>yd',  'n',  1, [],           ':YcmShowDetailedDiagnostic<cr>'],
+   \ ['<leader>ygd', 'n',  1, [],           ':YcmCompleter GoToDeclaration<cr>'],
+   \ ['<leader>ygi', 'n',  1, [],           ':YcmCompleter GoToInclude<cr>'],
+   \ ['<leader>yf',  'n',  1, [],           ':YcmCompleter FixIt<cr>'],
+   \
+   \ ['ga',          'nv', 0, [],           '<Plug>(EasyAlign)'],
+   \ ['<leader>sh',  'n',  1, [],           ':ALEHover<cr>'],
+   \ ['<leader>sr',  'n',  1, [],           ':ALEFindReferences<cr>'],
+   \ ]
+
+if has('nvim')
+  nnoremap __ :edit ~/.config/nvim/init.vim<cr>
+else
+  nnoremap __ :edit ~/.vimrc<cr>
+endif
+
+if $TERM ==# 'linux'
+  vnoremap \y y:call <SID>set_clipboard(@")<cr>
+endif
+
+for item in s:maps
+  call myvim#bindKey(item[0], item[1], item[2], item[3], item[4])
+endfor
+
+call myvim#loadAutoMap('quickfix')
