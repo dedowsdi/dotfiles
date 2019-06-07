@@ -7,8 +7,7 @@ fi
 
 #get abs real script address
 if [[ -h ${BASH_SOURCE} ]]; then
-    CFG_SCRIPT=$(readlink "$BASH_SOURCE")
-    CFG_SCRIPT=$(dirname "$CFG_SCRIPT")
+    CFG_SCRIPT="$(dirname "$(readlink "$BASH_SOURCE")")"
 else
     CFG_SCRIPT=$(dirname "$BASH_SOURCE")
 fi
@@ -61,10 +60,8 @@ while read ppaAddress ppaPattern ; do
         sudo add-apt-repository -y "$ppaAddress"
         needUpdate=
     fi
-    if [[ -v needUpdate ]] ; then
-        sudo apt update
-    fi
 done<"${CFG_SCRIPT}/ppa"
+[[ -v needUpdate ]] && sudo apt update
 
 echo include util
 source "${CFG_SCRIPT}/zxdUtil.sh"

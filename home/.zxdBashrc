@@ -1,7 +1,7 @@
 # since .profile loads ~/.bashrc, i put everything here for simplicity.
 
 stty -ixon
-# set -o vi
+#set -o vi
 eval `dircolors ~/.dir_colors/dircolors`
 export PATH=${PATH}:/usr/local/bin/script:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
 export PYTHONPATH=${PYTHONPATH}:~/study/python/util
@@ -17,6 +17,9 @@ export ESM_DATA="/usr/local/source/openmw/data/Morrowind.esm"
 export BSA_DATA="/usr/local/source/openmw/data/Morrowind.bsa"
 export MVP_MATRIX_FILE="/home/pntandcnt/black"
 export GL_FILE_PATH="$(realpath ~/journey/gl2/data);$(realpath ~/journey/gl4/data)"
+#export PAGER="/bin/bash -c \"unset PAGER; col -b -x | \
+    #vim -R --not-a-term -u ~/.less.vimrc -c 'set ft=man nomod nolist'  -\""
+export MANPAGER="vim -M +MANPAGER +'file -' --not-a-term -u ~/.less.vimrc  -"
 
 source /opt/vlab-4.4.1/bin/sourceme.sh
 
@@ -27,6 +30,8 @@ source /opt/vlab-4.4.1/bin/sourceme.sh
 alias go=gvfs-open
 # you can not use --exclude and --include together, the later one will be simply ignored
 alias grep='grep -I --exclude-dir={.git,.hg} --exclude={.*.swp}'
+alias cdstackexchange='cd ~/stackexchange/$(date +%Y/%m/%d)'
+alias vless="vim -Rnu ~/.less.vimrc -"
 
 #vim()
 #{
