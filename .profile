@@ -17,7 +17,7 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # set PATH so it includes user's private bin directories
-PATH="$HOME/bin:$HOME/.local/bin:/usr/local/source/cfg/script:$PATH"
+PATH="$HOME/bin:$HOME/.local/bin:$HOME/.script:$PATH"
 PATH=${PATH}:/usr/local/bin/script:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
 export PYTHONPATH=${PYTHONPATH}:~/study/python/util
 # let C-x C-e call nvim
