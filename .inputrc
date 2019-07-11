@@ -1,0 +1,18 @@
+set editing-mode vi
+
+$if mode=vi
+
+    set keyseq-timeout 0
+    set show-mode-in-prompt on
+
+    # "\C-r": reverse-search-history'
+    # "\C-t": transpose-chars'
+    #"\C-sex": "vim -u NONE -nE"
+
+$endif
+
+$if mode=emacs
+
+    # Include system-wide inputrc, which is ignored by default when a user has their own .inputrc file.
+    $include /etc/inputrc
+$endif
