@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# workrest -w work -r rest work_step work_step_count rest_step rest_step_count
+
+if [[ -z $TMUX ]]; then
+    echo "need tmux"
+    exit 0
+fi
+
+while getopts ":w:r:" Option ; do
+    case $Option in
+        w     ) work_session="$OPTARG"  ;;
+        r     ) rest_session="$OPTARG"  ;;
+        *     ) echo "Unimplemented option:$Option" ; exit 1 ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [[ ! -v work_session || ! -v rest_session ]]; then
+    echo "missiong work or rest session"
+    exit 1
+fi
+
+tmux_wid="$(xdotool getactivewindow)"
+
+work_step=${1:-1s}
+work_total_step=${2:-6}
+rest_step=${3:-1s}
+rest_total_step=${4:-5}
+
+# 0 as work, 1 as rest
+stage=0
+
+names=(work rest)
+steps=("$work_step" "$rest_step")
+total_steps=("$work_total_step" "$rest_total_step")
+sessions=("$work_session" "$rest_session")
+
+count=0
+
+echo "${names[$stage]} begin, ${total_steps[stage]} * ${steps[stage]}"
+while true ; do
+
+    # update count
+    sleep "${steps[$stage]}"
+    count=$((count+1))
+    [[ $stage -eq 0 ]] && symbol='$$' || symbol='**'
+    text="$symbol  $count / ${total_steps[$stage]}  $symbol"
+    # echo "$count / ${total_steps[$stage]}"
+    tput setaf $((RANDOM % 256)) ; figlet -ktc "$text"
+
+    if [[ $count -eq ${total_steps[$stage]} ]]; then
+
+
+        if [[ $stage -eq 0 ]] ; then
+            last_wid="$(xdotool getactivewindow)"
+            xdotool windowactivate "$tmux_wid"
+        else
+
+            # switch back to last active window
+            xdotool windowactivate "$last_wid"
+        fi
+
+        echo "${names[$stage]} done"
+        count=0
+        stage=$((stage^1))
+        tmux switch-client -t "${sessions[$stage]}"
+        echo "${names[$stage]} begin, ${total_steps[stage]} * ${steps[stage]}"
+    fi
+done

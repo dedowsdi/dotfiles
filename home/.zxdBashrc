@@ -1,74 +1,25 @@
 # since .profile loads ~/.bashrc, i put everything here for simplicity.
 
 stty -ixon
-#set -o vi
+set -o vi
 eval `dircolors ~/.dir_colors/dircolors`
-export PATH=${PATH}:/usr/local/bin/script:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
-export PYTHONPATH=${PYTHONPATH}:~/study/python/util
-# let C-x C-e call nvim
-# export EDITOR=nvim
-export OSG_DIR=/usr/local
-export OSGDIR=/usr/local
-export OSG_FILE_PATH="/usr/local/source/OpenSceneGraph-Data;/home/pntandcnt/journey/osg/data"
-export OSG_LIBRARY_PATH=/usr/local/lib64/osgPlugins-3.4.0
-export FZF_DEFAULT_COMMAND='find .'
-export OSG_NOTIFY_LEVEL=NOTICE
-export ESM_DATA="/usr/local/source/openmw/data/Morrowind.esm"
-export BSA_DATA="/usr/local/source/openmw/data/Morrowind.bsa"
-export MVP_MATRIX_FILE="/home/pntandcnt/black"
-export GL_FILE_PATH="$(realpath ~/journey/gl2/data);$(realpath ~/journey/gl4/data)"
-#export PAGER="/bin/bash -c \"unset PAGER; col -b -x | \
-    #vim -R --not-a-term -u ~/.less.vimrc -c 'set ft=man nomod nolist'  -\""
-export MANPAGER="vim -M +MANPAGER +'file -' --not-a-term -u ~/.less.vimrc  -"
-
 source /opt/vlab-4.4.1/bin/sourceme.sh
 
-# awk posix
-# POSIXLY_CORRECT=true
-# export POSIXLY_CORRECT
 
-alias go=gvfs-open
-# you can not use --exclude and --include together, the later one will be simply ignored
-alias grep='grep -I --exclude-dir={.git,.hg} --exclude={.*.swp}'
-alias cdstackexchange='cd ~/stackexchange/$(date +%Y/%m/%d)'
-alias vless="vim -Rnu ~/.less.vimrc -"
+# bindings
+[[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
 
-#vim()
-#{
-#  # osx users, use stty -g
-#  local STTYOPTS="$(stty --save)"
-#  stty stop '' -ixoff
-#  command vim "$@"
-#  stty "$STTYOPTS"
-#}
+# change fzf a-c to <c-f><c-j>
+bind "$(bind -s | grep fzf_cd | sed -r 's/^"[^"]+"/"\\C-f\\C-j"/')"
 
-if [ "$TERM" = "linux" ]; then
-  /bin/echo -e "
-  \e]P0002b36
-  \e]P1dc322f
-  \e]P2859900
-  \e]P3b58900
-  \e]P4268bd2
-  \e]P56c71c4
-  \e]P62aa198
-  \e]P793a1a1
-  \e]P8657b83
-  \e]P9dc322f
-  \e]PA859900
-  \e]PBb58900
-  \e]PC268bd2
-  \e]PD6c71c4
-  \e]PE2aa198
-  \e]PFfdf6e3
-  "
-  # get rid of artifacts
-  clear
-fi
-
-[ -z "$ZSH_NAME" ] && [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-[ -n "$ZSH_NAME" ] && [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # change fzf c-r to <c-f><c-r>
-bind "$(bind -s | grep fzf_history | sed 's/r/f\\C-r/')"
+bind "$(bind -s | grep fzf_history | sed -r 's/^"[^"]+"/"\\C-f\\C-r"/')"
+
+# change fzf c-t to <c-f><c-t>
+bind -x "$(bind -X | grep fzf-file-widget | sed -r 's/^"[^"]+"/"\\C-f\\C-t"/')"
+
+# reset c-r and c-t for readline, note no space before :, one space after :
 bind '"\C-r": reverse-search-history'
+bind '"\C-t": transpose-chars'
 
 # vim:set filetype=sh:

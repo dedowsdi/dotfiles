@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [[ -z "$TMUX" ]]; then
+    exit 1
+fi
+
+if [[ $# -lt 1 ]]; then
+    echo "it should be $0 src_tt"
+    exit 1
+fi
+
+src_tt=$1
+start_cmd=${2:-""}
+winname="tt_${src_tt}_$(head /dev/urandom | tr -cd [0-9a-zA-Z] | head -c 6)"
+winid=$( tmux new-window -dPF '#{window_id}' -n "$winname" )
+
+tmux send-keys -t "$winid" \
+    'dest_dir="$(tt "'$src_tt'")" && cd "$dest_dir" && vim +'\'"$start_cmd"\'' +'\''
+    call system("tmux select-window -t \"'$winid'\"")
+    call job_start("bash -c \"./script/cmake.sh &> cmake.log\"")
+    '\' 'Enter'
+
+# vim need 0.18 second to start up, i don't want to switch to that window before
+# vim starts.
+
+exit 0
