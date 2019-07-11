@@ -1,6 +1,7 @@
 #!/bin/bash
 
-src_dir="$(realpath ~/plugged/misc/template/cpptt)"
+template_path=$HOME/.tt_template
+src_dir="$(realpath "$template_path/cpp")"
 dest_dir="$(mktemp -dp /tmp cpptt_XXXXXX)"
 
 rsync -La --exclude="build/*/*/*" --exclude="tags" "$src_dir/" "$dest_dir"

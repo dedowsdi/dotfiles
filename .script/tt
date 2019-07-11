@@ -5,7 +5,8 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-src_dir="$(realpath ~/plugged/misc/template/$1)"
+template_path=$HOME/.tt_template
+src_dir="$(realpath "$template_path/$1")"
 dest_dir=${2:-$(mktemp -up /tmp cpptt_XXXXXX)}
 
 if [[ ! -d "$src_dir" ]]; then
