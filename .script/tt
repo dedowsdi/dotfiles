@@ -23,7 +23,4 @@ pwd
 text=$(cat compile_commands.json)
 echo "${text//"$src_dir"/"$dest_dir"}" > compile_commands.json
 
-# the caller is responsible to call ./cmake.sh
-# ./cmake.sh
-
 exit 0
