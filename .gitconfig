@@ -10,3 +10,5 @@
 	tool = vimdiff3
 [mergetool "vimdiff3"]
 	cmd = nvim -f -d -c \"wincmd J\" \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+[alias]
+	dotfiles = !git --git-dir=$HOME/.dotfiles --work-tree=$HOME
