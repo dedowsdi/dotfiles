@@ -16,29 +16,29 @@ done
 
 time=$(date +%Y.%m.%d_%H:%M:%S)
 # get used memory percent
-read total_memory used_memory<<<$(free -m | sed -n '2p' | tr -s ' ' |cut -d ' '  -f 2,3)
-used_mem_percent=$(echo "scale=1; 100*$total_memory/$used_memory"|bc)
+read total_memory used_memory < <(free -m | sed -n '2p' | tr -s ' ' | cut -d ' ' -f 2,3)
+used_mem_percent=$(echo "scale=1; 100*$total_memory/$used_memory" | bc)
 
 # get used cpu persent
 idle_cpu=$(top -bn1 | grep Cpu | grep -oP '[0-9.]+(?=\s*id)')
 used_cpu_percent=$(echo "100-$idle_cpu"|bc)
 
-if [[ $CPU_THRESHOLD < $used_cpu_percent ]]; then
+if [[ $CPU_THRESHOLD -lt $used_cpu_percent ]]; then
     {
-        echo 
+        echo
         echo --------------------------------------
         echo cpu
         echo "$time"
-        top -bn1 | sed -n '1,17p' 
+        top -bn1 | sed -n '1,17p'
     } >> "$REPORT_FILE"
 fi
 
-if [[ $MEM_THRESHOLD < $used_mem_percent ]]; then
+if [[ $MEM_THRESHOLD -lt $used_mem_percent ]]; then
     {
-        echo 
+        echo
         echo --------------------------------------
         echo mem
         echo "$time"
-        top -bn1 | sed -n '1,17p' 
+        top -bn1 | sed -n '1,17p'
     } >> "$REPORT_FILE"
 fi
