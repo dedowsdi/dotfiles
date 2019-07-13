@@ -98,10 +98,14 @@ source $ZSH/oh-my-zsh.sh
 #setopt KSH_ARRAYS
 
 setopt extendedglob
-source ~/.config/nvim/plugged/gruvbox/gruvbox_256palette.sh
-# eval `dircolors ~/.dir_colors/dircolors`
 
+# setup gruvbox 256 color palette
+source ~/.config/nvim/plugged/gruvbox/gruvbox_256palette.sh
+
+# disable flow control
 stty -ixon
+
+autoload zmv
 
 [[ -f ~/.bash_aliases ]] && . ~/.bash_aliases
 

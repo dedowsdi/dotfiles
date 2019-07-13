@@ -1,7 +1,14 @@
 #!/bin/bash
 
-tmux new-session -ds rest -n clock
-tmux send-keys -t rest 'workrest -w work -r rest 1m 20 30s 20' 'Enter'
-tmux new-session -s work -n main
+if ! tmux has-session -t rest ; then
+    tmux new-session -ds rest -n clock
+    tmux send-keys -t rest 'workrest -w work -r rest 1m 20 30s 20' 'Enter'
+fi
+
+if ! tmux has-session -t work ; then
+    tmux new-session -s work -n main
+else
+    tmux attach -t work
+fi
 
 # vim:set et ft=sh:

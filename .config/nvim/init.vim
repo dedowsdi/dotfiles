@@ -54,6 +54,7 @@ runtime ftplugin/man.vim
 
 " setup maps ctrl|shift + fuc_keys, alt+[a-z]
 if !has('gui_running')
+  " set termguicolors
   let xterm_maps = {
     \   'ctrl_fn': [ '[1;5P]', '[1;5Q]', '[1;5R]', '[1;5S]' ],
     \   'shift_fn':[ '[1;2P]', '[1;2Q]', '[1;2R]', '[1;2S]' ],
@@ -105,8 +106,32 @@ if !has('gui_running')
     endfor
   endif
 
+else
+
+
 endif
 
+if has('gui_running') || &termguicolors
+  " 16 ansi colors (gruvbox) for gvim or if 'termguicolors' is on
+  let g:terminal_ansi_colors =<< trim END
+    #282828
+    #cc241d
+    #98971a
+    #d79921
+    #458588
+    #b16286
+    #689d6a
+    #a89984
+    #928374
+    #fb4934
+    #b8bb26
+    #fabd2f
+    #83a598
+    #d3869b
+    #8ec07c
+    #ebdbb2
+  END
+endif
 
 if has('nvim')
   let g:python3_host_prog = '/usr/bin/python3'
@@ -126,6 +151,7 @@ else
   if has('gui_running')
     set lines=100 columns=999
     set guioptions=aegim " remove menu, scroll bars
+
   endif
 endif
 
@@ -160,16 +186,17 @@ let g:ale_linters_explicit = 1
 
 " you can not disable lint while enable language server, so i turn off auto
 " lint.
-let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_text_changed = 'always'
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_save = 0
 let g:ale_lint_on_filetype_changed = 0
+let g:ale_lint_on_insert_leave = 0
 
 let g:ale_linters = {
 \   'vim': ['vint'],
 \   'sh': ['shellcheck'],
 \   'glsl' : ['glslang'],
-\   'cpp'  : ['cquery']
+\   'cpp'  : []
 \}
 
 let g:ale_glsl_glslang_executable = '/usr/local/bin/glslangValidator'
@@ -651,6 +678,9 @@ command! UpdateVimHelpLink call misc#updateLink(0)
 command! UpdateNvimHelpLink call misc#updateLink(1)
 command! -nargs=* EditTemp e `=tempname().'_'.<q-args>`
 command! Synstack echo misc#synstack()
+command! SynID echo synIDtrans(synID(line('.'), col('.'), 1))
+command! -nargs=+ SynIDattr echo synIDattr(
+            \ synIDtrans(synID(line('.'), col('.'), 1)), <f-args>)
 command! HiTest source $VIMRUNTIME/syntax/hitest.vim
 command! TrimTrailingWhitespace :keepp %s/\v\s+$//g
 command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_

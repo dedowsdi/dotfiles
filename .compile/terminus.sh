@@ -14,6 +14,8 @@
 # The hard way is to install fonts to a new director
 # You must add the new directory (~/.fonts/share/fonts/terminus) to x11 font path
 ./configure --prefix=~/.fonts
-make pcf && make install-pcf && make fontdir
+make pcf && make install-pcf
+make pcf-8bit && make install-pcf-8bit
+make fontdir
 
 # note that only 16, 20, 24 looks nice.

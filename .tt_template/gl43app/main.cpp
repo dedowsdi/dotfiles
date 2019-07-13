@@ -54,7 +54,6 @@ void app_tt::init_info() {
 }
 
 void app_tt::create_scene() {
-  glClearColor(0.0f, 0.5f, 1.0f, 1.0f);
 
   prg.init();
 }
