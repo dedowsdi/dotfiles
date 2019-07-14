@@ -1,14 +1,21 @@
+# tags
 TAGS
 tags
 .notags
+
+# vim and it's plugin related
+*.swp
+.ycm_extra_conf.py
+.ropeproject
 tags.temp
 tags.lock
-build
-dependences
-*.swp
-__pycache__
-.ropeproject
-.ycm_extra_conf.py
 .color_coded
 .viminfo
+
+# cmake
 .compile_commands.json
+
+# misc
+build
+dependences
+__pycache__

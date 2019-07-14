@@ -63,3 +63,5 @@ export CVSROOT=/usr/local/source/cvsroot
 #   # get rid of artifacts
 #   clear
 # fi
+
+export PATH="$HOME/.cargo/bin:$PATH"

@@ -5,7 +5,7 @@
 	default = simple
 [core]
 	editor = nvim
-	excludesfile = /home/lpntandcnt/.gitignore
+	excludesfile = /home/pntandcnt/.gitignore
 [merge]
 	tool = vimdiff3
 [mergetool "vimdiff3"]

@@ -690,3 +690,6 @@ command! -nargs=+ -complete=command Less call <sid>less(<q-args>)
 command ReverseQuickFixList call setqflist(reverse(getqflist()))
 command! SuperWrite :w !sudo tee % > /dev/null
 command! ToggleAutoPairs :call AutoPairsToggle()
+command! Terminal exe 'terminal' |
+            \ call term_sendkeys("", printf("cd %s \<cr>",
+            \ fnamemodify(bufname(winbufnr(winnr('#'))), ':h') ) )
