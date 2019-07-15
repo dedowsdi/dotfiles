@@ -5,7 +5,7 @@ if [[ $# -lt 2 ]]; then
 fi
 
 elem=$1
-list=${*:2}
+list=("${@:2}")
 
-for item in $list; do [[ "$item" == "$elem" ]] && exit 0; done
+for item in "${list[@]}"; do [[ "$item" == "$elem" ]] && exit 0; done
 exit 1

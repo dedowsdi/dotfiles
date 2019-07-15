@@ -32,6 +32,7 @@ expect
 fcitx-googlepinyin
 fcitx-sunpinyin
 freeglut3-dev
+git-gui
 gcc-5-doc
 gdb-doc
 geogebra-classic
@@ -39,8 +40,6 @@ gimp
 gimp-dds
 gimp-help-common
 gimp-help-en
-git
-git-gui
 glew-utils
 google-chrome-stable
 ibus-sunpinyin
