@@ -22,7 +22,6 @@ if [[ ! -v work_session || ! -v rest_session ]]; then
 fi
 
 tmux_wid="$(xdotool getactivewindow)"
-
 work_step=${1:-1s}
 work_total_step=${2:-6}
 rest_step=${3:-1s}

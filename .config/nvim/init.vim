@@ -385,7 +385,7 @@ let g:vim_markdown_conceal = 0
 let g:indentLine_setConceal = 0
 
 " auto-pairs
-let g:AutoPairsShortcutToggle = ''
+let g:AutoPairsShortcutToggle = '<a-a>'
 let g:AutoPairsShortcutFastWrap = ''
 let g:AutoPairsShortcutJump = ''
 let g:AutoPairsShortcutBackInsert = ''
