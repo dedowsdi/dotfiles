@@ -41,7 +41,9 @@ sessions=("$work_session" "$rest_session")
 
 count=0
 
+tmux set -t work status-style "$work_regular_style"
 echo "${names[$stage]} begin, ${total_steps[stage]} * ${steps[stage]}"
+
 while true ; do
 
     # update count
