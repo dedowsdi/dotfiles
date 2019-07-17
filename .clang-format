@@ -1,0 +1,13 @@
+AccessModifierOffset : -2
+AllowShortFunctionsOnASingleLine : true
+AllowShortIfStatementsOnASingleLine : true
+AllowShortLoopsOnASingleLine : true
+AlwaysBreakTemplateDeclarations : true
+AlignAfterOpenBracket : false
+BreakBeforeBraces : Allman
+ContinuationIndentWidth : 2
+IndentWidth : 2
+TabWidth : 2
+UseTab : Never
+Standard : C++11
+SortIncludes: false
