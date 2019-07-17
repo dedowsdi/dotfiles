@@ -60,7 +60,7 @@ if [ "$TERM" = "linux" ]; then
   \e]PE8ec07c
   \e]PFebdbb2
   "
-  setfont /usr/share/consolefonts/ter-120n.psf.gz
+  tfont /usr/share/consolefonts/ter-120n.psf.gz
   # get rid of artifacts
   clear
 fi

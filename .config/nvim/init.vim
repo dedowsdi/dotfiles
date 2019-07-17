@@ -19,7 +19,7 @@ set showmatch matchtime=3
 set laststatus=2 cmdheight=1 scrolloff=1
 set spell spelllang=en_us dictionary+=spell
 set nrformats=octal,hex,bin
-set path+=/usr/local/include,**
+set path+=/usr/local/include,/usr/include/c++/5
 set backspace=indent,eol,start
 let &backup = !has('vms')
 set wildmenu history=200
@@ -45,13 +45,6 @@ syntax enable
 packadd cfilter
 runtime ftplugin/man.vim
 
-"if !empty($TMUX)
-  "set <Up>=OA
-  "set <Down>=OB
-  "set <Right>=OC
-  "set <Left>=OD
-"endif
-
 " setup maps ctrl|shift + fuc_keys, alt+[a-z]
 if !has('gui_running')
   " set termguicolors
@@ -75,7 +68,7 @@ if !has('gui_running')
 
   let maps = xterm_maps
   if &term =~? 'rxvt'
-   let maps = rxvt_maps
+    let maps = rxvt_maps
   endif
 
   let i = 1
@@ -107,7 +100,6 @@ if !has('gui_running')
   endif
 
 else
-
 
 endif
 
@@ -155,7 +147,6 @@ else
   endif
 endif
 
-
 " ------------------------------------------------------------------------------
 " auto commands
 " ------------------------------------------------------------------------------
@@ -170,10 +161,8 @@ augroup zxd_misc
   autocmd InsertEnter,InsertLeave * set cursorline!
   autocmd FileType * try | call call('abbre#'.expand('<amatch>'), [])
               \ | catch /.*/ | endtry
-  autocmd FileType cpp call misc#ui#loadFiletypeMap('c')
   autocmd FileType * call misc#ui#loadFiletypeMap(expand('<amatch>'))
   autocmd FileType * setlocal formatoptions-=o formatoptions+=j
-  autocmd FileType xdefaults setlocal commentstring=!\ %s
 augroup end
 
 " ------------------------------------------------------------------------------
@@ -418,12 +407,6 @@ function! s:tagSplit(itemName, splitType)
   normal! zz
 endfunction
 
-function! G_rm_qf_item(visual)
-  let r = a:visual ? [getpos("'<")[1], getpos("'>")[1]] : [line('.'), line('.')]
-  let l = getqflist() | call remove(l, r[0]-1, r[1]-1)
-              \ | call setqflist(l) | call cursor(r[0], 1)
-endfunction
-
 function! s:less(cmd)
   exec 'e ' . tempname()
   setlocal buftype=nofile nobuflisted noswapfile
@@ -492,7 +475,7 @@ vnoremap ,G  :<c-u>call misc#op#literalGrep(visualmode(), 1)<CR>
 nnoremap ,g  :set opfunc=misc#op#searchInBrowser<CR>g@
 vnoremap ,g  :<c-u>call misc#op#searchInBrowser(visualmode(), 1)<cr>
 
-nnoremap yot :exe 'set colorcolumn='. (empty(&colorcolumn) ? '+1' : '')<cr>
+nnoremap yoc :exe 'set colorcolumn='. (empty(&colorcolumn) ? '+1' : '')<cr>
 
 nnoremap Y  y$
 nnoremap K  :call <sid>man()<cr>
@@ -531,46 +514,6 @@ tnoremap <leader>th <c-\><c-n>:call misc#term#hideall()<cr>
 nnoremap <leader>yd :YcmShowDetailedDiagnostic<cr>
 nnoremap <leader>yf :YcmCompleter FixIt<cr>
 nnoremap <leader>yt :YcmCompleter GetType<cr>
-
-cnoreabbre awkp          awk '{print $}'<left><left>
-
-" ------------------------------------------------------------------------------
-" maps
-" ------------------------------------------------------------------------------
-let s:maps = [
-   \ ['<f5>',       'n',  1, ['lpfg'],     ':call myl#runLpfg()<cr>'],
-   \ ['<f5>',       'n',  1, ['vim'],      ':so %<cr>'],
-   \ ['<c-f5>',     'n',  1, ['vim'],      ':VimlReloadScript<cr>'],
-   \ ['<c-f7>',     'n',  1, ['c'],        ':YcmDiags<cr>'],
-   \ ['<s-f7>',     'n',  1, ['c'],        ':CppMakeFileName<cr>'],
-   \ ['<f8>',       'n',  0, ['c'],        ':CdefSwitch<cr>'],
-   \ ['<f9>',       'n',  0, ['vim'],      ':VimlBreakHere<cr>'],
-   \ ['<c-f9>',     'n',  0, ['vim'],      ':VimlBreakNumberedFunction<cr>'],
-   \
-   \
-   \ ['<a-o>',      'n',  0, ['c'],        ':CdefSwitchFile<cr>'],
-   \ ['<a-o>',      'n',  1, ['glsl'],     ':call myglsl#alternate()<cr>'],
-   \ ['<c-j>',      'n',  1, ['c',         'glsl'], ':call G_fzf_cpp_btags()<cr>'],
-   \
-   \ ['<leader>aa', 'n',  1, ['c'],        ':call mycpp#doTarget("apitrace trace", "", "<bar>& tee trace.log && qapitrace `grep -oP ''(?<=tracing to ).*$'' trace.log`")<cr>'],
-   \ ['<leader>al', 'n',  1, ['c'],        ':call mycpp#openLastApitrace()<cr>'],
-   \ ['<leader>ar', 'n',  1, ['c'],        ':CppRenderdoc<cr>'],
-   \
-   \ ['dd',         'n',  1, ['quickfix'], ':call G_rm_qf_item(0)<cr>'],
-   \ ['d',          'v',  1, ['quickfix'], ':<c-u>call G_rm_qf_item(1)<cr>'],
-   \
-   \ ['<leader>ei', 'n',  1, ['c'],        ':call mycpp#manualInclude()<cr>'],
-   \ ['<leader>ed', 'n',  0, ['c'],        ':CdefDef<cr>'],
-   \ ['<leader>ed', 'v',  0, ['c'],        ':CdefDef<cr>'],
-   \ ['<leader>ef', 'v',  1, ['c','glsl'], ':ClangFormat<cr>'],
-   \ ['<leader>ej', 'n',  1, ['vim'],      ':VimlJoin<cr>'],
-   \
-   \ ['<leader>df', 'n',  1, ['vim'],      ':verbose function{}<left>'],
-   \
-   \
-   \ ['<c-j>',      'i',  1, ['c'],        '->'],
-   \
-   \ ]
 
 if has('nvim')
   let g:projMaps =
@@ -617,7 +560,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'w0rp/ale'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim' | Plug 'junegunn/vim-easy-align'
-Plug 'Yggdroot/indentLine'
+" Plug 'Yggdroot/indentLine'
 " Plug 'altercation/vim-colors-solarized'
 Plug 'morhetz/gruvbox'
 " Plug 'jiangmiao/auto-pairs'
@@ -638,11 +581,10 @@ Plug 'itchyny/lightline.vim'
 Plug 'Valloric/YouCompleteMe'         " auto complete
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 Plug 'octol/vim-cpp-enhanced-highlight'
-Plug 'rhysd/vim-clang-format'         "clang c/c++ format
+" Plug 'rhysd/vim-clang-format'         "clang c/c++ format
 Plug 'othree/html5.vim'
 Plug 'elzr/vim-json'
 Plug 'tikhomirov/vim-glsl'
-Plug 'dedowsdi/misc'
 Plug 'dedowsdi/cdef'
 " Plug 'plasticboy/vim-markdown'
 " Plug 'klen/python-mode'
@@ -650,16 +592,6 @@ Plug 'dedowsdi/cdef'
 " Plug 'lervag/vimtex'                   " latex
 call plug#end()
 
-" only use solarized colorscheme if it's real unix, not wsl
-" if misc#env#isRealUnix() | colorscheme solarized | endif
-" if !has('gui_running')
-"   " undercurl doesn't work on terminal
-"   hi clear SpellBad
-"   hi SpellBad cterm=underline
-" endif
-
-" termguicolors cause inconsistent 16 ansi colors in :terminal
-" set termguicolors
 let g:gruvbox_number_column='bg1'
 colorscheme gruvbox
 if !has('gui_running')
@@ -668,7 +600,7 @@ if !has('gui_running')
   hi SpellBad cterm=underline
 endif
 
-call misc#ui#loadMaps(s:maps)
+" call misc#ui#loadMaps(s:maps)
 call misc#ui#loadAutoMap('quickfix')
 
 " some tiny util
