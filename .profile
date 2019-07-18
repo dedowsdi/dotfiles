@@ -21,7 +21,8 @@ PATH="$HOME/bin:$HOME/.local/bin:$HOME/.script:$PATH"
 PATH=${PATH}:/usr/local/bin/script:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
 export PYTHONPATH=${PYTHONPATH}:~/study/python/util
 # let C-x C-e call nvim
-# export EDITOR=nvim
+export VISUAL="vim"
+export EDITOR="VISUAL"
 export OSG_DIR=/usr/local
 export OSGDIR=/usr/local
 export OSG_FILE_PATH="/usr/local/source/OpenSceneGraph-Data;/home/pntandcnt/journey/osg/data"
