@@ -1,7 +1,7 @@
 autocmd!
 
 " should I export it instead?
-if !empty($TMUX)
+if !empty($TMUX) && !has('nvim')
   set term=xterm-256color
 endif
 
@@ -105,27 +105,28 @@ endif
 
 if has('gui_running') || &termguicolors
   " 16 ansi colors (gruvbox) for gvim or if 'termguicolors' is on
-  let g:terminal_ansi_colors =<< trim END
-    #282828
-    #cc241d
-    #98971a
-    #d79921
-    #458588
-    #b16286
-    #689d6a
-    #a89984
-    #928374
-    #fb4934
-    #b8bb26
-    #fabd2f
-    #83a598
-    #d3869b
-    #8ec07c
-    #ebdbb2
-  END
+  let g:terminal_ansi_colors = [
+              \ '#282828',
+              \ '#cc241d',
+              \ '#98971a',
+              \ '#d79921',
+              \ '#458588',
+              \ '#b16286',
+              \ '#689d6a',
+              \ '#a89984',
+              \ '#928374',
+              \ '#fb4934',
+              \ '#b8bb26',
+              \ '#fabd2f',
+              \ '#83a598',
+              \ '#d3869b',
+              \ '#8ec07c',
+              \ '#ebdbb2',
+              \ ]
 endif
 
 if has('nvim')
+  set rtp^=$HOME/.vim,$HOME/.vim/after
   let g:python3_host_prog = '/usr/bin/python3'
   let &shada="'200,<50,s10,h"
   tnoremap <expr> <m-r> '<C-\><C-N>"'.nr2char(getchar()).'pi'
@@ -143,7 +144,6 @@ else
   if has('gui_running')
     set lines=100 columns=999
     set guioptions=aegim " remove menu, scroll bars
-
   endif
 endif
 
@@ -215,22 +215,6 @@ let g:ycm_key_list_select_completion = ['<Down>']
 " compile_command.json exists?
 
 " easyalign
-
-" vim-clang-format
-let g:clang_format#style_options = {
-      \ 'AccessModifierOffset' : -2,
-      \ 'AllowShortFunctionsOnASingleLine' : 'true',
-      \ 'AllowShortIfStatementsOnASingleLine' : 'true',
-      \ 'AllowShortLoopsOnASingleLine' : 'true',
-      \ 'AlwaysBreakTemplateDeclarations' : 'true',
-      \ 'AlignAfterOpenBracket' : 'false',
-      \ 'ContinuationIndentWidth' : 2,
-      \ 'IndentWidth' : 2,
-      \ 'TabWidth' : 2,
-      \ 'UseTab' : 'Never',
-      \ 'Standard' : 'C++11',
-      \ 'SortIncludes': 'false',
-      \}
 
 " lightline
 let g:lightline = {
@@ -555,7 +539,6 @@ endif
 
 set rtp+=~/.fzf,.vim,.vim/after
 call plug#begin('~/.config/nvim/plugged')
-" common
 "Plug 'scrooloose/syntastic'
 Plug 'w0rp/ale'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -599,9 +582,6 @@ if !has('gui_running')
   hi clear SpellBad
   hi SpellBad cterm=underline
 endif
-
-" call misc#ui#loadMaps(s:maps)
-call misc#ui#loadAutoMap('quickfix')
 
 " some tiny util
 command! -nargs=+ LinkVimHelp let @+ = misc#createVimhelpLink(<q-args>)
