@@ -10,8 +10,11 @@
 [mergetool "vimdiff3"]
 	cmd = vim -f -d -c \"wincmd J\" \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 [alias]
-	dotfiles = !git --git-dir=$HOME/.dotfiles --work-tree=$HOME
+	df = !git --git-dir=$HOME/.dotfiles --work-tree=$HOME
         lg = log --graph --pretty=format:'%Cred%h%Creset - %C(bold blue)<%an>%Creset %Cgreen(%ad)%C(yellow)%d%Creset %s' --abbrev-commit --date=local
+        co = checkout
+        cm = commit
+        br = branch
 [diff]
 	tool = vimdiff
 [difftool]
