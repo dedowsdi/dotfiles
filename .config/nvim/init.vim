@@ -216,6 +216,10 @@ let g:ycm_key_list_select_completion = ['<Down>']
 
 " easyalign
 
+" fugitive
+command! -nargs=* Glg Git! lg --color=never <args>
+command! -nargs=* Glg Git! log --graph --pretty=format:'%h - <%an> (%ad)%d %s' --abbrev-commit --date=local <args>
+
 " lightline
 let g:lightline = {
       \ 'active': {
