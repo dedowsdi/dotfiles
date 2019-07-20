@@ -8,10 +8,12 @@ endif
 " ------------------------------------------------------------------------------
 " basic setting
 " ------------------------------------------------------------------------------
+scriptencoding utf-8
+set list listchars=trail:┄,tab:†·,extends:>,precedes:<,nbsp:+
+scriptencoding
 set ttimeout ttimeoutlen=5 timeoutlen=1000
 set number ruler novisualbell showmode showcmd hidden mouse=a background=dark
 set incsearch  ignorecase smartcase
-set list listchars=trail:┄,tab:†·,extends:>,precedes:<,nbsp:+
 set concealcursor=vn conceallevel=0
 set autoindent smartindent expandtab smarttab
 set shiftwidth=4 tabstop=8 softtabstop=4
@@ -19,12 +21,11 @@ set showmatch matchtime=3
 set laststatus=2 cmdheight=1 scrolloff=1
 set spell spelllang=en_us dictionary+=spell
 set nrformats=octal,hex,bin
-set path+=/usr/local/include,/usr/include/c++/5
+set path+=/usr/local/include
 set backspace=indent,eol,start
 let &backup = !has('vms')
 set wildmenu history=200
 set shellslash
-" set colorcolumn=+1
 set backupdir=$HOME/.vimbak directory=$HOME/.vimswap//
 set sessionoptions+=unix,slash                     " use unix /
 " search tag in dir of current file upward until root, use current dir tags if
@@ -33,7 +34,7 @@ set tags=./tags;,tags
 set wildmode=longest,list " set wildmode to unix glob
 set wildignore=*.o,*.a,*.so,tags,TAGS,*/.git/*,.git,*/build/*,build
 set matchpairs+=<:>                                " add match pair for < and >
-set fileencodings=ucs-bom,utf-8,gbk,cp936,big5,gb18030,latin1,utf-16
+set fileencodings=ucs-bom,utf-8,default,gb18030,utf-16,latin1
 let &grepprg = 'grep -n $* /dev/null --exclude-dir={.git,.hg} -I'
 " set grepprg=ag\ --vimgrep\ $* grepformat=%f:%l:%c:%m
 if executable('zsh')
@@ -56,12 +57,12 @@ if !has('gui_running')
     \ }
 
   let rxvt_maps = {
-    \   'ctrl_fn': [ '[11^]', '[12^]', '[13^]', '[14^]',
-    \                '[15^]', '[17^]', '[18^]', '[19^]',
-    \                '[20^]', '[21^]', '[23^]', '[24^]'  ],
-    \   'shift_fn':[ '[23~]', '[24~]', '[25~]', '[26~]',
-    \                '[28~]', '[29~]', '[31~]', '[32~]',
-    \                '[33~]', '[34~]', '[23$]', '[24$]'  ],
+    \   'ctrl_fn': [ '[11^', '[12^', '[13^', '[14^',
+    \                '[15^', '[17^', '[18^', '[19^',
+    \                '[20^', '[21^', '[23^', '[24^'  ],
+    \   'shift_fn':[ '[23~', '[24~', '[25~', '[26~',
+    \                '[28~', '[29~', '[31~', '[32~',
+    \                '[33~', '[34~', '[23$', '[24$'  ],
     \   'sets' : {},
     \   'maps' : {}
     \ }
@@ -81,7 +82,7 @@ if !has('gui_running')
   let i = 1
   for key in maps.shift_fn
     exec printf('set <f%d>=%s', 12 + i, key)
-    exec printf('map <f%d> <c-f%d>', 12 + i, i)
+    exec printf('map <f%d> <s-f%d>', 12 + i, i)
     let i += 1
   endfor
 
@@ -150,19 +151,14 @@ endif
 " ------------------------------------------------------------------------------
 " auto commands
 " ------------------------------------------------------------------------------
-function! s:on_dir_change()
-  if filereadable('.vim/init.vim') | source .vim/init.vim | endif
-endfunction
-
 augroup zxd_misc
   au!
-  autocmd DirChanged * cal s:on_dir_change()
+  autocmd DirChanged * if filereadable('.vim/init.vim') | source .vim/init.vim | endif
   autocmd BufWritePost *.l if &filetype ==# 'lpfg' | call myl#runLpfg() | endif
   autocmd InsertEnter,InsertLeave * set cursorline!
   autocmd FileType * try | call call('abbre#'.expand('<amatch>'), [])
               \ | catch /.*/ | endtry
-  autocmd FileType * call misc#ui#loadFiletypeMap(expand('<amatch>'))
-  autocmd FileType * setlocal formatoptions-=o formatoptions+=j
+              \ | setlocal formatoptions-=o formatoptions+=j
 augroup end
 
 " ------------------------------------------------------------------------------
@@ -344,7 +340,7 @@ function! G_fzf_search_tag(name, ...)
 endfunction
 
 let g:fzf_file_project = 'find . \( -name ".hg" -o -name ".git" -o
-            \ -name "build" -o -name ".vscode" \) -prune -o -type f'
+            \ -name "build" -o -name ".vscode" \) -prune -o -type f -print'
 
 " tex
 let g:tex_flavor = 'latex'
@@ -420,7 +416,7 @@ vnoremap al :<C-U>silent! call misc#to#selLetter()<cr>
 onoremap <expr> al <sid>omap('al')
 vnoremap il :<C-U>silent! call misc#to#selLetter()<cr>
 onoremap <expr> il <sid>omap('il')
-vnoremap ic :<c-u>call misc#to#verticalE()<cr>
+vnoremap ic :<c-u>call misc#to#column()<cr>
 onoremap <expr> ic <sid>omap('ic')
 
 " circumvent count, register changes
@@ -603,7 +599,7 @@ command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_
   \ | diffthis | wincmd p | diffthis
 command! SelectLastPaste exec 'normal! `[' . getregtype() . '`]'
 command! -nargs=+ -complete=command Less call <sid>less(<q-args>)
-command ReverseQuickFixList call setqflist(reverse(getqflist()))
+command! ReverseQuickFixList call setqflist(reverse(getqflist()))
 command! SuperWrite :w !sudo tee % > /dev/null
 command! ToggleAutoPairs :call AutoPairsToggle()
 command! Terminal exe 'terminal' |
