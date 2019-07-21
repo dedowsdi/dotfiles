@@ -1,1 +1,1 @@
-.vim/vimrc
+/home/pntandcnt/.vim/vimrc

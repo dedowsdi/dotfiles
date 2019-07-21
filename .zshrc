@@ -133,5 +133,3 @@ bindkey -a "c" fzf-cd-widget
 # bindkey -v "" fzf-history-widget
 # bindkey -v "" fzf-file-widget
 # bindkey -v "c" fzf-cd-widget
-
-# export TERM=xterm-256color

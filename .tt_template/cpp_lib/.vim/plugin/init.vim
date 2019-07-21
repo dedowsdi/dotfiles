@@ -1,4 +1,4 @@
-call misc#ui#loadProjSetting('c')
+call misc#proj#loadMap('c')
 call mycpp#setLastTarget('mylib')
 let g:mycppBuildDir = './build/gcc/Debug'
 let g:cdefProjName = 'test'
