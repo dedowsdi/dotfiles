@@ -1,12 +1,15 @@
 #version 430 core
 
+layout(location = 0) in vec4 pos;
+
+layout(location = 0)uniform mat4 mvp_mat;
+
+out vertex_data
+{
+
+} vo;
+
 void main(void)
 {
-  vec4 vertices[4] = {
-    {-1, 1 , 0, 1},
-    {-1, -1, 0, 1},
-    {1 , 1 , 0, 1},
-    {1 , -1, 0, 1}
-  };
-  gl_Position = vertices[gl_VertexID];
+  gl_Position = mvp_mat * pos;
 }

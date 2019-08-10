@@ -20,7 +20,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # -isystem ... is used to add auto complete for c++ head in ycm
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread -isystem /usr/include/c++/5")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread")
 
 set(SRC
     main.cpp
