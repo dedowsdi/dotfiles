@@ -5,9 +5,11 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
+template=$1
 template_path=$HOME/.tt_template
-src_dir="$(realpath "$template_path/$1")"
-dest_dir=${2:-$(mktemp -up /tmp cpptt_XXXXXX)}
+src_dir="$(realpath "$template_path/$template")"
+dest_dir=${2:-$(mktemp -up ~/study/"$(date +"%Y/%m/%d")" "${template}_XXXXXX")}
+mkdir -p "${dest_dir}"
 
 if [[ ! -d "$src_dir" ]]; then
     >&2 echo "$src_dir does not exist"
