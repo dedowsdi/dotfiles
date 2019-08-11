@@ -8,6 +8,10 @@ Rxvt.scrollBar_right: true
 Rxvt.iso14755: false
 Rxvt.iso14755_52: false
 
+! clickable url
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.matcher.button: 1
+
 !Xterm escapes, word by word movement
 URxvt.keysym.Control-Left:  \033[1;5D
 URxvt.keysym.Control-Right: \033[1;5C
