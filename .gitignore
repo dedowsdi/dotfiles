@@ -12,6 +12,7 @@ tags.lock
 .color_coded
 .viminfo
 .netrwhist
+.clangd
 
 # cmake
 .compile_commands.json
