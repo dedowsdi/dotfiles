@@ -1,4 +1,5 @@
-Rxvt.font: -*-terminus-*-*-*-*-20-*-*-*-*-*-iso10646-1
+! Rxvt.font: xft:Ubuntu Mono:regular:medium:size=12
+Rxvt.font: -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
 
 Rxvt.perl-ext-common: default,matcher,resize-font
 
