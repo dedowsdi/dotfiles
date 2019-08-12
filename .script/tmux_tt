@@ -15,7 +15,7 @@ winname="tt_${src_tt}_$(head /dev/urandom | tr -cd '0-9a-zA-Z' | head -c 6)"
 winid=$( tmux new-window -dPF '#{window_id}' -n "$winname" )
 
 tmux send-keys -t "$winid" \
-    'dest_dir="$(tt "'$src_tt'")" && cd "$dest_dir" &&
+    'TT_DIR="$(tt "'$src_tt'")" && cd "$TT_DIR" &&
     vim +'\'"$start_cmd"'
             call system("tmux select-window -t \"'$winid'\"")
             call job_start("bash -c \"./script/cmake.sh &> cmake.log\"")
