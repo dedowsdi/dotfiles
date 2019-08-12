@@ -1,3 +1,6 @@
+# uncomment this line and the last line to profile startup time
+# zmodload zsh/zprof
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -62,7 +65,7 @@ plugins=(
   git
   python
   z
-  nvm
+  # nvm
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -134,3 +137,5 @@ bindkey -a "c" fzf-cd-widget
 # bindkey -v "" fzf-history-widget
 # bindkey -v "" fzf-file-widget
 # bindkey -v "c" fzf-cd-widget
+
+# zprof
