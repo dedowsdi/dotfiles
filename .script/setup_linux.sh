@@ -28,6 +28,7 @@ while getopts ":arwdip" Option ; do
     case $Option in
         p     ) DO_PREPARE=''  ;;
         a     ) DO_APT=''  ;;
+        t     ) DO_THIRD=''  ;;
         w     ) DO_WEB=''  ;;
         r     ) DO_REPO='' ;;
         d     ) DO_DOWNLOAD=''  ;;
@@ -66,11 +67,6 @@ if [[ -v DO_PREPARE ]]; then
     fi
 
     sudo apt install tmux
-
-    # oh-my-zsh
-    cd ~/Downloads
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
 fi
 
 if [[ -v DO_APT ]]; then
@@ -82,6 +78,15 @@ if [[ -v DO_APT ]]; then
             sudo apt -y install "$app"
         fi
     done < "${RC}"/app
+fi
+
+if [[ -v DO_THIRD ]]; then
+    # oh-my-zsh
+    cd ~/Downloads
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+    # nvm
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 fi
 
 if [[ -v DO_PIP3 ]]; then
