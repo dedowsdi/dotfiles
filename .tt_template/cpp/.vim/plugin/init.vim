@@ -3,3 +3,5 @@ call mycpp#setLastTarget('tt')
 let g:mycppBuildDir = './build/gcc/Debug'
 let g:cdefProjName = 'test'
 let g:gutentags_project_root += ['.vim']
+
+silent e +/main/+2 main.cpp
