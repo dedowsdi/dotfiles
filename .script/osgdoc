@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage : $0 [namespace] class"
+    exit 1
+fi
+
+if [[ $# -eq 1 ]]; then
+    namespace=''
+    class=$1
+fi
+
+if [[ $# -gt 1 ]]; then
+    namespace=$1
+    class=$2
+fi
+
+doc_path=${OSG_DOC-/var/www/html/OpenSceneGraphReferenceDocs}
+class_path=${doc_path}/classes.html
+
+if [[ ! -f "$class_path" ]]; then
+    echo "$class_path doesn't exist" 
+    exit 1
+fi
+
+target_line="$(grep -Po "\b\w+\.html\">$class<.*>$namespace<" "$class_path")"
+
+if [[ ! $? -eq 0 ]]; then
+    exit 0
+fi
+
+if [[ $(<<<"$target_line" wc -l) -gt 1 ]]; then
+    echo "multiple target lines found:"
+    echo "$target_line"
+    exit 1
+fi
+
+target_file=$(<<<"$target_line" grep -Po '^\w+\.html')
+
+gvfs-open "$doc_path/$target_file"
