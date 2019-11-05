@@ -6,7 +6,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ $# -eq 1 ]]; then
-    namespace=''
+    namespace='\b\w+\b'
     class=$1
 fi
 
