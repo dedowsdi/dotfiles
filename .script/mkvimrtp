@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+set -e
+
+PROG_NAME=$0
+MINIMAL=1
+
+show_usage() {
+    echo "Usage:"
+    echo ""
+    echo "    $PROG_NAME rtp"
+    echo ""
+    echo "Create a new dir, init it as vim rtp."
+    echo ""
+    echo "    -h show this help"
+    echo "    -m miminal, add plugin, ftplugin and synax only "
+    echo "    -M maximal, add everything "
+}
+
+while getopts "hmM" opt; do
+    case $opt in
+        h)
+            show_suage
+            exit 0
+            ;;
+        m)
+            MINIMAL=1
+            ;;
+        M)
+            MINIMAL=0
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+rtp=$1
+
+if [[ -z "$rtp" ]]; then
+    show_usage
+    exit 1
+fi
+
+mkdir "$rtp" && cd "$rtp"
+
+if [[ $MINIMAL -eq 1 ]]; then
+    mkdir autoload \
+          ftplugin \
+          plugin   \
+          syntax
+else
+    mkdir autoload \
+          colors   \
+          compiler \
+          doc      \
+          ftplugin \
+          indent   \
+          keymap   \
+          lang     \
+          menu.vim \
+          pack     \
+          plugin   \
+          print    \
+          spell    \
+          syntax   \
+          tutor
+
+    touch filetype.vim \
+          scripts.vim
+fi
+
+exit 0

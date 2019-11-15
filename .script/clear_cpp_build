@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# clear build/*/*/* 
+find . -type d -name 'build' -execdir sh -c 'cd $0 && rm -rfv */*/*' {} \;
+
+# clear .cland in all child directories
+find . -type d -name '.clangd' -exec rm -rfv {} +

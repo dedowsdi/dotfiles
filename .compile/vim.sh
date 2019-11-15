@@ -13,10 +13,8 @@ sudo apt install libncurses5-dev libgnome2-dev libgnomeui-dev \
   --enable-gui=auto \
   --enable-multibyte \
   --enable-rubyinterp=yes \
-  --enable-pythoninterp=yes \
-  --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu \
-  --enable-python3interp=yes \
-  --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu \
+  --enable-pythoninterp=dynamic \
+  --enable-python3interp=dynamic \
   --enable-perlinterp=yes \
   --enable-luainterp=yes \
   --enable-cscope \

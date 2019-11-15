@@ -19,7 +19,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread -DOSG_PROJ_FILE_PATH='\"${CMAKE_CURRENT_SOURCE_DIR}\"'")
+
+find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer
+    CONFIG
+    )
 
 set(SRC
     main.cpp
@@ -27,14 +31,17 @@ set(SRC
 
 add_executable(tt ${SRC})
 
-# global cxx version
-# set(CMAKE_CXX_STANDARD 14)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_CXX_EXTENSIONS OFF)
+target_link_libraries(tt
+    osg3::osgViewer
+    )
 
 # target cxx version
 target_compile_features(tt PUBLIC cxx_std_14)
 set_target_properties(tt PROPERTIES CXX_EXTENSIONS OFF)
 
-
 target_compile_options(tt PRIVATE $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:-pthread -gdwarf -g3>)
+
+add_custom_target(tt_data COMMAND ${CMAKE_COMMAND} -E
+    copy_directory ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/data
+    )
+add_dependencies(tt tt_data)

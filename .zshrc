@@ -111,9 +111,28 @@ stty -ixon
 
 autoload zmv
 
+cdv()
+{
+  printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$(pwd)"
+}
+
+cd_and_cdv()
+{
+  cd "$@" && cdv
+}
+
+hookvim()
+{
+    alias cd=cd_and_cdv
+}
+
 [[ -f ~/.bash_aliases ]] && . ~/.bash_aliases
 
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+
+if [[ ! -z "$VIM_TERMINAL" ]]; then
+   hookvim
+fi
 
 KEYTIMEOUT=1
 bindkey -a "\C-h" history-incremental-search-backward

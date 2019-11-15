@@ -71,8 +71,7 @@ void app_tt::create_scene() {
 
   glEnable(GL_CULL_FACE);
 
-  cube.include_color(true);
-  cube.build_mesh();
+  cube.build_mesh({attrib_semantic::vertex, attrib_semantic::color});
 
   prg.with_color = true;
   prg.init();

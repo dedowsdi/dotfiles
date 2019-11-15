@@ -1,3 +1,4 @@
+
 # tags
 TAGS
 tags
@@ -17,7 +18,26 @@ tags.lock
 # cmake
 .compile_commands.json
 
+# latex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.pdf
+*.synctex.gz
+
 # misc
 build
 dependences
 __pycache__
+
+# parts of .oh-my-zsh
+.oh-my-zsh/*
+!.oh-my-zsh/custom/*
+.oh-my-zsh/example.zsh
+.oh-my-zsh/custom/plugins/examples
+.oh-my-zsh/custom/themes/example.zsh-theme
+
+# parts of .config
+.config/*
+!.config/nvim/autoload

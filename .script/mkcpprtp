@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -ex
+
+PROG_NAME=$0
+rtp=$1
+
+show_usage() {
+    echo "Usage:"
+    echo ""
+    echo "    $PROG_NAME rtp"
+    echo ""
+    echo "Create a new dir, init it as cpp vim rtp."
+    echo ""
+    echo "    -h show this help"
+}
+
+while getopts "h" opt; do
+    case $opt in
+        h)
+            show_suage
+            exit 0
+            ;;
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+
+if [[ -z "$rtp" ]]; then
+    show_usage
+    exit 1
+fi
+
+mkvimrtp "$rtp"
+cd "$rtp"
+mkvimrtp after
+
+is_empty_file() {
+    file=$1
+    if [[ ( ! -f "$file" ) || $(wc -c "$file") -eq 0 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if is_empty_file ftplugin/cpp.vim ; then
+    echo >ftplugin/cpp.vim \
+'call abbre#opengl()
+call abbre#cpp()'
+fi
+
+if is_empty_file after/ftplugin/cpp.vim ; then
+    echo >after/syntax/cpp.vim \
+'call abbre#opengl()
+call abbre#cpp()'
+fi
+
+if is_empty_file plugin/init.vim ; then
+    echo >plugin/init.vim \
+"set nospell
+let &viminfofile = getcwd() . '/.vim/.viminfo'
+call misc#proj#load_map('c')
+let g:mycpp_build_dir = './build/gcc/Debug'
+let g:external_files = [] "
+
+fi

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# convert opengl enum to string
+# convert string to opengl enum
+
+# input stream is read word by word
+
+if [[ ! -f /usr/include/GL/gl.h ]]; then
+    echo 'need /usr/include/GL/gl.h'
+    exit 1
+fi
+if [[ ! -f /usr/include/GL/glext.h ]]; then
+    echo 'need /usr/include/GL/glext.h'
+    exit 1
+fi
+
+awk '
+# collect <enum, string> in a
+# collect <string, enum> in b
+BEGIN {
+    IGNORECASE=1
+    while (getline < "/usr/include/GL/gl.h") {
+        if ($0 ~ /^\s*#define\s+GL_\w+\s+0x[0-9A-F]{4}/) {
+            a[toupper($3)] = $2
+            b[toupper($2)] = $3
+        }
+    }
+    while (getline < "/usr/include/GL/glext.h") {
+        if ($0 ~ /^\s*#define\s+GL_\w+\s+0x[0-9A-F]{4}/) {
+            a[toupper($3)] = $2
+            b[toupper($2)] = $3
+        }
+    }
+
+    # split record by word
+    RS="[ \t\n]"
+}
+
+/^(0x)?[0-9A-Z]{4}$/{
+print $0, ":", a[toupper($0)]
+}
+
+/^GL\w+$/{
+print $0, ":", b[toupper($0)]
+}
+'

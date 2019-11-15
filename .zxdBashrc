@@ -5,6 +5,20 @@ set -o vi
 eval `dircolors ~/.dir_colors/dircolors`
 source /opt/vlab-4.4.1/bin/sourceme.sh
 
+cdv()
+{
+  printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$(pwd)"
+}
+
+cd_and_cdv()
+{
+  cd "$@" && cdv
+}
+
+hookvim()
+{
+    alias cd=cd_and_cdv
+}
 
 # bindings
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
@@ -21,5 +35,6 @@ bind -x "$(bind -X | grep fzf-file-widget | sed -r 's/^"[^"]+"/"\\C-f\\C-t"/')"
 # reset c-r and c-t for readline, note no space before :, one space after :
 bind '"\C-r": reverse-search-history'
 bind '"\C-t": transpose-chars'
+
 
 # vim:set filetype=sh:
