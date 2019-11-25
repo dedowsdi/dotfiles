@@ -97,7 +97,7 @@ clone_git_repo()
 download()
 {
     local OPTIND
-    while getopts "hi" opt
+    while getopts "hivC" opt
     do
       case $opt in
 
@@ -112,8 +112,7 @@ download()
 
             ;;
 
-        i )
-            local install=  ;;
+        i ) local install=  ;;
 
         * )
             echo -e "\n  Option does not exist : $OPTARG\n"
@@ -137,8 +136,9 @@ download()
 
     cd "$DOWNLOAD" || return 1
     suffix=${fname##*.}
+    options=(--create-dir -fsSL)
     if [[ ! -f "$fname" ]]; then
-        curl -fsSL --create-dir "$url" -o "$fname" || return 1
+        curl "${options[@]}"  "$url" -o "$fname" || return 1
     fi
 
     if [[ ! -v install ]]; then
@@ -264,7 +264,7 @@ install_essential()
 
     # https://github.com/Mayccoll/Gogh , change terminal color
     sudo apt -y install dconf-cli uuid-runtime
-    curl -fsSL https://git.io/vQgMr -o "$DOWNLOAD/terminal_color_gogh.sh"
+    download https://git.io/vQgMr terminal_color_gogh.sh
     cd "$DOWNLOAD" && chmod a+x ./terminal_color_gogh.sh
 
     # essential repo
@@ -328,11 +328,15 @@ install_repo()
 
 install_download()
 {
-    set -x
     cd ~/Downloads || return 1
-    while read -r link target ; do
-        download "$link" "$target"
+    options=( --create-dir -fL -C - )
+    while read -r url fname ; do
+        if [[ -z "$fname" ]]; then
+            fname=${url##*/}
+        fi
+        options+=("$url" "-o" "$fname")
     done < "${RC}/download"
+    curl "${options[@]}"
 }
 
 install_web()

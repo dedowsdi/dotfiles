@@ -33,7 +33,9 @@ export OSG_NOTIFY_LEVEL=NOTICE
 export ESM_DATA="/usr/local/source/openmw/data/Morrowind.esm"
 export BSA_DATA="/usr/local/source/openmw/data/Morrowind.bsa"
 export MVP_MATRIX_FILE="/home/pntandcnt/black"
-export GL_FILE_PATH="$(realpath ~/journey/gl2/data);$(realpath ~/journey/gl4/data)"
+if [ -d ~/journey/gl2/data ]; then
+    export GL_FILE_PATH="$(realpath ~/journey/gl2/data);$(realpath ~/journey/gl4/data)"
+fi
 #export PAGER="/bin/bash -c \"unset PAGER; col -b -x | \
     #vim -R --not-a-term -u ~/.less.vimrc -c 'set ft=man nomod nolist'  -\""
 export MANPAGER="vim -M +MANPAGER +'file -' --not-a-term -u ~/.less.vimrc  -"
