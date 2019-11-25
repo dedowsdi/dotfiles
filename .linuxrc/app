@@ -1,79 +1,79 @@
-ant
-apache2
-apitrace
-apitrace-gui
-apt-file
-aptitude
-atom
-autoconf
-bear
-build-essential
-byzanz
-clang
-clang-format
-clang-tidy
-clinfo
-clipit
-cmake-doc
-code
-default-jre
-dict
-dictd
-dict-devil
-dict-gcide
-dict-moby-thesaurus
-dict-wn
-discord
+# small utils
 dos2unix
-doxygen
-duplicity
-equivs
-expect
-fcitx-googlepinyin
-fcitx-sunpinyin
-freeglut3-dev
-git-gui
-gcc-5-doc
-gdb-doc
+tree
+uuid
+pcregrep
+screenruler
+dconf-editor
+
+# ssh
+openssh-server
+
+# compression
+p7zip
+p7zip-full
+unrar
+xzdec
+
+# graphics util
 geogebra-classic
 gimp
 gimp-dds
 gimp-help-common
 gimp-help-en
-glew-utils
-google-chrome-stable
-ibus-sunpinyin
-jq
+blender
+
+# chm viewer
 kchmviewer
-mercurial
-mesa-utils
-minizip
+
+# video player
 mpv
-nas
-ncdu
-neovim
-nodejs
-npm
-nvidia-nsight
-nvidia-settings
+
+# c++
+valgrind
+doxygen
+git-gui
+
+# opengl
+mesa-utils
 opengl-4-html-doc
 opengl-4-man-doc
-openssh-server
-p7zip
-p7zip-full
-pcregrep
-phonon
-ruby-dev
-screen
-screenruler
-shellcheck
+freeglut3-dev
+glew-utils
+
+# json
+jq
+
+# too old ?
+apitrace
+apitrace-gui
+
+# screen record
+byzanz
 simplescreenrecorder
-steam-launcher
-texlive
-tree
-unrar
-uuid
-valgrind
-xclip
-xzdec
+
+# java
+default-jre
+
+# doc viewer
 zeal
+
+# pure doc
+cmake-doc
+clang-8-doc
+libglfw3-doc
+gcc-doc
+gdb-doc
+libstdc++-7-doc
+bash-doc
+
+# editor
+neovim
+
+# lint
+shellcheck
+
+# nvidia
+nvidia-settings
+
+# vim:set filetype=cfg:

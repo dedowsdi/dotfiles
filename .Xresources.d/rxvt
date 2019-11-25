@@ -1,14 +1,19 @@
-Rxvt.font: xft:Ubuntu Mono:regular:medium:size=13
+URxvt.font: xft:Ubuntu Mono:regular:medium:size=13
 ! Rxvt.font: -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
-Rxvt.letterSpace: -1
+URxvt.letterSpace: -1
 
-Rxvt.perl-ext-common: default,matcher,resize-font
+URxvt.perl-ext-common: default,matcher,resize-font,fullscreen
+URxvt.keysym.C-minus:     resize-font:smaller
+URxvt.keysym.C-plus:      resize-font:bigger
+URxvt.keysym.C-equal:     resize-font:reset
+URxvt.keysym.C-question:  resize-font:show
+URxvt.keysym.F11: perl:fullscreen:switch
 
-Rxvt.scrollBar: false
-Rxvt.scrollBar_right: true
+URxvt.scrollBar: false
+URxvt.scrollBar_right: true
 
-Rxvt.iso14755: false
-Rxvt.iso14755_52: false
+URxvt.iso14755: false
+URxvt.iso14755_52: false
 
 ! clickable url
 URxvt.url-launcher: /usr/bin/xdg-open
@@ -39,32 +44,32 @@ URxvt.keysym.Shift-F12:   \033[24;2~
 ! -----------------------------------------------------------------------------
 
 ! hard contrast: *background: #1d2021
-Rxvt.background: #282828
+URxvt.background: #282828
 ! soft contrast: Rxvt.background: #32302f
-Rxvt.foreground: #ebdbb2
+URxvt.foreground: #ebdbb2
 ! Black + DarkGrey
-Rxvt.color0:  #282828
-Rxvt.color8:  #928374
+URxvt.color0:  #282828
+URxvt.color8:  #928374
 ! DarkRed + Red
-Rxvt.color1:  #cc241d
-Rxvt.color9:  #fb4934
+URxvt.color1:  #cc241d
+URxvt.color9:  #fb4934
 ! DarkGreen + Green
-Rxvt.color2:  #98971a
-Rxvt.color10: #b8bb26
+URxvt.color2:  #98971a
+URxvt.color10: #b8bb26
 ! DarkYellow + Yellow
-Rxvt.color3:  #d79921
-Rxvt.color11: #fabd2f
+URxvt.color3:  #d79921
+URxvt.color11: #fabd2f
 ! DarkBlue + Blue
-Rxvt.color4:  #458588
-Rxvt.color12: #83a598
+URxvt.color4:  #458588
+URxvt.color12: #83a598
 ! DarkMagenta + Magenta
-Rxvt.color5:  #b16286
-Rxvt.color13: #d3869b
+URxvt.color5:  #b16286
+URxvt.color13: #d3869b
 ! DarkCyan + Cyan
-Rxvt.color6:  #689d6a
-Rxvt.color14: #8ec07c
+URxvt.color6:  #689d6a
+URxvt.color14: #8ec07c
 ! LightGrey + White
-Rxvt.color7:  #a89984
-Rxvt.color15: #ebdbb2
+URxvt.color7:  #a89984
+URxvt.color15: #ebdbb2
 
 ! vim:set ft=xdefaults:

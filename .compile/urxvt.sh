@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ ! -d libev ]]; then
     git clone https://github.com/enki/libev

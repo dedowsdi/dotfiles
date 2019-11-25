@@ -2,8 +2,14 @@
 
 stty -ixon
 set -o vi
-eval `dircolors ~/.dir_colors/dircolors`
-source /opt/vlab-4.4.1/bin/sourceme.sh
+
+if [[ -d ~/.dir_colors/dircolors ]]; then
+    eval `dircolors ~/.dir_colors/dircolors`
+fi
+
+if [[ -f /opt/vlab-4.4.1/bin/sourceme.sh ]]; then
+    source /opt/vlab-4.4.1/bin/sourceme.sh
+fi
 
 cdv()
 {
@@ -36,5 +42,8 @@ bind -x "$(bind -X | grep fzf-file-widget | sed -r 's/^"[^"]+"/"\\C-f\\C-t"/')"
 bind '"\C-r": reverse-search-history'
 bind '"\C-t": transpose-chars'
 
+if [ ! -z "$NVM_DIR" ]; then
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
 
 # vim:set filetype=sh:

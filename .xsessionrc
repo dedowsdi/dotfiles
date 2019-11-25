@@ -1,0 +1,13 @@
+#!/bin/sh
+
+/usr/bin/urxvtd -q -f -o
+xrdb -merge ~/.Xresources
+
+# uncomment this if you use custom build terminus
+# xset +fp /usr/local/share/fonts/terminus
+
+# various x rc:
+# .xinitrc      executed by xinit via startx.
+# .xsession     executed after log in graphical mode (on a display manager)
+# .xsessionrc   debian feature, executed after gui login, fallback of .xinitrc.
+# .xprofile     similar to .xsessionrc, only used for GDM

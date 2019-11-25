@@ -1,2 +1,0 @@
-/usr/local/bin/urxvtd -q -f -o
-xset +fp /usr/local/share/fonts/terminus

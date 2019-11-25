@@ -20,7 +20,7 @@ filetype plugin indent on
 syntax enable
 
 if has('unix')
-  call plug#begin('~/.config/nvim/plugged')
+  call plug#begin('~/.vim/plugged')
   " Plug 'altercation/vim-colors-solarized'
   Plug 'morhetz/gruvbox'
   Plug 'dedowsdi/misc'

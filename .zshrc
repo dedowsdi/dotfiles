@@ -5,7 +5,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-  export ZSH=/home/pntandcnt/.oh-my-zsh
+  export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -104,7 +104,7 @@ source $ZSH/oh-my-zsh.sh
 setopt extendedglob
 
 # setup gruvbox 256 color palette
-source ~/.config/nvim/plugged/gruvbox/gruvbox_256palette.sh
+source ~/.vim/plugged/gruvbox/gruvbox_256palette.sh
 
 # disable flow control
 stty -ixon
