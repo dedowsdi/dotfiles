@@ -19,6 +19,7 @@ APT_LOG="$LOG/apt.log"
 PIP_LOG="$LOG/pip.log"
 DOWNLOAD_LOG="$LOG/download.log"
 REPO_LOG="$LOG/repo.log"
+WEB_LOG="$LOG/web.log"
 
 mkdir -p "$LOG" "$DOWNLOAD"
 
@@ -264,13 +265,13 @@ install_essential()
     # https://github.com/Mayccoll/Gogh , change terminal color
     sudo apt -y install dconf-cli uuid-runtime
     curl -fsSL https://git.io/vQgMr -o "$DOWNLOAD/terminal_color_gogh.sh"
-    cd "$DOWNLOAD" && chmod a+x ./terminal_color_gogh
+    cd "$DOWNLOAD" && chmod a+x ./terminal_color_gogh.sh
 
     # essential repo
-    clone_git_repo hppts://github.com/dedowsdi/.vim .vim
+    clone_git_repo https://github.com/dedowsdi/.vim .vim
     ln -s $GIT_SOURCE/.vim ~/.vim
 
-    clone_git_repo hppts://github.com/dedowsdi/journey journey
+    clone_git_repo https://github.com/dedowsdi/journey journey
     ln -s $GIT_SOURCE/.journey ~/.journey
 
     clone_git_repo https://github.com/vim/vim.git vim
@@ -286,7 +287,7 @@ install_optional()
     >"$APT_LOG" 2>&1 install_apt &
     >"$PIP_LOG" 2>&1 install_pip &
     >"$REPO_LOG" 2>&1 install_repo &
-    >"$LOG_WEB" 2>&1 install_web &
+    >"$WEB_LOG" 2>&1 install_web &
 }
 
 install_apt()
