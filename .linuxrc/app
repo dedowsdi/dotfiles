@@ -5,6 +5,7 @@ uuid
 pcregrep
 screenruler
 dconf-editor
+git-gui
 
 # ssh
 openssh-server
@@ -29,17 +30,41 @@ kchmviewer
 # video player
 mpv
 
+#clang
+clang-8
+clang-tools-8
+clang-8-doc
+
+#cmake
+cmake
+cmake-qt-gui
+cmake-doc
+
+#doxygen
+doxygen
+graphviz
+
 # c++
 valgrind
-doxygen
-git-gui
+libfreeimageplus-dev
+libfreeimageplus-doc
+libfreetype6-dev
+rapidjson-dev
+rapidjson-dev
+libboost-filesystem-dev
+libboost-program-options-dev
 
 # opengl
 mesa-utils
+mesa-common-dev
+libglu1-mesa-dev
 opengl-4-html-doc
 opengl-4-man-doc
 freeglut3-dev
 glew-utils
+libglfw3
+libglfw3-dev
+libglfw3-doc
 
 # json
 jq
@@ -59,9 +84,6 @@ default-jre
 zeal
 
 # pure doc
-cmake-doc
-clang-8-doc
-libglfw3-doc
 gcc-doc
 gdb-doc
 libstdc++-7-doc

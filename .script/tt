@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -o errexit
+set -o nounset
+
 if [[ $# -lt 1 ]]; then
     >&2 echo "it should be $0 src_tt [dest_dir]"
     exit 1
@@ -16,13 +19,7 @@ if [[ ! -d "$src_dir" ]]; then
     exit 1
 fi
 
-rsync -La --exclude="build/*/*/*" --exclude="tags" "$src_dir/" "$dest_dir"
-cd "$dest_dir"
-pwd
-
-# cmake configuration is slow, i don't want to wait for it, but i need compile_commands.json
-# for ycm to work. So i replace build path of existing compile_commands.json to the new one.
-text=$(cat compile_commands.json)
-echo "${text//"$src_dir"/"$dest_dir"}" > compile_commands.json
+rsync -a --exclude="build/*/*/*" --exclude="tags" --exclude="compile_commands.json" "$src_dir/" "$dest_dir"
+cd "$dest_dir" && pwd
 
 exit 0

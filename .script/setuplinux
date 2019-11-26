@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [[ $USER == "root" ]]; then
-    echo "$0 should not be called as root"
-    exit 1
-fi
-
 # set -o errexit
 set -o nounset
 
@@ -21,8 +16,6 @@ DOWNLOAD_LOG="$LOG/download.log"
 REPO_LOG="$LOG/repo.log"
 WEB_LOG="$LOG/web.log"
 
-mkdir -p "$LOG" "$DOWNLOAD"
-
 show_usage()
 {
     echo "Prerequisite:"
@@ -37,6 +30,8 @@ show_usage()
     echo "    cd ~/.script"
     echo ""
     echo "    Written for ubuntu18.04.3"
+    echo ""
+    echo "    Must be called as normal user"
     echo ""
     echo "Usage:"
     echo ""
@@ -61,6 +56,13 @@ show_usage()
     echo "    you must manually clear nvm stuff at the end of .bashrc, it's already included in .profile and .zxdBashrc"
 }
 
+if [[ $USER == "root" ]]; then
+    show_usage
+    exit 1
+fi
+
+mkdir -p "$LOG" "$DOWNLOAD" "$GIT_SOURCE"
+
 elem_in()
 {
     if [[ $# -lt 2 ]]; then
@@ -74,24 +76,9 @@ elem_in()
     exit 1
 }
 
-clone_git_repo()
+read_data()
 {
-    address=${1}
-    dir=${2}
-
-    if [[ -z "$address" || -z "$dir" ]]; then
-        echo "empty address or dir"
-        return 1
-    fi
-
-    {
-        cd $GIT_SOURCE || return 1
-        if [[ -d $dir ]]; then
-            echo "$dir already exists, skipped"
-            return 0
-        fi
-        sudo git clone "$address" "$dir"
-    }
+    grep -E '^\s*[^# \t]' "$1"
 }
 
 download()
@@ -163,20 +150,25 @@ install_ppa()
 
         sudo apt-add-repository -y "$address"
         new_ppa=
-    done<"${RC}/ppa"
+    done< <(read_data "${RC}/ppa")
 
     if [[ -v new_ppa ]]; then
         sudo apt update
     fi
 }
 
+command_exist()
+{
+    >/dev/null 2>&1 command -v "$1"
+}
+
 install_essential()
 {
-    # Failed to login after reboot, log says no permission for /dev/fb0, had to add self to video group, but not working.
+    # Failed to login after reboot, log says no permission for /dev/fb0, had to add self to video group, but not always work.
     sudo usermod -a -G video "$USER"
 
-    # It's said it's caused by rootless X (https://wiki.archlinux.org/index.php/xorg#Rootless_Xorg), we disable it here. No longer needed after install nvidia
-    # driver?
+    # It's said it's caused by rootless X (https://wiki.archlinux.org/index.php/xorg#Rootless_Xorg), we disable it here. ( No longer needed after install nvidia
+    # driver? )
     #
     # if grep -q needs_root_rights /etc/X11/Xwrapper.config ; then
     #     >>/etc/X11/Xwrapper.config echo 'needs_root_rights=yes'
@@ -193,21 +185,21 @@ install_essential()
     install_ppa
 
     # urxvt
-    if [[ $(type -t urxvt) != file ]]; then
+    if ! command_exist urxvt ; then
         sudo apt -y install rxvt-unicode-256color xfonts-terminus
         sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/urxvtc 100
         download https://raw.githubusercontent.com/simmel/urxvt-resize-font/master/resize-font ~/.urxvt/ext/resize-font
-        clone_git_repo https://aur.archlinux.org/urxvt-fullscreen.git urxvt-fullscreen
+        git clone https://aur.archlinux.org/urxvt-fullscreen.git
         cp $GIT_SOURCE/urxvt-fullscreen/fullscreen ~/.urxvt/ext/
     fi
 
     # apt tmux is old, you might want to purge this and build from source
-    if [[ $(type -t tmux) != file ]]; then
+    if ! command_exist tmux ; then
         sudo apt -y install tmux figlet
     fi
 
     # apt vim is pretty old, you should purge this and build from source
-    if [[ $(type -t vim) != file ]]; then
+    if ! command_exist vim ; then
         sudo apt -y install vim clipit xclip
         mkdir -p ~/.vimbak ~/.vimundo ~/.vimswap
         mkdir -p ~/.config/nvim/autoload
@@ -215,7 +207,7 @@ install_essential()
     fi
 
     # zsh
-    if [[ $(type -t zsh) != file ]]; then
+    if ! command_exist zsh ; then
         sudo apt -y install zsh zsh-doc
         download -i https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh oh-my-zsh.sh
     fi
@@ -228,12 +220,6 @@ install_essential()
 
     # manage window in commandline. (wmctrl is needed by urxvt-fullscreen)
     sudo apt -y install xdotool wmctrl
-
-    # c++ related
-    sudo apt -y install clang-8 clang-8-tools
-    sudo ln -fs  /usr/bin/clangd-8 /usr/bin/clangd
-    sudo apt -y install libglfw3 libglfw3-dev
-    sudo apt -y install cmake cmake-qt-gui
 
     # python
     sudo apt -y install python3-pip
@@ -264,30 +250,20 @@ install_essential()
 
     # https://github.com/Mayccoll/Gogh , change terminal color
     sudo apt -y install dconf-cli uuid-runtime
-    download https://git.io/vQgMr terminal_color_gogh.sh
+    download https://raw.githubusercontent.com/Mayccoll/Gogh/master/gogh.sh terminal_color_gogh.sh
     cd "$DOWNLOAD" && chmod a+x ./terminal_color_gogh.sh
-
-    # essential repo
-    clone_git_repo https://github.com/dedowsdi/.vim .vim
-    ln -s $GIT_SOURCE/.vim ~/.vim
-
-    clone_git_repo https://github.com/dedowsdi/journey journey
-    ln -s $GIT_SOURCE/.journey ~/.journey
-
-    clone_git_repo https://github.com/vim/vim.git vim
-    clone_git_repo https://github.com/universal-ctags/ctags ctags
-    clone_git_repo https://github.com/tmux/tmux tmux
-    clone_git_repo https://github.com/dedowsdi/OpenSceneGraph osg
-    clone_git_repo https://github.com/openscenegraph/OpenSceneGraph-Data osg-data
 }
 
 install_optional()
 {
-    sudo echo authorize
-    >"$APT_LOG" 2>&1 install_apt &
-    >"$PIP_LOG" 2>&1 install_pip &
-    >"$REPO_LOG" 2>&1 install_repo &
-    >"$WEB_LOG" 2>&1 install_web &
+    # no background, need job control
+    install_apt  |& tee "$APT_LOG"
+    install_pip  |& tee "$PIP_LOG"
+    install_download |& tee "$DOWNLOAD_LOG"
+    install_repo |& tee "$REPO_LOG"
+    install_web  |& tee "$WEB_LOG"
+
+    sudo ln -fs  /usr/bin/clangd-8 /usr/bin/clangd
 }
 
 install_apt()
@@ -303,7 +279,7 @@ install_apt()
             echo installing "$app"
             sudo apt -y install "$app"
         fi
-    done < "${RC}"/app
+    done < <(read_data  "${RC}"/app)
 }
 
 install_pip()
@@ -315,15 +291,18 @@ install_pip()
         else
             pip3 install "$pkg"
         fi
-    done<"${RC}/"pip3
+    done< <(read_data "${RC}/"pip3)
 }
 
 install_repo()
 {
+    set -x
     cd "$GIT_SOURCE" || return 1
-    while read -r cmd remote ; do
-        sudo "$cmd" clone "$remote"
-    done < "${RC}"/repo
+    while read -r cmd url output ; do
+        if [[ $cmd == git ]]; then
+            git clone "$url" $output
+        fi
+    done < <(read_data  "${RC}"/repo)
 }
 
 install_download()
@@ -335,7 +314,7 @@ install_download()
             fname=${url##*/}
         fi
         options+=("$url" "-o" "$fname")
-    done < "${RC}/download"
+    done < <(read_data  "${RC}/download")
     curl "${options[@]}"
 }
 
@@ -343,7 +322,7 @@ install_web()
 {
     while read -r filename link; do
         sudo ln -vfs "$filename" "$link"
-    done<"${RC}"/apache
+    done< <(read_data "${RC}"/apache)
 }
 
 if [[ $# == 0 ]]; then
@@ -351,7 +330,7 @@ if [[ $# == 0 ]]; then
     exit 0
 fi
 
-while getopts "heoapdr" opt; do
+while getopts "heoapdrw" opt; do
     case $opt in
         h)
             show_usage
@@ -385,6 +364,11 @@ while getopts "heoapdr" opt; do
 
         r)
             install_repo |& tee "$REPO_LOG"
+            exit $?
+            ;;
+
+        w)
+            install_web |& tee "$WEB_LOG"
             exit $?
             ;;
 

@@ -1,3 +1,8 @@
+git https://github.com/vim/vim.git
+git https://github.com/universal-ctags/ctags
+git https://github.com/tmux/tmux
+git https://github.com/dedowsdi/OpenSceneGraph
+git https://github.com/openscenegraph/OpenSceneGraph-Data
 git https://github.com/apitrace/apitrace
 git https://github.com/BSVino/docs.gl
 git https://github.com/g-truc/glm
