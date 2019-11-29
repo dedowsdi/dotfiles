@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+PROG_NAME=${0##*/}
+TEMPLATE_PATH=~/.mkt_template
+STUDY_PATH=~/study
+
+show_usage()
+{
+    echo "Usage:"
+    echo ""
+    echo "Make test file, project"
+    echo ""
+    echo "    $PROG_NAME -[ht] [name]"
+    echo ""
+    echo "    Without options, create $STUDY_PATH/year/month/day/(f_n or name) and print it"
+    echo ""
+    echo "    -h show this help"
+    echo ""
+    echo "    -p create $STUDY_PATH/year/month/day and print it"
+    echo ""
+    echo "    -t template, use template from ~/.tt_template, [name] is ignored"
+}
+
+load_template()
+{
+    local template=$1
+    local src_dir
+    src_dir="$(realpath "$TEMPLATE_PATH/$template")"
+    if [[ ! -d "$src_dir" ]]; then
+        1>&2 echo "$src_dir doesn't exists"
+        exit 1
+    fi
+
+    # use template_n style name
+    local n
+    n=$(find . -regextype posix-egrep -regex "^./${template}_[0-9]+" | cut -b "$((${#template}+4))"- | sort -n | tail -1)
+    if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
+
+    # copy template
+    local dest_dir=${template}_$n
+    mkdir -p "${dest_dir}"
+
+    rsync -a --exclude="build/*/*/*" --exclude="tags" --exclude="compile_commands.json" "$src_dir/" "$dest_dir"
+    cd "$dest_dir" && pwd
+}
+
+# goto today's directory
+today_dir="$STUDY_PATH/$(date +"%Y/%m/%d")"
+if [[ ! -d "$today_dir" ]]; then
+    mkdir -p "$today_dir"
+fi
+cd "$today_dir"
+
+while getopts "ht:p" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        t)
+            load_template "$OPTARG"
+            exit $?
+            ;;
+
+        p)
+            pwd
+            exit 0
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+# create new file and print it's path
+if [[ $# -gt 0 ]]; then
+    fname=$1
+else
+    n=$(find . -regextype posix-egrep -regex "^./f_[0-9]+" | cut -b 5- | sort -n | tail -1)
+    if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
+    fname="f_$n"
+fi
+
+touch "$fname"
+realpath "$fname"
+
+exit $?
