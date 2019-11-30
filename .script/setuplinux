@@ -21,13 +21,10 @@ show_usage()
     echo "Prerequisite:"
     echo ""
     echo "    git clone --bare https://github.com/dedowsdi/dotfiles .dotfiles"
+    echo "    git --git-dir=.dotfiles --word-tree=. checkout ."
     echo ""
-    echo "    # checkout .script only, some installment suchas oh-my-zsh"
-    echo "    # won't work if you checkout everything, you should do it after"
-    echo "    # essenctial finished"
-    echo "    git --git-dir=.dotfiles --word-tree=. checkout .script"
-    echo ""
-    echo "    cd ~/.script"
+    echo "    Due to poor internet, you must manually do operations that"
+    echo "    relies on downloaded files ($DOWNLOAD)."
     echo ""
     echo "    Written for ubuntu18.04.3"
     echo ""
@@ -53,7 +50,8 @@ show_usage()
     echo ""
     echo "Issue:"
     echo ""
-    echo "    you must manually clear nvm stuff at the end of .bashrc, it's already included in .profile and .zxdBashrc"
+    echo "    you might need to manually clear nvm stuff at the end of .bashrc,"
+    echo "    it's already included in .profile and .zxdBashrc"
 }
 
 if [[ $USER == "root" ]]; then
@@ -79,68 +77,6 @@ elem_in()
 read_data()
 {
     grep -E '^\s*[^# \t]' "$1"
-}
-
-download()
-{
-    local OPTIND
-    while getopts "hivC" opt
-    do
-      case $opt in
-
-        h )
-            echo "usage"
-            echo ""
-            echo "      download -[i] url [output]"
-            echo ""
-            echo "      -i install"
-            echo ""
-            echo "      if output is relative, it's relative to $DOWNLOAD, not current dir"
-
-            ;;
-
-        i ) local install=  ;;
-
-        * )
-            echo -e "\n  Option does not exist : $OPTARG\n"
-            usage; return 1   ;;
-
-      esac    # --- end of case ---
-    done
-
-    shift $((OPTIND-1))
-
-    url=${1}
-    if [[ -z "$url" ]]; then
-        echo "empty url "
-        return 1
-    fi
-
-    fname=${2}
-    if [[ -z "$fname" ]]; then
-        fname=${url##*/}
-    fi
-
-    cd "$DOWNLOAD" || return 1
-    suffix=${fname##*.}
-    options=(--create-dir -fsSL)
-    if [[ ! -f "$fname" ]]; then
-        curl "${options[@]}"  "$url" -o "$fname" || return 1
-    fi
-
-    if [[ ! -v install ]]; then
-        return 0
-    fi
-
-    chmod a+x "$fname"
-    if [[ "$suffix" == deb ]]; then
-        sudo dpkg -i "./$fname"
-    fi
-
-    if [[ "$suffix" == sh ]]; then
-        chmod a+x "$fname"
-        "./$fname"
-    fi
 }
 
 install_ppa()
@@ -174,7 +110,7 @@ install_essential()
     #     >>/etc/X11/Xwrapper.config echo 'needs_root_rights=yes'
     # fi
 
-    sudo apt -y install build-essential git mercurial curl
+    sudo apt -y install build-essential git mercurial curl wget
 
     # chinese input method
     # Open "Language support", add simplified chinese
@@ -188,9 +124,9 @@ install_essential()
     if ! command_exist urxvt ; then
         sudo apt -y install rxvt-unicode-256color xfonts-terminus
         sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/urxvtc 100
-        download https://raw.githubusercontent.com/simmel/urxvt-resize-font/master/resize-font ~/.urxvt/ext/resize-font
-        git clone https://aur.archlinux.org/urxvt-fullscreen.git
-        cp $GIT_SOURCE/urxvt-fullscreen/fullscreen ~/.urxvt/ext/
+
+        # copy resize-font and fullscreen to ~/.urxvt/ext
+        mkdir -p ~/.urxvt/ext
     fi
 
     # apt tmux is old, you might want to purge this and build from source
@@ -209,7 +145,10 @@ install_essential()
     # zsh
     if ! command_exist zsh ; then
         sudo apt -y install zsh zsh-doc
-        download -i https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh oh-my-zsh.sh
+        # install oh-my-zsh.sh
+        # make sure ~/.oh-my-zsh doesn't exist
+        # execute oh-my-zsh.sh
+        # restore .zshrc
     fi
 
     # bash
@@ -226,14 +165,7 @@ install_essential()
 
     # node
     sudo apt -y install nodejs npm
-    if [[ ! -f ~/.nvm/Makefile ]]; then
-        download -i https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh nvm0.34.0.sh
-    fi
-
-    # browser
-    if [[ $(type -t google-chrome) != file ]]; then
-        download -i https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb chrome-stable.deb
-    fi
+    # install nvm
 
     # webserver
     sudo apt -y install ant apache2
@@ -250,8 +182,7 @@ install_essential()
 
     # https://github.com/Mayccoll/Gogh , change terminal color
     sudo apt -y install dconf-cli uuid-runtime
-    download https://raw.githubusercontent.com/Mayccoll/Gogh/master/gogh.sh terminal_color_gogh.sh
-    cd "$DOWNLOAD" && chmod a+x ./terminal_color_gogh.sh
+    # execute gosh.sh
 }
 
 install_optional()
@@ -268,11 +199,7 @@ install_optional()
 
 install_apt()
 {
-    pattern=$'^[ \t]*(#|$)'
     while read -r app ; do
-        if [[ "$app" =~ $pattern ]]; then
-            continue
-        fi
         if  dpkg -l "$app" | tail -1 | grep -E '^ii' ; then
             echo "$app" already installed
         else
@@ -297,26 +224,40 @@ install_pip()
 
 install_repo()
 {
-    set -x
     cd "$GIT_SOURCE" || return 1
     while read -r cmd url output ; do
         if [[ $cmd == git ]]; then
-            git clone "$url" $output
+
+            if [[ -z "$output" ]]; then
+                output=${url##*/}
+            fi
+
+            if [[ -d "$output" ]]; then
+                echo "skip $output"
+                continue
+            fi
+
+            echo "cloning $output"
+
+            # shallow clone. You can fetch revisions later with git fetch --depth=1000
+            # or git fetch --unshallow
+            { git clone --progress --depth=1 "$url" "$output" || rm -rf "$output" ;} \
+                > "${url##*/}.gitclone.log" 2>&1 &
         fi
     done < <(read_data  "${RC}"/repo)
 }
 
 install_download()
 {
-    cd ~/Downloads || return 1
-    options=( --create-dir -fL -C - )
+    cd "$DOWNLOAD" || exit 1
     while read -r url fname ; do
         if [[ -z "$fname" ]]; then
             fname=${url##*/}
         fi
-        options+=("$url" "-o" "$fname")
+
+        # continue download in background
+        wget --tries=100 -cb "$url" -O "$fname" -o "$fname.wget.log"
     done < <(read_data  "${RC}/download")
-    curl "${options[@]}"
 }
 
 install_web()

@@ -1,4 +1,16 @@
-https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-preview-64-bit.deb
-http://pilotfiber.dl.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.tar.bz2
+https://raw.githubusercontent.com/simmel/urxvt-resize-font/master/resize-font
+
+https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh oh-my-zsh.sh
+
+https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb chrome-stable.deb
+
+# terminal color
+https://raw.githubusercontent.com/Mayccoll/Gogh/master/gogh.sh
+
+https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh nvm0.34.0.sh
+
+https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.bz2
+
 http://mirror.bit.edu.cn/qtproject/archive/qt/5.7/5.7.0/qt-opensource-linux-x64-5.7.0.run
+
 https://github.com/justjavac/ReplaceGoogleCDN/archive/master.zip ReplaceGoogleCDN-master.zip

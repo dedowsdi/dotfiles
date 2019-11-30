@@ -1,3 +1,4 @@
 /usr/share/doc                                   /var/www/html/doc
 /opt/Qt5.7.0/Docs/Qt-5.7/qtdoc                   /var/www/html/qt5
 /usr/local/source/osg3.6_gl2/build/gcc/Release/doc/OpenSceneGraphReferenceDocs                      /var/www/html/OpenSceneGraphReferenceDocs
+/usr/local/source/docs.gl/htdocs                 /var/www/html/docs.gl
