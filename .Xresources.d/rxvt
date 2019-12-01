@@ -7,7 +7,7 @@ URxvt.keysym.C-minus:     resize-font:smaller
 URxvt.keysym.C-plus:      resize-font:bigger
 URxvt.keysym.C-equal:     resize-font:reset
 URxvt.keysym.C-question:  resize-font:show
-! URxvt.keysym.F11: perl:fullscreen:switch
+URxvt.keysym.F11: perl:fullscreen:switch
 
 URxvt.scrollBar: false
 URxvt.scrollBar_right: true
@@ -19,7 +19,7 @@ URxvt.iso14755_52: false
 URxvt.url-launcher: /usr/bin/xdg-open
 URxvt.matcher.button: 1
 
-! rxvt s-f1=f11, s-f2=f12, s-f4 and s-f4 don't work for unknown reason, replace
+! rxvt s-f1=f11, s-f2=f12, s-f4 and s-f4 do not work for unknown reason, replace
 ! them with xterm code
 URxvt.keysym.Shift-F1:    \033[1;2P
 URxvt.keysym.Shift-F2:    \033[1;2Q
