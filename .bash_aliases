@@ -9,6 +9,9 @@ alias dgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias dgitdirstatus='dgit status -unormal $( dgit ls-tree -d -r master --name-only ) '
 alias tt='cd "$(mkt -p)"'
 
+# quite gdb
+alias gdb='gdb -q'
+
 # you can not use --exclude and --include together, the later one will be simply ignored
 # alias grep='grep -I --exclude-dir={.git,.hg} --exclude={.*.swp}'
 
