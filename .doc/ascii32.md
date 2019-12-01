@@ -1,3 +1,12 @@
+% ascii32(7)
+
+## Name ##
+ascii32
+
+## SYNOPSIS
+group ascii code in 32. copied from https://bestasciitable.com/
+
+## DESCRIPTION
 ```
 Dec Hex  Binary   Char | Dec Hex  Binary   Char  | Dec Hex  Binary   Char | Dec Hex  Binary   Char
 --------------------------------------------------------------------------------------------------
@@ -34,10 +43,5 @@ Dec Hex  Binary   Char | Dec Hex  Binary   Char  | Dec Hex  Binary   Char | Dec 
 30  0x1e 00_11110 RS   | 62  0x3e 01_11110 >     | 94  0x5e 10_11110 ^    | 126 0x7e 11_11110 ~
 31  0x1f 00_11111 US   | 63  0x3f 01_11111 ?     | 95  0x5f 10_11111 _    | 127 0x7f 11_11111 DEL
 ```
-
-- control : `& 01_11111`
+- control : `& 01_11111`. ctrl-[a-z] doesn't make too much sense, most shell treat ctrl-[a-z] asctrl-[A-Z]
 - shift :   `& 10_11111`
-
-copied from https://bestasciitable.com/
-
-vim:set filetype=markdown:
