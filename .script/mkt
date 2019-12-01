@@ -22,6 +22,8 @@ show_usage()
     echo "    -p create $STUDY_PATH/year/month/day and print it"
     echo ""
     echo "    -t template, use template from ~/.tt_template, [name] is ignored"
+    echo ""
+    echo "    -l list templates"
 }
 
 load_template()
@@ -31,7 +33,7 @@ load_template()
     src_dir="$(realpath "$TEMPLATE_PATH/$template")"
     if [[ ! -d "$src_dir" ]]; then
         1>&2 echo "$src_dir doesn't exists"
-        exit 1
+        return 1
     fi
 
     # use template_n style name
@@ -47,6 +49,11 @@ load_template()
     cd "$dest_dir" && pwd
 }
 
+list_templates()
+{
+    find "$TEMPLATE_PATH" -maxdepth 1 -mindepth 1 -type d -printf "%f\n" | sort
+}
+
 # goto today's directory
 today_dir="$STUDY_PATH/$(date +"%Y/%m/%d")"
 if [[ ! -d "$today_dir" ]]; then
@@ -54,7 +61,7 @@ if [[ ! -d "$today_dir" ]]; then
 fi
 cd "$today_dir"
 
-while getopts "ht:p" opt; do
+while getopts "ht:pl" opt; do
     case $opt in
         h)
             show_usage
@@ -69,6 +76,11 @@ while getopts "ht:p" opt; do
         p)
             pwd
             exit 0
+            ;;
+
+        l)
+            list_templates
+            exit $?
             ;;
 
         * )
