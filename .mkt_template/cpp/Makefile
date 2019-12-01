@@ -10,7 +10,7 @@ L_DIRS ?=
 LIBS ?=
 
 # find all *.cpp, *.c, *.cxx, *.s files in source dirs
-SRCS := $(shell find $(SRC_DIRS) -regex ".*\.\(cpp\|.c\|.cxx\|*.s\)" | sed 's/^.\///')
+SRCS := $(shell find $(SRC_DIRS) -regex ".*\.\(cpp\|.c\|.cxx\|*.s\)" | sed 's/^\.\///')
 
 # map from *.cpp to ./build/*.cpp.o
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

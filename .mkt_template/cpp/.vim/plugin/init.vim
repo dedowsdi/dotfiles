@@ -6,7 +6,7 @@ endfunction
 
 function s:run()
   CloseFinishedTerminal
-  bot ter ./build/a.out
+  bot ter bash -c "make && ./build/a.out"
   wincmd p
 endfunction
 
