@@ -83,6 +83,9 @@ default-jre
 # doc viewer
 zeal
 
+# doc converter
+pandoc
+
 # pure doc
 gcc-doc
 gdb-doc
