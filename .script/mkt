@@ -6,6 +6,7 @@ set -o nounset
 PROG_NAME=${0##*/}
 TEMPLATE_PATH=~/.mkt_template
 STUDY_PATH=~/study
+SUFFIX=
 
 show_usage()
 {
@@ -24,6 +25,8 @@ show_usage()
     echo "    -t template, use template from ~/.tt_template, [name] is ignored"
     echo ""
     echo "    -l list templates"
+    echo ""
+    echo "    -s add suffix if no -t, no name"
 }
 
 load_template()
@@ -61,7 +64,7 @@ if [[ ! -d "$today_dir" ]]; then
 fi
 cd "$today_dir"
 
-while getopts "ht:pl" opt; do
+while getopts "ht:pls:" opt; do
     case $opt in
         h)
             show_usage
@@ -83,6 +86,10 @@ while getopts "ht:pl" opt; do
             exit $?
             ;;
 
+        s)
+            SUFFIX="$OPTARG"
+            ;;
+
         * )
             echo -e "\n  Option does not exist : $OPTARG\n"
             usage; exit 1
@@ -95,9 +102,9 @@ shift $((OPTIND-1))
 if [[ $# -gt 0 ]]; then
     fname=$1
 else
-    n=$(find . -regextype posix-egrep -regex "^./f_[0-9]+" | cut -b 5- | sort -n | tail -1)
+    n=$(find . -regextype posix-egrep -regex "^./f_[0-9]+.*" | grep -oP 'f_\K\d+' | sort -n | tail -1)
     if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
-    fname="f_$n"
+    fname="f_$n$SUFFIX"
 fi
 
 touch "$fname"
