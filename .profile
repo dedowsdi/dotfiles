@@ -38,7 +38,7 @@ if [ -d ~/journey/gl2/data ]; then
 fi
 #export PAGER="/bin/bash -c \"unset PAGER; col -b -x | \
     #vim -R --not-a-term -u ~/.less.vimrc -c 'set ft=man nomod nolist'  -\""
-export MANPAGER="vim -M +MANPAGER +'file -' --not-a-term -u ~/.less.vimrc  -"
+export MANPAGER="vim -M +MANPAGER +'file -' --not-a-term -"
 export CVSROOT=/usr/local/source/cvsroot
 
 # awk posix
