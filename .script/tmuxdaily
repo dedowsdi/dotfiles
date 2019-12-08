@@ -1,8 +1,11 @@
 #!/bin/bash
 
+REST=${DAILY_REST-"30s 20"}
+WORK=${DAILY_WORK-"1m 45"}
+
 if ! tmux has-session -t rest ; then
     tmux new-session -ds rest -n clock
-    tmux send-keys -t rest 'workrest -w work -r rest 1m 20 30s 20' 'Enter'
+    tmux send-keys -t rest "workrest -w work -r $WORK $REST" 'Enter'
 fi
 
 if ! tmux has-session -t work ; then
