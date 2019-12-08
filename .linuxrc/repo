@@ -4,13 +4,13 @@ git https://github.com/apitrace/apitrace
 git https://github.com/BSVino/docs.gl
 git https://github.com/erich666/GraphicsGems
 git https://github.com/g-truc/glm
-git https://github.com/KhronosGroup/glslang
 git https://github.com/Microsoft/GSL
 git https://github.com/NVIDIAGameWorks/GraphicsSamples
 git https://github.com/NVIDIAGameWorks/OpenGLSamples
 git https://github.com/openscenegraph/OpenSceneGraph-Data
-git https://github.com/Tencent/rapidjson/
+git https://github.com/Tencent/rapidjson
 git https://github.com/tmux/tmux
 git https://github.com/universal-ctags/ctags
 git https://github.com/vim/vim.git vim
 git https://github.com/dedowsdi/OpenSceneGraph
+git https://github.com/rtyley/bfg-repo-cleaner

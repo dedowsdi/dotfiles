@@ -33,6 +33,7 @@ mpv
 #clang
 clang-8
 clang-tools-8
+clang-format-8
 clang-8-doc
 
 #cmake
@@ -44,8 +45,12 @@ cmake-doc
 doxygen
 graphviz
 
+# needed by ctags to generate man
+python-docutil
+
 # c++
 valgrind
+bear
 libfreeimageplus-dev
 libfreeimageplus-doc
 libfreetype6-dev

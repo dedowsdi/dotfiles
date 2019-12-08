@@ -237,12 +237,18 @@ install_repo()
                 continue
             fi
 
+            # make sure output is relative path. output will be removed if clone failed, it's dangerous to rm absolute path
+            if [[ "$output" =~ ^/ ]]; then
+                echo "skip absolute output $output"
+                continue
+            fi
+
             echo "cloning $output"
 
             # shallow clone. You can fetch revisions later with git fetch --depth=1000
             # or git fetch --unshallow
-            { git clone --progress --depth=1 "$url" "$output" || rm -rf "$output" ;} \
-                > "${url##*/}.gitclone.log" 2>&1 &
+            sudo bash -c "{ git clone --progress --depth=1 \"$url\" \"$output\" || rm -rf \"$output\"
+                            } > \"${output}.gitclone.log\" 2>&1 &"
         fi
     done < <(read_data  "${RC}"/repo)
 }
