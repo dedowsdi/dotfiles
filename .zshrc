@@ -1,3 +1,7 @@
+# vim:set foldmethod=marker :
+
+# oh-my-zsh {{{1
+
 # uncomment this line and the last line to profile startup time
 # zmodload zsh/zprof
 
@@ -5,7 +9,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-  export ZSH="$HOME/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -101,42 +105,25 @@ source $ZSH/oh-my-zsh.sh
 
 #setopt KSH_ARRAYS
 
+# my settings {{{1
+
+# reduce escape delay
+KEYTIMEOUT=1
+
 setopt extendedglob
-
-# setup gruvbox 256 color palette
-source ~/.vim/plugged/gruvbox/gruvbox_256palette.sh
-
-# disable flow control
-stty -ixon
-
 autoload zmv
 
-# sync vim local dir
-cdv()
-{
-  printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$(pwd)"
-}
+. ~/.commonrc
 
-cd_and_cdv()
-{
-  cd "$@" && cdv
-}
-
-hookvim()
-{
-    alias cd=cd_and_cdv
-}
-
-if [[ ! -z "$VIM_TERMINAL" ]]; then
-   hookvim
-fi
-
-[[ -f ~/.bash_aliases ]] && . ~/.bash_aliases
-
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
-
-KEYTIMEOUT=1
 bindkey -v
+
+# rebind fzf
+[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+bindkey -a "	" fzf-completion
+bindkey -a "" fzf-history-widget
+bindkey -a "" fzf-file-widget
+bindkey -a "c" fzf-cd-widget
+
 bindkey -a "\C-h" history-incremental-search-backward
 bindkey -v "\C-h" history-incremental-search-backward
 bindkey -a "\C-s" history-incremental-search-forward
@@ -146,17 +133,3 @@ bindkey -M isearch "\C-s" history-incremental-search-forward
 bindkey -v "" edit-command-line
 bindkey -a "" edit-command-line
 bindkey -v "" self-insert-unmeta
-
-# rebind fzf
-bindkey -a "	" fzf-completion
-bindkey -a "" fzf-history-widget
-bindkey -a "" fzf-file-widget
-bindkey -a "c" fzf-cd-widget
-
-# not working in insert mode?
-# bindkey -v "	" fzf-completion
-# bindkey -v "" fzf-history-widget
-# bindkey -v "" fzf-file-widget
-# bindkey -v "c" fzf-cd-widget
-
-# zprof

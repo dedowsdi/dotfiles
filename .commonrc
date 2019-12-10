@@ -1,0 +1,34 @@
+# vim:set filetype=sh foldmethod=marker :
+
+# disable flow control
+stty -ixon
+
+[ -f ~/.bash_aliases ] && . ~/.bash_aliases
+
+if [ -s ~/.vim/plugged/gruvbox/gruvbox_256palette.sh ] ; then
+    . ~/.vim/plugged/gruvbox/gruvbox_256palette.sh
+fi
+
+if [[ -s /opt/vlab-4.4.1/bin/sourceme.sh ]]; then
+    source /opt/vlab-4.4.1/bin/sourceme.sh
+fi
+
+# sync vim local dir {{{1
+cdv()
+{
+  printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$(pwd)"
+}
+
+cd_and_cdv()
+{
+  cd "$@" && cdv
+}
+
+hookvim()
+{
+    alias cd=cd_and_cdv
+}
+
+if [ ! -z "$VIM_TERMINAL" ]; then
+   hookvim
+fi
