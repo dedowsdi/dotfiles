@@ -1,4 +1,6 @@
 # changed from https://spin.atomicobject.com/2016/08/26/makefile-c-projects/
+#
+# Used for quick test. If you need compile_commands.json, exectute `bear make`
 
 TARGET_EXEC ?= a.out
 BUILD_TYPE ?= debug
@@ -18,14 +20,16 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 # map from ./build/*.cpp.o to ./build/*.cpp.d
 DEPS := $(OBJS:.o=.d)
 
+PP := $(OBJS:.o=.ii)
+
 # -MMD create non system headfile dependency rule(use -MD if you also need
 #  system heads ) for *.cpp to *.cpp.d in the same dir as *.o
 # -MP add PHONY to headfile in dependency in case you delete it and make complains.
-CPPFLAGS ?= $(INCLUDE_FLAGS) $(LIBRARY_INCLUDE_FLAGS) -MMD -MP
+CPPFLAGS ?= -MMD -MP $(INCLUDE_FLAGS)
 
 ifeq ($(BUILD_TYPE), debug)
 # default to debug build, include macro info
-CXXFLAGS ?= -g3 -gdwarf -DDEBUG -D_DEBUG 
+CXXFLAGS ?= -g3 -gdwarf -DDEBUG -D_DEBUG
 else ifeq ($(BUILD_TYPE), relwithdebinfo)
 CXXFLAGS ?= -O2 -g -DNDEBUG
 else ifeq ($(BUILD_TYPE), release)
@@ -34,7 +38,9 @@ else ifeq ($(BUILD_TYPE), minsizerel)
 CXXFLAGS ?= -Os
 endif
 
-I_DIRS += $(shell find $(SRC_DIRS) -mindepth 1 -name .vim -prune -or -type d -print | sed 's/^.\///')
+CXXFLAGS := -std=c++14 $(CXXFLAGS)
+
+I_DIRS += $(shell find $(SRC_DIRS) -mindepth 1 \( -name .vim -or -name .clangd -or -name build \) -prune -or -type d -print | sed 's/^.\///')
 INCLUDE_FLAGS := $(addprefix -I,$(I_DIRS)) $(addprefix -isystem,$(ISYSTEM_DIRS))
 
 LDFLAGS := $(addprefix -L,$(L_DIRS))
@@ -45,6 +51,8 @@ all: $(BUILD_DIR)/$(TARGET_EXEC)
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
+	@echo "--------"
+	@echo "linking..."
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
 
 # assembly
@@ -53,11 +61,17 @@ $(BUILD_DIR)/%.s.o: %.s Makefile | $(BUILD_DIR)
 
 # c source
 $(BUILD_DIR)/%.c.o: %.c Makefile | $(BUILD_DIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp Makefile | $(BUILD_DIR)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+# stop after preprocessor
+pp : $(PP)
+
+$(BUILD_DIR)/%.cpp.ii: %.cpp Makefile | $(BUILD_DIR)
+	$(CC) $(CXXFLAGS) $(CPPFLAGS) -E $< -o $@
 
 $(BUILD_DIR):
 	$(MKDIR_P) $(BUILD_DIR)

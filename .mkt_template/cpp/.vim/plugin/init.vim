@@ -10,7 +10,8 @@ function s:run()
   wincmd p
 endfunction
 
+set splitbelow
 nnoremap <f7> :call <sid>make()<cr>
 nnoremap <f5> :call <sid>run()<cr>
 silent e a.cpp
-/main/++
+1;/main/++

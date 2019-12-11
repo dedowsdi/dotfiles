@@ -1,0 +1,21 @@
+[
+    {
+        "arguments": [
+            "c++",
+            "-c",
+            "-std=c++14",
+            "-g3",
+            "-gdwarf",
+            "-DDEBUG",
+            "-D_DEBUG",
+            "-I.clangd",
+            "-I.clangd/index",
+            "-Ibuild",
+            "-o",
+            "build/a.cpp.o",
+            "a.cpp"
+        ],
+        "directory": "/home/dedowsdi/.mkt_template/cpp",
+        "file": "a.cpp"
+    }
+]

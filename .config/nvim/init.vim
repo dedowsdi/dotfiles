@@ -1,1 +1,0 @@
-/home/pntandcnt/.vim/vimrc
