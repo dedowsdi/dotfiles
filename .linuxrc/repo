@@ -14,3 +14,4 @@ git https://github.com/universal-ctags/ctags
 git https://github.com/vim/vim.git vim
 git https://github.com/dedowsdi/OpenSceneGraph
 git https://github.com/rtyley/bfg-repo-cleaner
+git https://github.com/bulletphysics/bullet3
