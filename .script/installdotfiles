@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+PROG_NAME=$0
+
+show_usage()
+{
+    echo "Usage:"
+    echo ""
+    echo "    $PROG_NAME args"
+    echo ""
+    echo "Install dotfiles by symbolic links. If target exists and is not"
+    echo "a link, It will be moved to .dotfiles.bak"
+    echo ""
+    echo "    -h show this help"
+    echo ""
+    echo "    -f from"
+}
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+FROM=$(realpath "$SCRIPT_DIR/..")
+TO=~
+
+if [[ "$FROM" == "$TO" ]]; then
+    echo can not set both from and to to "$FROM"
+    exit 1
+fi
+
+while getopts ":hf:t:" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        f)
+            FROM=$OPTARG
+            ;;
+
+        t)
+            TO=$OPTARG
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+# create link for all files except .oh-my-zsh and .config
+find "$FROM" -mindepth 1 -maxdepth 1 -name '.*' ! -name '.git' ! -name '.oh-my-zsh' ! -name '.config' |
+while read -r f; do
+    if [[ "$f" =~ \.(oh-my-zsh|config|git) ]]; then
+        continue
+    fi
+
+    link="$TO/${f##*/}"
+
+    if [[ ! -L "$link" ]]; then
+        mkdir -p "$TO/.dotfiles.bak"
+        rsync -a "$link" "$TO/.dotfiles.bak" && rm -rf "$link"
+        echo "$link"
+    elif [[ "$(readlink "$f")" != "$f" ]] ; then
+        continue
+    fi
+
+    ln -vfs "$f" "$TO/${f##*/}"
+done
+
+if [[ -d "$FROM/.oh-my-zsh" ]]; then
+    ln -fs "$FROM/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme" "$TO/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme"
+fi
+
+exit 0
