@@ -1,0 +1,29 @@
+# global default ctags setting for cpp.
+#
+# This file add all macros used in all libraries.
+
+# case insensitive sort
+--sort=foldcase
+
+# Kinds scope Signature inheritance language
+--fields=KsSil
+--excmd=number
+
+# add prototype
+--kinds-c++=+p
+
+--exclude=.vim
+--exclude=data
+--exclude=build
+--exclude=*/bin/*
+
+# osg macros
+-D META_Object(library,name)
+-D META_ValueObject(value, valueObject)
+
+# qt macros
+-D Q_OBJECT
+
+# bullet macros
+-D SIMD_FORCE_INLINE
+-D ATTRIBUTE_ALIGNED16(class)=class
