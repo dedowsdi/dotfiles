@@ -24,6 +24,9 @@ void add_quad(osg::DrawElementsUInt& indices, GLuint v0, GLuint v1, GLuint v2, G
 osg::Node* create_cube()
 {
   auto geom = new osg::Geometry();
+  geom->setUseVertexArrayObject(1);
+  geom->setUseVertexBufferObjects(1);
+  geom->setUseDisplayList(false);
   auto vertices = new osg::Vec3Array(osg::Array::BIND_PER_VERTEX);
   vertices->reserve(8);
 
@@ -50,8 +53,8 @@ osg::Node* create_cube()
   colors->push_back(osg::Vec3(0, 0, 0));
   colors->push_back(osg::Vec3(1, 1, 1));
 
-  geom->setVertexAttribArray(0, vertices);
-  geom->setVertexAttribArray(1, colors);
+  geom->setVertexArray(vertices);
+  geom->setColorArray(colors);
 
   auto elements = new osg::DrawElementsUInt(GL_TRIANGLES, 36, 0);
   elements->reserve(36);
@@ -82,5 +85,18 @@ int main(int argc, char *argv[])
 {
   osgViewer::Viewer viewer;
   viewer.setSceneData(create_cube());
+  viewer.setLightingMode(osg::View::NO_LIGHT);
+
+  viewer.realize();
+
+  osgViewer::Viewer::Windows windows;
+  viewer.getWindows(windows);
+
+  auto state = windows.front()->getState();
+
+  // you don't need to set this if you turn off fixed function pipeline.
+  state->setUseModelViewAndProjectionUniforms(true);
+  state->setUseVertexAttributeAliasing(true);
+
   return viewer.run();
 }
