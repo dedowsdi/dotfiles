@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+prog_name=
+
+show_usage()
+{
+    echo "Usage:"
+    echo ""
+    echo "    $prog_name"
+    echo ""
+    echo "    -h show this help"
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+template=~/.mkt_template/cpp_cmake
+
+verbose_copy()
+{
+    path=$1
+    target=${path##*/}
+    if [[ -e "$target" ]]; then
+        echo "$target exists, skip"
+    else
+        cp -vr "$path" .
+    fi
+}
+
+verbose_copy "$template/.dedowsdi"
+
+exit 0

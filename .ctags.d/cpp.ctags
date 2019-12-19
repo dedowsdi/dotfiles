@@ -2,6 +2,9 @@
 #
 # This file add all macros used in all libraries.
 
+# same as -G. needed for c++ head without suffix.
+--guess-language-eagerly
+
 # case insensitive sort
 --sort=foldcase
 

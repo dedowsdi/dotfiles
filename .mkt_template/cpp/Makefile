@@ -38,7 +38,8 @@ else ifeq ($(BUILD_TYPE), minsizerel)
 CXXFLAGS ?= -Os
 endif
 
-CXXFLAGS := -std=c++14 $(CXXFLAGS)
+# avoid signed and unsigned compare warning
+CXXFLAGS := -std=c++14 -Wall $(CXXFLAGS)
 
 I_DIRS += $(shell find $(SRC_DIRS) -mindepth 1 \( -name .vim -or -name .clangd -or -name build \) -prune -or -type d -print | sed 's/^.\///')
 INCLUDE_FLAGS := $(addprefix -I,$(I_DIRS)) $(addprefix -isystem,$(ISYSTEM_DIRS))
@@ -54,6 +55,7 @@ $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	@echo "--------"
 	@echo "linking..."
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
+	@echo
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s Makefile | $(BUILD_DIR)

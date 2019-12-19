@@ -8,6 +8,9 @@ alias dvim='GIT_DIR="$HOME/.dotfiles" GIT_WORK_TREE="$HOME" vim'
 alias dgit='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias dgitdirstatus='dgit status -unormal $( dgit ls-tree -d -r master --name-only ) '
 alias tt='cd "$(mkt -p)"'
+alias tb='nc termbin.com 9999'
+alias rdp='CPP_BUILD_TYPE=Release ./.dedowsdi/proj.sh'
+alias rddp='CPP_BUILD_TYPE=RelWithDebInfo ./.dedowsdi/proj.sh'
 
 # quite gdb
 alias gdb='gdb -q'

@@ -1,0 +1,22 @@
+#! /bin/bash
+
+# common cmake stuff
+
+set -o errexit
+set -o nounset
+
+build_type=${CPP_BUILD_TYPE:-Debug}
+build_dir=${CPP_BUILD_DIR:-build/gcc/${build_type}}
+
+source_dir="$(pwd)"
+
+[[ ! -d "$build_dir" ]] && mkdir -p "$build_dir"
+
+(
+cd "$build_dir" && cmake "$@"                       \
+         -DCMAKE_BUILD_TYPE:STRING="$build_type"    \
+         -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOLEAN=ON \
+         "$source_dir"
+)
+
+ln -fs "$build_dir"/compile_commands.json compile_commands.json

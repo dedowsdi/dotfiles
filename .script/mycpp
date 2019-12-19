@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+prog_name=
+
+show_usage()
+{
+    echo "Usage:"
+    echo ""
+    echo "get cpp settings used in personal script"
+    echo ""
+    echo "    $prog_name -[hbc]"
+    echo ""
+    echo "    -h show this help"
+    echo ""
+    echo "    -b output mid build direcotory "
+}
+
+output_mid_build_dir()
+{
+    compiler_dir=${CXX:-gcc}
+
+    # use gcc for all g++, c++, cc, gcc ....
+    if [[ "$compiler_dir" =~ ^[gc+]+$ ]]; then
+        compiler_dir=gcc
+    fi
+    echo $compiler_dir
+}
+
+while getopts ":hb" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+        b)
+            output_mid_build_dir
+            exit $?
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+exit 0
+

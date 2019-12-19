@@ -21,9 +21,21 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread -DOSG_PROJ_FILE_PATH='\"${CMAKE_CURRENT_SOURCE_DIR}\"'")
 
-find_package(OpenSceneGraph REQUIRED COMPONENTS osgViewer
-    CONFIG
+FIND_PACKAGE(Fontconfig REQUIRED)
+FIND_PACKAGE(OpenSceneGraph REQUIRED COMPONENTS
+    osgViewer
+    osgAnimation
+    osgParticle
+    osgFX
+    osgShadow
+    osgWidget
+    osgGA
+    osgDB
+    osgUtil
     )
+
+INCLUDE_DIRECTORIES(${OPENSCENEGRAPH_INCLUDE_DIRS})
+
 
 set(SRC
     main.cpp
@@ -32,7 +44,7 @@ set(SRC
 add_executable(tt ${SRC})
 
 target_link_libraries(tt
-    osg3::osgViewer
+    ${OPENSCENEGRAPH_LIBRARIES}
     )
 
 # target cxx version

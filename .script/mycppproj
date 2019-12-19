@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# default cpp project start script
+
+cppbuilddir=${CXX-gcc}
+if [[ $cppbuilddir =~ ^[gc+]+$ ]]; then
+    cppbuilddir=gcc
+fi
+
+export CPP_BUILD_TYPE=Debug
+export CPP_BUILD_DIR=build/$(cppbuilddir)/$CPP_BUILD_TYPE
+
+vim

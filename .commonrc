@@ -29,6 +29,15 @@ hookvim()
     alias cd=cd_and_cdv
 }
 
+dp()
+{
+    if [ -f .dedowsdi/proj.sh ]; then
+        .dedowsdi/proj.sh
+    else
+        vim
+    fi
+}
+
 if [ ! -z "$VIM_TERMINAL" ]; then
    hookvim
 fi
