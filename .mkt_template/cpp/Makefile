@@ -11,8 +11,10 @@ I_DIRS ?=
 L_DIRS ?=
 LIBS ?=
 
+FIND_EXCLUDE := -type d \( -name '.?*' -o -name build \) -prune -o
+
 # find all *.cpp, *.c, *.cxx, *.s files in source dirs
-SRCS := $(shell find $(SRC_DIRS) -regex ".*\.\(cpp\|.c\|.cxx\|*.s\)" | sed 's/^\.\///')
+SRCS := $(shell find $(SRC_DIRS) $(FIND_EXCLUDE) -type f -regex ".*\.\(cpp\|c\|cxx\|s\)" -print)
 
 # map from *.cpp to ./build/*.cpp.o
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -39,9 +41,11 @@ CXXFLAGS ?= -Os
 endif
 
 # avoid signed and unsigned compare warning
-CXXFLAGS := -std=c++14 -Wall $(CXXFLAGS)
+CXXFLAGS := -Wall $(CXXFLAGS)
+CFLAGS := $(CXXFLAGS)
+CXXFLAGS := -std=c++14 $(CXXFLAGS)
 
-I_DIRS += $(shell find $(SRC_DIRS) -mindepth 1 \( -name .vim -or -name .clangd -or -name build \) -prune -or -type d -print | sed 's/^.\///')
+I_DIRS += $(shell find $(SRC_DIRS) -mindepth 1 $(FIND_EXCLUDE) -type d -print)
 INCLUDE_FLAGS := $(addprefix -I,$(I_DIRS)) $(addprefix -isystem,$(ISYSTEM_DIRS))
 
 LDFLAGS := $(addprefix -L,$(L_DIRS))
