@@ -21,13 +21,18 @@ export VISUAL="vim"
 export EDITOR="$VISUAL"
 export OSG_DIR=/usr/local
 export OSGDIR=/usr/local
+
+# ReaderWriterViewer need deprecated library.
+# export OSG_CONFIG_FILE="$HOME/.osg.view"
+
+export OSG_WINDOW="100 100 1280 720"
 export OSG_FILE_PATH=/usr/local/source/OpenSceneGraph-Data
-export OSG_LIBRARY_PATH=/usr/local/lib/osgPlugins-3.7.0
+export OSG_LIBRARY_PATH=/usr/local/lib
 export OSG_NOTIFY_LEVEL=NOTICE
 export FZF_DEFAULT_COMMAND='find .'
 export ESM_DATA="/usr/local/source/openmw/data/Morrowind.esm"
 export BSA_DATA="/usr/local/source/openmw/data/Morrowind.bsa"
-export MANPAGER="vim -M +MANPAGER +'file -' --not-a-term -"
+export MANPAGER="vim -n -M +MANPAGER +'file -' --not-a-term -"
 export CVSROOT=/usr/local/source/cvsroot
 if [ -d ~/journey/gl2/data ]; then
     export GL_FILE_PATH="$(realpath ~/journey/gl2/data);$(realpath ~/journey/gl4/data)"

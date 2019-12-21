@@ -29,12 +29,12 @@ hookvim()
     alias cd=cd_and_cdv
 }
 
-dp()
+vp()
 {
     if [ -f .dedowsdi/proj.sh ]; then
-        .dedowsdi/proj.sh
+        .dedowsdi/proj.sh "$@"
     else
-        vim
+        vim "$@"
     fi
 }
 
