@@ -1,7 +1,34 @@
 #!/usr/bin/env bash
 
+set -o errexit
+set -o nounset
+
+show_usage()
+{
+    echo "Usage: $0 [namespace] class "
+    echo ""
+    echo "Browse openscenegraph doc"
+    echo ""
+    echo "    -h show this help"
+}
+
+while getopts ":hw" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
 if [[ $# -eq 0 ]]; then
-    echo "Usage : $0 [namespace] class"
+    show_usage
     exit 1
 fi
 
@@ -15,23 +42,22 @@ if [[ $# -gt 1 ]]; then
     class=$2
 fi
 
-doc_path=${OSG_DOC-/var/www/html/OpenSceneGraphReferenceDocs}
+doc_path=${OSG_DOC-/var/www/html/doc/osg-doc}
 class_path=${doc_path}/classes.html
 
 if [[ ! -f "$class_path" ]]; then
-    echo "$class_path doesn't exist" 
+    echo "$class_path doesn't exist"
     exit 1
 fi
 
-target_line="$(grep -Po "\b\w+\.html\">$class<.*>$namespace<" "$class_path")"
+mapfile -t target_line < <(grep -iPo "\b\w+\.html\">$class<.*>$namespace<" "$class_path")
 
-if [[ ! $? -eq 0 ]]; then
-    exit 0
-fi
-
-if [[ $(<<<"$target_line" wc -l) -gt 1 ]]; then
+if [[ ${#target_line[@]} -gt 1 ]]; then
     echo "multiple target lines found:"
-    echo "$target_line"
+    printf "%s\n" "${target_line[@]}"
+    exit 1
+elif [[ ${#target_line[@]} -eq 0 ]]; then
+    echo "nothing found"
     exit 1
 fi
 
