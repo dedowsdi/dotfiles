@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+show_usage()
+{
+    echo "Usage: $0 name "
+    echo ""
+    echo "Open html doc under /var/www/html/*doc/html. only *-doc is matched"
+    echo ""
+    echo "    -h show this help"
+    echo ""
+    echo "    -w match name* instead of *name*"
+    echo ""
+    echo "    -f open as /... instead of http"
+}
+
+whole_word_match=
+browse_as_file=
+
+while getopts ":hw" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        w)
+            whole_word_match=1
+            ;;
+
+        f)
+            browse_as_file=1
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [[ $# -lt 1 ]]; then
+    show_usage
+    exit 1
+fi
+
+name=$1
+if [[ -n "$whole_word_match" ]]; then
+    glob_pattern="$name*-doc"
+else
+    glob_pattern="*$name*-doc"
+fi
+
+items=($(find -H /var/www/html/doc -maxdepth 1 -name "$glob_pattern"))
+
+if [[ ${#items[@]} -eq 1 ]]; then
+
+    index_file="${items[0]}/html/index.html"
+    if [[ ! -f $index_file ]]; then
+        index_file=$(find -H "${items[0]}" -name "index.html")
+    fi
+
+    if [[ -f $index_file ]]; then
+        if [[ -n "$browse_as_file" ]]; then
+            gio open "$index_file"
+        else
+            google-chrome "http://localhost/doc/${index_file##*/doc/}"
+        fi
+    else
+        echo "no valid index.html found under ${items[0]}"
+        exit 1
+    fi
+
+elif [[ ${#items[@]} -eq 0 ]]; then
+    >&2 echo "nothing found"
+else
+    printf "%s\n" "${items[@]##*/}"
+    exit 1
+fi
+
+exit 0
