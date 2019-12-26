@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 # old policy for FindOpenGL
-cmake_policy(SET CMP0072 OLD)
+# cmake_policy(SET CMP0072 OLD)
 
 project(tt VERSION 0.0 LANGUAGES CXX)
 
@@ -26,10 +26,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# -isystem ... is used to add auto complete for c++ head in ycm
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread")
-
-find_package(gl43app REQUIRED CONFIG NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+    set(EXPORT_POSTFIX -d)
+ENDIF()
+find_package(gl43app${EXPORT_POSTFIX} REQUIRED CONFIG NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
 
 set(SRC
     main.cpp

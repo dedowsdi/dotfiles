@@ -1,2 +1,2 @@
 call misc#proj#load_map('c')
-call mycpp#setLastTarget('mylib')
+call mycpp#set_last_target('mylib')

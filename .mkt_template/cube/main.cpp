@@ -9,15 +9,12 @@ namespace zxd {
 
 const GLint width = 800;
 const GLint height = 800;
-lightless_program prg;
-cuboid cube;
 mat4 p_mat;
 mat4 v_mat;
 mat4 m_mat;
 
 class unused_program : public program
 {
-public:
 
 protected:
 
@@ -41,6 +38,8 @@ protected:
 
 class app_tt : public app {
 private:
+  lightless_program _prg;
+  cuboid _cube;
 
 public:
   void init_info() override;
@@ -71,10 +70,10 @@ void app_tt::create_scene() {
 
   glEnable(GL_CULL_FACE);
 
-  cube.build_mesh({attrib_semantic::vertex, attrib_semantic::color});
+  _cube.build_mesh({attrib_semantic::vertex, attrib_semantic::color});
 
-  prg.with_color = true;
-  prg.init();
+  _prg.with_color = true;
+  _prg.init();
 
   p_mat = perspective(fpi4, wnd_aspect(), 0.1f, 1000.0f);
   v_mat = isometric_projection(2);
@@ -87,11 +86,11 @@ void app_tt::update() {}
 void app_tt::display() {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  prg.use();
+  _prg.use();
   auto mvp_mat = p_mat * v_mat * m_mat;
-  glUniformMatrix4fv(prg.ul_mvp_mat, 1, 0, value_ptr(mvp_mat));
+  glUniformMatrix4fv(_prg.ul_mvp_mat, 1, 0, value_ptr(mvp_mat));
 
-  cube.draw();
+  _cube.draw();
 
   if(!m_display_help)
     return;
