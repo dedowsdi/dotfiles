@@ -31,17 +31,6 @@ shift $((OPTIND-1))
 
 template=~/.mkt_template/cpp_cmake
 
-verbose_copy()
-{
-    path=$1
-    target=${path##*/}
-    if [[ -e "$target" ]]; then
-        echo "$target exists, skip"
-    else
-        cp -vr "$path" .
-    fi
-}
-
-verbose_copy "$template/.dedowsdi"
+rsync -av "$template/.dedowsdi" .dedowsdi
 
 exit 0

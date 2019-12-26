@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
+set -o errexit
+set -o nounset
 
 PROG_NAME=$0
 MINIMAL=1
@@ -45,29 +46,29 @@ if [[ -z "$rtp" ]]; then
     exit 1
 fi
 
-mkdir "$rtp" && cd "$rtp"
+mkdir -p "$rtp" && cd "$rtp"
 
 if [[ $MINIMAL -eq 1 ]]; then
-    mkdir autoload \
-          ftplugin \
-          plugin   \
-          syntax
+    mkdir -p autoload \
+             ftplugin \
+             plugin   \
+             syntax
 else
-    mkdir autoload \
-          colors   \
-          compiler \
-          doc      \
-          ftplugin \
-          indent   \
-          keymap   \
-          lang     \
-          menu.vim \
-          pack     \
-          plugin   \
-          print    \
-          spell    \
-          syntax   \
-          tutor
+    mkdir -p autoload \
+             colors   \
+             compiler \
+             doc      \
+             ftplugin \
+             indent   \
+             keymap   \
+             lang     \
+             menu.vim \
+             pack     \
+             plugin   \
+             print    \
+             spell    \
+             syntax   \
+             tutor
 
     touch filetype.vim \
           scripts.vim
