@@ -1,39 +1,38 @@
 #!/bin/bash
 
-set -o errexit
-set -o nounset
+set -eu -o pipefail
 
-PROG_NAME=${0##*/}
-TEMPLATE_PATH=~/.mkt_template
-STUDY_PATH=~/study
-SUFFIX=
+prog_name=${0##*/}
+template_path=~/.mkt_template
+study_path=~/study
+suffix=
 
+prog_name=${0##*/}
 show_usage()
 {
-    echo "Usage:"
-    echo ""
-    echo "Make test file, project"
-    echo ""
-    echo "    $PROG_NAME -[ht] [name]"
-    echo ""
-    echo "    Without options, create $STUDY_PATH/year/month/day/(f_n or name) and print it"
-    echo ""
-    echo "    -h show this help"
-    echo ""
-    echo "    -p create $STUDY_PATH/year/month/day and print it"
-    echo ""
-    echo "    -t template, use template from ~/.tt_template, [name] is ignored"
-    echo ""
-    echo "    -l list templates"
-    echo ""
-    echo "    -s add suffix if no -t, no name"
+    echo "
+  Usage: $prog_name [name | -s SUFFIX | -t TEMPLATE]
+
+  Create test project or file under $study_path/year/month/day/.
+
+  Options:
+    -h           Show this help.
+
+    -p           Create $study_path/year/month/day and print it.
+
+    -t TEMPLATE  Use template from ~/.mkt_template, name new directory as TEMPLATE_N.
+
+    -l           List templates from ~/.mkt_template.
+
+    -s SUFFIX    Add suffix to file name.
+"
 }
 
 load_template()
 {
     local template=$1
     local src_dir
-    src_dir="$(realpath "$TEMPLATE_PATH/$template")"
+    src_dir="$(realpath "$template_path/$template")"
     if [[ ! -d "$src_dir" ]]; then
         1>&2 echo "$src_dir doesn't exists"
         return 1
@@ -54,11 +53,11 @@ load_template()
 
 list_templates()
 {
-    find "$TEMPLATE_PATH" -maxdepth 1 -mindepth 1 -type d -printf "%f\n" | sort
+    find "$template_path" -maxdepth 1 -mindepth 1 -type d -printf "%f\n" | sort
 }
 
 # goto today's directory
-today_dir="$STUDY_PATH/$(date +"%Y/%m/%d")"
+today_dir="$study_path/$(date +"%Y/%m/%d")"
 if [[ ! -d "$today_dir" ]]; then
     mkdir -p "$today_dir"
 fi
@@ -87,7 +86,7 @@ while getopts "ht:pls:" opt; do
             ;;
 
         s)
-            SUFFIX="$OPTARG"
+            suffix="$OPTARG"
             ;;
 
         * )
@@ -99,12 +98,11 @@ done
 shift $((OPTIND-1))
 
 # create new file and print it's path
-if [[ $# -gt 0 ]]; then
-    fname=$1
-else
+fname=${1:-}
+if [[ -z "$fname" ]]; then
     n=$(find . -regextype posix-egrep -regex "^./f_[0-9]+.*" | grep -oP 'f_\K\d+' | sort -n | tail -1)
     if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
-    fname="f_$n$SUFFIX"
+    fname="f_$n$suffix"
 fi
 
 touch "$fname"

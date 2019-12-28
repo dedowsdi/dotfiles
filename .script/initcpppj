@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-
-prog_name=
+set -eu -o pipefail
 
 show_usage()
 {
-    echo "Usage:"
-    echo ""
-    echo "    $prog_name"
-    echo ""
-    echo "    -h show this help"
+    echo "
+  Usage: ${0##*/}
+
+  Init current dir as personal cpp project. All settings are copied into
+  .dedowsdi directory.
+
+  Options:
+    -h  Show this help.
+"
 }
 
 while getopts ":h" opt; do

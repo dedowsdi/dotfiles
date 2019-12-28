@@ -2,8 +2,7 @@
 
 # common cmake stuff
 
-set -o errexit
-set -o nounset
+set -eu -o pipefail
 
 build_type=${CPP_BUILD_TYPE:-Debug}
 build_dir=${CPP_BUILD_DIR:-build/gcc/${build_type}}

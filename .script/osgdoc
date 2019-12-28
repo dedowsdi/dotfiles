@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
+set -eu -o pipefail
 
 show_usage()
 {
-    echo "Usage: $0 [namespace] class "
-    echo ""
-    echo "Browse openscenegraph doc"
-    echo ""
-    echo "    -h show this help"
+    echo"
+  Usage: ${0##*/} [<namespace>] <class>
+
+  Browse openscenegraph doc
+
+    -h  Show this help
+"
 }
 
 while getopts ":hw" opt; do

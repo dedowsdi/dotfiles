@@ -1,23 +1,22 @@
 #!/usr/bin/env bash
 # readtags is not easy to use, this is a simple wrapper around it
 
-set -e
+set -eu -o pipefail
 
-prog=$0
 name=-l
 kind=
 search_derived=
 search_base=
 
 show_usage() {
-    echo "Usage:"
-    echo ""
-    echo "    $prog [options] [name]"
-    echo ""
-    echo "    -h show this help"
-    echo "    -k kind, restrict kind"
-    echo "    -d derived, search derived classes, at most 3 layers by default, can be changed by -n"
-    echo "    -n number of layer, affect -d only"
+    echo "
+  Usage ${0##*/} [options] [name]
+
+    -h          Show this help.
+    -k KIND     Restrict kind.
+    -d DERIVED  Search derived classes, at most 3 layers by default, can be changed by -n.
+    -n NUMBER   Of layer, affect -d only.
+"
 }
 
 # print in one line

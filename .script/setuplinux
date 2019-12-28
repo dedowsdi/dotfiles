@@ -1,57 +1,53 @@
 #!/bin/bash
 
-# set -o errexit
-set -o nounset
+# set -eu -o pipefail
 
-PROG_NAME=$0
-APACHE_WEB=/var/www/html
-RC=$HOME/.linuxrc
-GIT_SOURCE=/usr/local/source
-DOWNLOAD="$HOME/.setup_download"
-LOG="$HOME/setup_log"
-ESSENTIAL_LOG="$LOG/essential.log"
-APT_LOG="$LOG/apt.log"
-PIP_LOG="$LOG/pip.log"
-DOWNLOAD_LOG="$LOG/download.log"
-REPO_LOG="$LOG/repo.log"
-WEB_LOG="$LOG/web.log"
+prog_name=$0
+apache_web=/var/www/html
+rc=$HOME/.linuxrc
+git_source=/usr/local/source
+download="$HOME/.setup_download"
+log="$HOME/setup_log"
+essential_log="$log/essential.log"
+apt_log="$log/apt.log"
+pip_log="$log/pip.log"
+download_log="$log/download.log"
+repo_log="$log/repo.log"
+web_log="$log/web.log"
 
 show_usage()
 {
-    echo "Prerequisite:"
-    echo ""
-    echo "    git clone --bare https://github.com/dedowsdi/dotfiles .dotfiles"
-    echo "    git --git-dir=.dotfiles --word-tree=. checkout ."
-    echo ""
-    echo "    Due to poor internet, you must manually do operations that"
-    echo "    relies on downloaded files ($DOWNLOAD)."
-    echo ""
-    echo "    Written for ubuntu18.04.3"
-    echo ""
-    echo "    Must be called as normal user"
-    echo ""
-    echo "Usage:"
-    echo ""
-    echo "    $PROG_NAME -{heoapdr}"
-    echo ""
-    echo "    -h show this help"
-    echo ""
-    echo "    -e install essential, fast setup, log to $ESSENTIAL_LOG"
-    echo ""
-    echo "    -o install everything except essential"
-    echo ""
-    echo "    -a install apt, log to $APT_LOG"
-    echo ""
-    echo "    -p install pip apt, log to $PIP_LOG"
-    echo ""
-    echo "    -d download, log to $DOWNLOAD_LOG"
-    echo ""
-    echo "    -r clone repo, log to $REPO_LOG"
-    echo ""
-    echo "Issue:"
-    echo ""
-    echo "    you might need to manually clear nvm stuff at the end of .bashrc,"
-    echo "    it's already included in .profile and .zxdBashrc"
+    echo "
+  Usage: ${0##*/} -options
+
+  Prerequisite:
+    git clone --bare https://github.com/dedowsdi/dotfiles .dotfiles
+    cd .dotfiles && ./installdotfiles
+
+  Install everything I needed on a new system. Written for ubuntu18.04.3. Must
+  be called as normal user
+
+  Options:
+    -h  Show this help.
+
+    -e  Install essential, fast setup, log to $essential_log.
+
+    -o  Install everything except essential.
+
+    -a  Install apt, log to $apt_log.
+
+    -p  Install pip apt, log to $pip_log.
+
+    -d  Download, log to $download_log.
+
+    -r  Clone repo, log to $repo_log.
+
+    -w  Install web, log to $web_log.
+
+  Issue:
+    you might need to manually clear nvm stuff at the end of .bashrc,
+    it's already included in .profile and .zxdBashrc
+"
 }
 
 if [[ $USER == "root" ]]; then
@@ -59,7 +55,7 @@ if [[ $USER == "root" ]]; then
     exit 1
 fi
 
-mkdir -p "$LOG" "$DOWNLOAD" "$GIT_SOURCE"
+mkdir -p "$log" "$download" "$git_source"
 
 elem_in()
 {
@@ -86,7 +82,7 @@ install_ppa()
 
         sudo apt-add-repository -y "$address"
         new_ppa=
-    done< <(read_data "${RC}/ppa")
+    done< <(read_data "${rc}/ppa")
 
     if [[ -v new_ppa ]]; then
         sudo apt update
@@ -176,8 +172,8 @@ install_essential()
     fi
 
     #change index.html to apache.html
-    if [[ -f ${APACHE_WEB}/index.html ]]; then
-        sudo mv ${APACHE_WEB}/index.html ${APACHE_WEB}/apache.html
+    if [[ -f ${apache_web}/index.html ]]; then
+        sudo mv ${apache_web}/index.html ${apache_web}/apache.html
     fi
 
     # https://github.com/Mayccoll/Gogh , change terminal color
@@ -188,11 +184,11 @@ install_essential()
 install_optional()
 {
     # no background, need job control
-    install_apt  |& tee "$APT_LOG"
-    install_pip  |& tee "$PIP_LOG"
-    install_download |& tee "$DOWNLOAD_LOG"
-    install_repo |& tee "$REPO_LOG"
-    install_web  |& tee "$WEB_LOG"
+    install_apt  |& tee "$apt_log"
+    install_pip  |& tee "$pip_log"
+    install_download |& tee "$download_log"
+    install_repo |& tee "$repo_log"
+    install_web  |& tee "$web_log"
 
     sudo ln -fs  /usr/bin/clangd-8 /usr/bin/clangd
 }
@@ -206,7 +202,7 @@ install_apt()
             echo installing "$app"
             sudo apt -y install "$app"
         fi
-    done < <(read_data  "${RC}"/app)
+    done < <(read_data  "${rc}"/app)
 }
 
 install_pip()
@@ -219,12 +215,12 @@ install_pip()
         else
             pip3 install "$pkg"
         fi
-    done< <(read_data "${RC}/"pip3)
+    done< <(read_data "${rc}/"pip3)
 }
 
 install_repo()
 {
-    cd "$GIT_SOURCE" || return 1
+    cd "$git_source" || return 1
     while read -r cmd url output ; do
         if [[ $cmd == git ]]; then
 
@@ -250,12 +246,12 @@ install_repo()
             sudo bash -c "{ git clone --progress --depth=1 \"$url\" \"$output\" || rm -rf \"$output\"
                             } > \"${output}.gitclone.log\" 2>&1 &"
         fi
-    done < <(read_data  "${RC}"/repo)
+    done < <(read_data  "${rc}"/repo)
 }
 
 install_download()
 {
-    cd "$DOWNLOAD" || exit 1
+    cd "$download" || exit 1
     while read -r url fname ; do
         if [[ -z "$fname" ]]; then
             fname=${url##*/}
@@ -263,14 +259,14 @@ install_download()
 
         # continue download in background
         wget --tries=100 -cb "$url" -O "$fname" -o "$fname.wget.log"
-    done < <(read_data  "${RC}/download")
+    done < <(read_data  "${rc}/download")
 }
 
 install_web()
 {
     while read -r filename link; do
         sudo ln -vfs "$filename" "$link"
-    done< <(read_data "${RC}"/apache)
+    done< <(read_data "${rc}"/apache)
 }
 
 if [[ $# == 0 ]]; then
@@ -286,7 +282,7 @@ while getopts "heoapdrw" opt; do
             ;;
 
         e)
-            install_essential |& tee "$ESSENTIAL_LOG"
+            install_essential |& tee "$essential_log"
             exit $?
             ;;
 
@@ -296,27 +292,27 @@ while getopts "heoapdrw" opt; do
             ;;
 
         a)
-            install_apt |& tee "$APT_LOG"
+            install_apt |& tee "$apt_log"
             exit $?
             ;;
 
         p)
-            install_pip |& tee "$PIP_LOG"
+            install_pip |& tee "$pip_log"
             exit $?
             ;;
 
         d)
-            install_download |& tee "$DOWNLOAD_LOG"
+            install_download |& tee "$download_log"
             exit $?
             ;;
 
         r)
-            install_repo |& tee "$REPO_LOG"
+            install_repo |& tee "$repo_log"
             exit $?
             ;;
 
         w)
-            install_web |& tee "$WEB_LOG"
+            install_web |& tee "$web_log"
             exit $?
             ;;
 

@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
+set -eu -o pipefail
 
 show_usage()
 {
-    echo "Usage: $0 name "
-    echo ""
-    echo "Open html doc under /var/www/html/*doc/html. only *-doc is matched"
-    echo ""
-    echo "    -h show this help"
-    echo ""
-    echo "    -w match name* instead of *name*"
-    echo ""
-    echo "    -f open as /... instead of http"
+    echo "
+  Usage: ${0##*/} <name>
+
+  Open html doc at /var/www/html/*-doc/**/html.
+
+  Options:
+
+    -h  Show this help.
+
+    -w  Match name* instead of *name*.
+
+    -f  Open as /... instead of http.
+"
 }
 
 whole_word_match=

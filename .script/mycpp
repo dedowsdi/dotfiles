@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-
-prog_name=
+set -eu -o pipefail
 
 show_usage()
 {
-    echo "Usage:"
-    echo ""
-    echo "get cpp settings used in personal script"
-    echo ""
-    echo "    $prog_name -[hbc]"
-    echo ""
-    echo "    -h show this help"
-    echo ""
-    echo "    -b output mid build direcotory "
+    echo "
+  Usage: ${0##*/} [options]
+
+  Get cpp settings used in personal script
+
+  Options:
+
+    -h  Show this help.
+
+    -b  Output mid build direcotory.
+"
 }
 
 output_mid_build_dir()
@@ -49,4 +48,3 @@ done
 shift $((OPTIND-1))
 
 exit 0
-

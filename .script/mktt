@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
+set -eu -o pipefail
 
 if [[ -z "$TMUX" ]]; then
     exit 1

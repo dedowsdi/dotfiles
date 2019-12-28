@@ -1,30 +1,30 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
-
-PROG_NAME=$0
+set -eu -o pipefail
 
 show_usage()
 {
-    echo "Usage:"
-    echo ""
-    echo "    $PROG_NAME args"
-    echo ""
-    echo "Install dotfiles by symbolic links. If target exists and is not"
-    echo "a link, It will be moved to .dotfiles.bak"
-    echo ""
-    echo "    -h show this help"
-    echo ""
-    echo "    -f from"
+    echo "
+  Usage: ${0##*/} [-hft]
+
+  Install dotfiles by creating symbolic links. If target exists and is not
+  a link, It will be moved to .dotfiles.bak
+
+  Options:
+    -h             Show this help
+
+    -f FROM_DIR    Dot files source directory. [default: parent dir of this script]
+
+    -t TO_DIR Dot  files target directory. [default: home]
+"
 }
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-FROM=$(realpath "$SCRIPT_DIR/..")
-TO=~
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+from_dir=$(realpath "$script_dir/..")
+to_dir=~
 
-if [[ "$FROM" == "$TO" ]]; then
-    echo can not set both from and to to "$FROM"
+if [[ "$from_dir" == "$to_dir" ]]; then
+    echo can not set both from_dir and to_dir to_dir "$from_dir"
     exit 1
 fi
 
@@ -36,11 +36,11 @@ while getopts ":hf:t:" opt; do
             ;;
 
         f)
-            FROM=$OPTARG
+            from_dir=$OPTARG
             ;;
 
         t)
-            TO=$OPTARG
+            to_dir=$OPTARG
             ;;
 
         * )
@@ -52,27 +52,27 @@ done
 shift $((OPTIND-1))
 
 # create link for all files except .oh-my-zsh and .config
-find "$FROM" -mindepth 1 -maxdepth 1 -name '.*' ! -name '.git' ! -name '.oh-my-zsh' ! -name '.config' |
+find "$from_dir" -mindepth 1 -maxdepth 1 -name '.*' ! -name '.git' ! -name '.oh-my-zsh' ! -name '.config' |
 while read -r f; do
     if [[ "$f" =~ \.(oh-my-zsh|config|git) ]]; then
         continue
     fi
 
-    link="$TO/${f##*/}"
+    link="$to_dir/${f##*/}"
 
     if [[ ! -L "$link" ]]; then
-        mkdir -p "$TO/.dotfiles.bak"
-        rsync -a "$link" "$TO/.dotfiles.bak" && rm -rf "$link"
+        mkdir -p "$to_dir/.dotfiles.bak"
+        rsync -a "$link" "$to_dir/.dotfiles.bak" && rm -rf "$link"
         echo "$link"
     elif [[ "$(readlink "$f")" != "$f" ]] ; then
         continue
     fi
 
-    ln -vfs "$f" "$TO/${f##*/}"
+    ln -vfs "$f" "$to_dir/${f##*/}"
 done
 
-if [[ -d "$FROM/.oh-my-zsh" ]]; then
-    ln -fs "$FROM/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme" "$TO/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme"
+if [[ -d "$from_dir/.oh-my-zsh" ]]; then
+    ln -fs "$from_dir/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme" "$to_dir/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme"
 fi
 
 exit 0

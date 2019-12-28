@@ -1,21 +1,15 @@
 #!/bin/bash
 
-set -o errexit
-set -o nounset
-
-PROG_NAME=$0
+set -eu -o pipefail
 
 show_usage()
 {
-    echo "Usage:"
-    echo ""
-    echo "    $PROG_NAME -[hwr] work_stp work_step_count, rest_step rest_step_count"
-    echo ""
-    echo "    -h show this help"
-    echo ""
-    echo "    -w work session name"
-    echo ""
-    echo "    -r rest session name"
+    echo "
+  Usage: ${0##*/} [<work> <work_step> <rest> <rest_step>]
+
+  Options:
+    -h  Show this help.
+"
 }
 
 if [[ -z $TMUX ]]; then
@@ -25,6 +19,10 @@ fi
 
 work_session=work
 rest_session=rest
+work_step=${1-1m}
+work_total_step=${2-45}
+rest_step=${3-1m}
+rest_total_step=${4-10}
 
 while getopts ":hw:r:" Option ; do
     case $Option in
@@ -51,10 +49,6 @@ done
 shift $((OPTIND-1))
 
 tmux_wid="$(xdotool getactivewindow)"
-work_step=${1:-1s}
-work_total_step=${2:-6}
-rest_step=${3:-1s}
-rest_total_step=${4:-5}
 # work_regular_style=$(tmux show-options -t work status-style)
 work_regular_style='bg=green fg=black'
 work_rest_style='bg=magenta fg=black'

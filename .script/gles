@@ -1,9 +1,33 @@
 #!/usr/bin/env bash
 
-# convert opengl enum to string
-# convert string to opengl enum
+set -eu -o pipefail
 
-# input stream is read word by word
+show_usage()
+{
+    echo "
+  Usage: gles <string|enum>...
+
+  Convert opengl enum to or from string. Written for gawk.
+
+  Options:
+    -h   Show this help.
+"
+}
+
+while getopts ":h" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 if [[ ! -f /usr/include/GL/gl.h ]]; then
     echo 'need /usr/include/GL/gl.h'
@@ -14,7 +38,12 @@ if [[ ! -f /usr/include/GL/glext.h ]]; then
     exit 1
 fi
 
-awk '
+if [[ $# -eq 0 ]]; then
+    show_usage
+    exit 1
+fi
+
+gawk '
 # collect <enum, string> in a
 # collect <string, enum> in b
 BEGIN {
@@ -36,11 +65,13 @@ BEGIN {
     RS="[ \t\n]"
 }
 
-/^(0x)?[0-9A-Z]{4}$/{
+# enum to string
+/^(0x)?[0-9A-F]{4}$/{
 print $0, ":", a[toupper($0)]
 }
 
+# string to enum
 /^GL\w+$/{
 print $0, ":", b[toupper($0)]
 }
-'
+' <<<"$*"

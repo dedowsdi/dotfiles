@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o nounset
+set -eu -o pipefail
 
-PROG_NAME=$0
-MINIMAL=1
+minimal=1
 
 show_usage() {
-    echo "Usage:"
-    echo ""
-    echo "    $PROG_NAME rtp"
-    echo ""
-    echo "Create a new dir, init it as vim rtp."
-    echo ""
-    echo "    -h show this help"
-    echo "    -m miminal, add plugin, ftplugin and synax only "
-    echo "    -M maximal, add everything "
+
+    echo "
+  Usage: ${0##*/} dir
+
+  Create a new dir, init it as vim rtp.
+
+  Options:
+    -h  Show this help.
+    -m  Miminal, add plugin, ftplugin and synax only.
+    -M  Maximal, add everything.
+    "
 }
 
 while getopts "hmM" opt; do
@@ -25,10 +25,10 @@ while getopts "hmM" opt; do
             exit 0
             ;;
         m)
-            MINIMAL=1
+            minimal=1
             ;;
         M)
-            MINIMAL=0
+            minimal=0
             ;;
 
         * )
@@ -39,7 +39,7 @@ while getopts "hmM" opt; do
 done
 shift $((OPTIND-1))
 
-rtp=$1
+rtp=${1:-}
 
 if [[ -z "$rtp" ]]; then
     show_usage
@@ -48,7 +48,7 @@ fi
 
 mkdir -p "$rtp" && cd "$rtp"
 
-if [[ $MINIMAL -eq 1 ]]; then
+if [[ $minimal -eq 1 ]]; then
     mkdir -p autoload \
              ftplugin \
              plugin   \

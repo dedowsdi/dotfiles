@@ -2,14 +2,14 @@
 
 # print memory or cpu snapshot when used_memory_percent or used_cpu_percent exceed some point
 
-CPU_THRESHOLD=70
-MEM_THRESHOLD=80
-REPORT_FILE=~/pfsnap_$(date +%Y%m%d)
+cpu_threshold=70
+mem_threshold=80
+report_file=~/pfsnap_$(date +%Y%m%d)
 
 while getopts "m:c:" Option ; do
     case $Option in
-        m     ) MEM_THRESHOLD=$OPTARG  ;;
-        c     ) CPU_THRESHOLD=$OPTARG  ;;
+        m     ) mem_threshold=$OPTARG  ;;
+        c     ) cpu_threshold=$OPTARG  ;;
         *     ) echo "Unimplemented option:$Option" ; exit 1 ;;
     esac
 done
@@ -23,22 +23,22 @@ used_mem_percent=$(echo "scale=1; 100*$total_memory/$used_memory" | bc)
 idle_cpu=$(top -bn1 | grep Cpu | grep -oP '[0-9.]+(?=\s*id)')
 used_cpu_percent=$(echo "100-$idle_cpu"|bc)
 
-if [[ $CPU_THRESHOLD -lt $used_cpu_percent ]]; then
+if [[ $cpu_threshold -lt $used_cpu_percent ]]; then
     {
         echo
         echo --------------------------------------
         echo cpu
         echo "$time"
         top -bn1 | sed -n '1,17p'
-    } >> "$REPORT_FILE"
+    } >> "$report_file"
 fi
 
-if [[ $MEM_THRESHOLD -lt $used_mem_percent ]]; then
+if [[ $mem_threshold -lt $used_mem_percent ]]; then
     {
         echo
         echo --------------------------------------
         echo mem
         echo "$time"
         top -bn1 | sed -n '1,17p'
-    } >> "$REPORT_FILE"
+    } >> "$report_file"
 fi
