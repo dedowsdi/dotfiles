@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+show_usage() {
+    echo "
+  Usage ${0##*/} [options] <name>
+
+  Search derived or parent classes.
+
+  Options:
+    -h        Show this help.
+
+    -r        Recursive search.
+
+    -p        Search parent instead of derived.
+
+    -f        Out put full tag instead of just name.
+
+    -n SCOPE  Try extra namespace for every searched tag. Tag is text based, A::B is
+              different from B.
+
+  All other options except -Q are forwarded to readtags.
+"
+}
+
+extra_options=()
+namespace=
+
+while getopts ":hrpfn:" Option ; do
+    case $Option in
+
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        p)
+            search_parent=
+            ;;
+
+        f)
+            full_tag=
+            ;;
+
+        r)
+            recursive=
+            ;;
+
+        n)
+            namespace="$OPTARG"
+            ;;
+
+        *)
+            echo "Unimplemented option:$OPTARG"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+name=${1:-}
+if [[ -z "$name" ]]; then
+    show_usage
+    exit 1
+fi
+
+elem_in()
+{
+    if [[ $# -lt 1 ]]; then
+        echo "wrong arg, is should be $0 <item> [list]"
+        exit 1
+    fi
+
+    if [[ $# -eq 1 ]]; then
+        return 1
+    fi
+
+    local elem=$1
+    local list=("${@:2}")
+    for item in "${list[@]}"; do
+        if [[ "$item" == "$elem" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+get_tag()
+{
+    local tag_name
+    local condition
+    tag_name=$1
+
+    if elem_in "$tag_name" "${processed[@]}" ; then
+        return 0
+    fi
+
+    if [[ -v search_parent ]]; then
+        echo "not implemented!!!!!!!!!"
+    else
+        if [[ -z "$namespace" ]]; then
+            condition="(member \"$tag_name\" \$inherits)"
+        else
+            condition="(or
+                       (member \"$tag_name\" \$inherits)
+                       (member \"$namespace$tag_name\" \$inherits)
+                       )"
+        fi
+    fi
+
+    readtags -Q "$condition" -l
+}
+
+indent=0
+processed=()
+print_tags()
+{
+    local indent_string
+    indent_string=
+    if [[ ! indent -eq 0 ]]; then
+        indent_string=$( printf "%0.s " $( eval "echo {1..$((indent*4))}" ) )
+    fi
+
+    local tag_name
+    for tag; do
+        if [[ -z "$tag" ]]; then
+            continue
+        fi
+        tag_name="$( echo "$tag" | cut -f 1 )"
+
+        if [[ -v full_tag ]]; then
+
+            # no indent for full tag
+            printf "%s\n" "$tag"
+        else
+            printf "%s%s\n" "$indent_string" "$tag_name"
+        fi
+
+        if [[ -v recursive ]]; then
+            local child_tags
+            mapfile -t child_tags < <(get_tag "$tag_name")
+            processed+=("$tag_name")
+            processed+=("$namespace$tag_name")
+
+            indent=$(( indent + 1))
+            print_tags "${child_tags[@]}"
+            indent=$(( indent - 1))
+        fi
+
+
+    done
+}
+
+# be very careful here. processed is global, don't change it in get_tag, it's
+# called in a sub shell
+mapfile -t tags < <(get_tag "$name")
+processed+=("$name")
+print_tags "${tags[@]}"
