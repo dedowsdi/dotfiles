@@ -38,6 +38,12 @@ vp()
     fi
 }
 
+swapfile()
+{
+    tmp_swap_file=tmp.$$
+    mv "$1" $tmp_swap_file && mv "$2" "$1" && mv $tmp_swap_file "$2"
+}
+
 if [ ! -z "$VIM_TERMINAL" ]; then
    hookvim
 fi
