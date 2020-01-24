@@ -100,12 +100,17 @@ shift $((OPTIND-1))
 # create new file and print it's path
 fname=${1:-}
 if [[ -z "$fname" ]]; then
+    set +e
     n=$(find . -regextype posix-egrep -regex "^./f_[0-9]+.*" | grep -oP 'f_\K\d+' | sort -n | tail -1)
+    set -e
     if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
     fname="f_$n$suffix"
 fi
 
 touch "$fname"
+if [[ ${fname##*.} == 'sh' ]]; then
+    chmod a+x "$fname"
+fi
 realpath "$fname"
 
 exit $?
