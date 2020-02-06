@@ -9,7 +9,7 @@
 --sort=foldcase
 
 # Kinds scope Signature inheritance language
---fields=KsSil
+--fields=KsSilZ
 --excmd=number
 
 # add prototype
@@ -23,6 +23,7 @@
 # osg macros
 -D META_Object(library,name)
 -D META_ValueObject(value, valueObject)
+-D OSG_INIT_SINGLETON_PROXY(a,b)
 
 # qt macros
 -D Q_OBJECT
@@ -30,3 +31,6 @@
 # bullet macros
 -D SIMD_FORCE_INLINE
 -D ATTRIBUTE_ALIGNED16(class)=class
+
+# add glsl to c++
+--langmap=C++:+.vert.frag.geom.comp.tesc.tese.glsl
