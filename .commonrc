@@ -47,3 +47,37 @@ swapfile()
 if [ ! -z "$VIM_TERMINAL" ]; then
    hookvim
 fi
+
+# awk literal replace.
+gsub_literal() {
+  # STR cannot be empty
+  [[ "$1" ]] || return
+
+  # string manip needed to escape '\'s, so awk doesn't expand '\n' and such
+  awk -v str="${1//\\/\\\\}" -v rep="${2//\\/\\\\}" '
+    # get the length of the search string
+    BEGIN {
+      len = length(str);
+    }
+
+    {
+      # empty the output string
+      out = "";
+
+      # continue looping while the search string is in the line
+      while (i = index($0, str)) {
+        # append everything up to the search string, and the replacement string
+        out = out substr($0, 1, i-1) rep;
+
+        # remove everything up to and including the first instance of the
+        # search string from the line
+        $0 = substr($0, i + len);
+      }
+
+      # append whatever is left
+      out = out $0;
+
+      print out;
+    }
+  '
+}
