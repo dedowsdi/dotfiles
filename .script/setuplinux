@@ -66,7 +66,7 @@ elem_in()
 
     local elem=$1
     local list=("${@:2}")
-    for item in "${list[@]}"; do [[ "$item" == "$elem" ]] && exit 0; done
+    for item in "${list[@]}"; do [[ "$item" == "$elem" ]] && return 0; done
     return 1
 }
 
@@ -87,6 +87,9 @@ install_ppa()
     if [[ -v new_ppa ]]; then
         sudo apt update
     fi
+
+    # TODO test geogebra existence
+    sudo apt-add-repository -u 'deb http://www.geogebra.net/linux/ stable main'
 }
 
 command_exist()

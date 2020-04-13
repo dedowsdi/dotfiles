@@ -1,11 +1,9 @@
-# small utils
+# small cli utl
 dos2unix
 tree
 uuid
 pcregrep
-screenruler
-dconf-editor
-git-gui
+gawk
 
 # ssh
 openssh-server
@@ -15,6 +13,9 @@ p7zip
 p7zip-full
 unrar
 xzdec
+
+# irc
+weechat
 
 # graphics util
 geogebra-classic
@@ -58,6 +59,13 @@ rapidjson-dev
 rapidjson-dev
 libboost-filesystem-dev
 libboost-program-options-dev
+libboost-test-dev
+
+# required by osg to read jpeg files
+libjpeg-dev
+
+# required by osg to generate doc
+gnuplot
 
 # opengl
 mesa-utils
@@ -70,6 +78,10 @@ glew-utils
 libglfw3
 libglfw3-dev
 libglfw3-doc
+
+# openal
+libopenal-dev
+libalut-dev
 
 # json
 jq
@@ -104,7 +116,16 @@ neovim
 # lint
 shellcheck
 
+# misc gui utils
+screenruler
+dconf-editor
+git-gui
+umlet
+
 # nvidia
 nvidia-settings
+
+# gnome
+chrome-gnome-shell
 
 # vim:set filetype=cfg:
