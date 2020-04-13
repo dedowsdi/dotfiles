@@ -7,9 +7,9 @@ BUILD_TYPE ?= debug
 BUILD_DIR ?= build
 SRC_DIRS ?= .
 ISYSTEM_DIRS ?=
-I_DIRS ?=
+I_DIRS ?= /usr/include/boost
 L_DIRS ?=
-LIBS ?=
+LIBS ?= openal alut boost_filesystem boost_system
 
 FIND_EXCLUDE := -type d \( -name '.?*' -o -name build \) -prune -o
 
@@ -23,7 +23,6 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 PP := $(OBJS:.o=.ii)
-AA := $(OBJS:.o=.s)
 
 # -MMD create non system headfile dependency rule(use -MD if you also need
 #  system heads ) for *.cpp to *.cpp.d in the same dir as *.o
@@ -44,7 +43,7 @@ endif
 # avoid signed and unsigned compare warning
 CXXFLAGS := -Wall $(CXXFLAGS)
 CFLAGS := $(CXXFLAGS)
-CXXFLAGS := -std=c++14 $(CXXFLAGS)
+CXXFLAGS := -std=c++17 $(CXXFLAGS)
 
 I_DIRS += $(shell find $(SRC_DIRS) -mindepth 1 $(FIND_EXCLUDE) -type d -print)
 INCLUDE_FLAGS := $(addprefix -I,$(I_DIRS)) $(addprefix -isystem,$(ISYSTEM_DIRS))
@@ -79,10 +78,6 @@ pp : $(PP)
 
 $(BUILD_DIR)/%.cpp.ii: %.cpp Makefile | $(BUILD_DIR)
 	$(CC) $(CXXFLAGS) $(CPPFLAGS) -E $< -o $@
-
-aa : $(AA)
-$(BUILD_DIR)/%.cpp.s: %.cpp Makefile | $(BUILD_DIR)
-	$(CC) $(CXXFLAGS) $(CPPFLAGS) -fverbose-asm -S $< -o $@
 
 $(BUILD_DIR):
 	$(MKDIR_P) $(BUILD_DIR)

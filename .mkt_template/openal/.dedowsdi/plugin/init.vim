@@ -1,3 +1,7 @@
+set tags+=/usr/include/AL/tags
+
+set path+=/usr/include/AL
+
 call misc#proj#load_map('c')
 
 nnoremap <f7> :call <sid>make()<cr>
@@ -8,15 +12,16 @@ set splitbelow
 
 function s:make()
   CloseFinishedTerminal
-  bot ter ++rows=16 make
+  bot ter make
   wincmd p
 endfunction
 
 function s:run()
   CloseFinishedTerminal
-  bot ter ++rows=16 bash -c "make && ./build/a.out"
+  bot ter bash -c "make && ./build/a.out"
   wincmd p
 endfunction
+
 
 function s:debug() abort
   Termdebug ./build/a.out
