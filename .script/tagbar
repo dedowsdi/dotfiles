@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# mimic vim tagbar plugin
+
+ctags --fields=K -f- "$@" | sort -k 4 \
+    | awk -vOFS=$'\t' '
+    { if( $4!=kind ) { kind=$4; printf "\n%s\n--------\n",kind } }
+    { printf "%s\t%s\n", $1, $3 }'
