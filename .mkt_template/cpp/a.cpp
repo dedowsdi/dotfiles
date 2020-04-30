@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include <memory>
+#include <regex>
 
 int main( int argc, char *argv[] )
 {

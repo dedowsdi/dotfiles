@@ -1,2 +1,1 @@
-call abbre#opengl()
-call abbre#osg()
+Abbre opengl osg

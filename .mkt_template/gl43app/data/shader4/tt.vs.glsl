@@ -4,10 +4,10 @@ layout(location = 0) in vec4 pos;
 
 layout(location = 0)uniform mat4 mvp_mat;
 
-out vertex_data
-{
+// out vertex_data
+// {
 
-} vo;
+// } vo;
 
 void main(void)
 {

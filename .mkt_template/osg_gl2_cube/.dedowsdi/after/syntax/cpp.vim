@@ -1,2 +1,1 @@
-call syntax#opengl()
-call syntax#osg()
+Syntax opengl osg

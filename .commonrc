@@ -16,12 +16,12 @@ fi
 # sync vim local dir {{{1
 cdv()
 {
-  printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$(pwd)"
+  printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$PWD"
 }
 
 cd_and_cdv()
 {
-  cd "$@" && cdv
+  'cd' "$@" && cdv
 }
 
 hookvim()
@@ -37,6 +37,19 @@ vp()
         vim "$@"
     fi
 }
+
+run_cmake()
+{
+    local script=$( find . -type d \( -name .git -or -name .clangd -or -name .hg -prune \) -or \
+        -type f -name 'cmake.sh' -exec {} \; )
+    if [[ -n $script ]]; then
+        "$script"
+    else
+        mycmake
+    fi
+}
+
+# vgdb cmd args
 
 swapfile()
 {

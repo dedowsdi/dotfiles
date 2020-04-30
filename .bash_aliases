@@ -18,7 +18,6 @@ alias ntoyf='ntoy --shadertoy --frag'
 # quite gdb
 alias gdb='gdb -q'
 
-# you can not use --exclude and --include together, the later one will be simply ignored
-# alias grep='grep -I --exclude-dir={.git,.hg} --exclude={.*.swp}'
+alias grep='grep --color=auto --binary-files=without-match --devices=skip --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.clangd}'
 
 # alias info="info --vi-keys"

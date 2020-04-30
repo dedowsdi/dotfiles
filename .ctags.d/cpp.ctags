@@ -8,17 +8,17 @@
 # case insensitive sort
 --sort=foldcase
 
-# Kinds scope Signature inheritance language
---fields=KsSilZ
+# kind scope Signature inheritance language Scope
+--fields=ksSiZ
 --excmd=number
 
 # add prototype
 --kinds-c++=+p
 
---exclude=.vim
---exclude=data
 --exclude=build
---exclude=*/bin/*
+--exclude=bin
+--exclude=*.md
+--exclude=*.json
 
 # osg macros
 -D META_Object(library,name)

@@ -13,16 +13,7 @@ winid=$( tmux new-window -dPF '#{window_id}' -n "$winname" )
 if [[ -f "$target" ]]; then
     cmd="cd \"$(mkt -p)\" && vim \"$target\""
 elif [[ -d "$target" ]]; then
-    cmd="cd \"$target\""
-
-    # execute cmake if it exists
-    # if [[ -f "$target/script/cmake.sh" ]]; then
-
-        # use usb shell to disable job control, no job message
-        # cmd="$cmd ; ( ./script/cmake.sh>cmake.log 2>&1 & ) "
-    # fi
-
-    cmd="$cmd ; if [[ -f .dedowsdi/proj.sh ]] ; then ./.dedowsdi/proj.sh ; else vim ; fi "
+    cmd="cd \"$target\" ; if [[ -f CMakeLists.txt ]] ; then run_cmake ; fi ; vp "
 fi
 
 tmux send-keys -t "$winid" "$cmd" Enter

@@ -1,7 +1,9 @@
-set tags+=~/journey/gl4/tags
+set rtp+=.dedowsdi,.dedowsdi/after
+
 set path+=~/journey/gl4/gl43/include
 set path+=~/journey/gl4/gl43app/include
 set path+=~/journey/gl4/glc/include
 
-call misc#proj#load_map('c')
-call mycpp#set_last_target('tt')
+set tags+=~/journey/gl4/tags
+
+Proj cpp

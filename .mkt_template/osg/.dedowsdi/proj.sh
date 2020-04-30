@@ -7,4 +7,4 @@ export OSG_FILE_PATH="$OSG_FILE_PATH:$(pwd)/data"
 export OSG_THREADING=DrawThreadPerContext
 # export OSG_THREADING=SingleThreaded
 
-vim +/main +'norm! zz' src/main.cpp
+vim +'1;/main' +'norm! zz' src/main.cpp
