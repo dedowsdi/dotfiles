@@ -19,16 +19,6 @@ cdv()
   printf '\033]51;["call", "Tapi_lcd", ["%s"]]\007' "$PWD"
 }
 
-cd_and_cdv()
-{
-  'cd' "$@" && cdv
-}
-
-hookvim()
-{
-    alias cd=cd_and_cdv
-}
-
 vp()
 {
     if [ -f .dedowsdi/proj.sh ]; then
@@ -49,6 +39,22 @@ run_cmake()
     fi
 }
 
+apitraceq()
+{
+    apitrace trace "$@"
+    qapitrace "$( find . -maxdepth 1 -type f -name '*.trace' -printf "%T@\t%p\0" | sort -nrz | cut -f2 )"
+}
+
+nnlf()
+{
+    nnl --activity="Frame Debugger" --exe="$1" --args "${@:1}"
+}
+
+cph()
+{
+    history "${1:--1}" | sed -E 's/^\w+\s*//g' | xclip
+}
+
 # vgdb cmd args
 
 swapfile()
@@ -56,10 +62,6 @@ swapfile()
     tmp_swap_file=tmp.$$
     mv "$1" $tmp_swap_file && mv "$2" "$1" && mv $tmp_swap_file "$2"
 }
-
-if [ ! -z "$VIM_TERMINAL" ]; then
-   hookvim
-fi
 
 # awk literal replace.
 gsub_literal() {

@@ -40,7 +40,7 @@ sudo apt install libncurses5-dev libgnome2-dev libgnomeui-dev \
 
   # --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu
 
-make -j 3 VIMRUNTIMEDIR=/usr/local/share/vim/vim81 |& tee make.log
+make -j 3 VIMRUNTIMEDIR=/usr/local/share/vim/vim82 |& tee make.log
 
 sudo make -j 3 install |& tee -a make.log
 

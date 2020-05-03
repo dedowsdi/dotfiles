@@ -1,22 +1,74 @@
+# Include system-wide inputrc, which is ignored by default when a user has
+# their own .inputrc file.
+$include /etc/inputrc
+
 set editing-mode vi
+set convert-meta on
+set colored-completion-prefix on
+
+# replace prefix with ... if it's longer than 8 characters, it conflicts with
+# colored-completion-prefix
+# set completion-prefix-display-length 8
+
+# skip ringing bell, list completions immediately
+set show-all-if-ambiguous on
+
+# color completion by LS_COLORS
+set colored-stats on
+
+# avoid duplicate tail
+set skip-completed-text on
+
+# add trailing file type mark for completions
+set visible-stats on
+
+set completion-ignore-case on
+
+set menu-complete-display-prefix off
 
 $if mode=vi
-
     set keyseq-timeout 0
     set show-mode-in-prompt on
 
-    # "\C-r": reverse-search-history'
-    # "\C-t": transpose-chars'
-    #"\C-sex": "vim -u NONE -nE"
+    # display mod string in yellow
+    set vi-cmd-mode-string \1\e[0;33m\2(c)
+    set vi-ins-mode-string \1\e[0;33m\2(i)
+
+    # insert mode map
+    set keymap vi-insert
+
+    "\M-e":history-expand-line
+    "\M-t":complete
+
+    # use tab for both complete and history expand line.  If current word
+    # starts with !, and it's possible to complete, complete will escaped the
+    # leading ! as \!, so history expansion won't be triggered.
+    "\t":"\M-t\M-e"
+    "\C-e":shell-expand-line
+    "\C-x\C-r":re-read-init-file
+    "\C-x\C-a":alias-expand-line
+
+    # command mode map
+    set keymap vi-command
+
+    # c mode * to glob-expand-word
+    # c mode [count]_ to insert nth arg, count starts from 1 for !!:0, insert
+    # last arg without count
+    # c mode c-t transpose neighbor characters
+    # c mode [count]G to move to nth history
+    # / search is broken until bash 5.0 (It should use glob pattern, plus use ^
+    # to match start).
+
+    "gU":upcase-word
+    "gu":downcase-word
+    "qq":start-kbd-macro
+    "qe":end-kbd-macro
+    "@q":call-last-kbd-macro
+    "qp":print-last-kbd-macro
+
+    # use this until bash5.0
+    "\C-n":history-search-forward
+    "\C-p":history-search-backward
+$else
 
 $endif
-
-$if mode=emacs
-
-    # Include system-wide inputrc, which is ignored by default when a user has their own .inputrc file.
-    $include /etc/inputrc
-$endif
-
-# bind ctrl up, down to history search
-"\e[1;5A":history-search-backward
-"\e[1;5B":history-search-forward

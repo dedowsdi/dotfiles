@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-if (( $# < 1 )); then
-    echo "${0##*/} missing command and args"
-    exit 1
-fi
-
-nnl --activity="Frame Debugger" --exe="$1" --args "${@:1}"

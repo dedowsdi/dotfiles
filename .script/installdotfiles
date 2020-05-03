@@ -51,28 +51,32 @@ while getopts ":hf:t:" opt; do
 done
 shift $((OPTIND-1))
 
-# create link for all files except .oh-my-zsh and .config
-find "$from_dir" -mindepth 1 -maxdepth 1 -name '.*' ! -name '.git' ! -name '.oh-my-zsh' ! -name '.config' |
+mkdir -p "$to_dir/.dotfiles.bak"
+
+find "$from_dir" -mindepth 1 -maxdepth 1 -name '.*' \
+    $(eval echo '! -name '{.git,.config}) |
 while read -r f; do
-    if [[ "$f" =~ \.(oh-my-zsh|config|git) ]]; then
-        continue
-    fi
 
     link="$to_dir/${f##*/}"
 
-    if [[ ! -L "$link" ]]; then
-        mkdir -p "$to_dir/.dotfiles.bak"
+    if [[ ! -L "$link" && -e "$link" ]]; then
         rsync -a "$link" "$to_dir/.dotfiles.bak" && rm -rf "$link"
         echo "$link"
-    elif [[ "$(readlink "$f")" != "$f" ]] ; then
-        continue
     fi
 
-    ln -vfs "$f" "$to_dir/${f##*/}"
+    ln -vTfs "$f" "$to_dir/${f##*/}"
 done
 
-if [[ -d "$from_dir/.oh-my-zsh" ]]; then
-    ln -fs "$from_dir/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme" "$to_dir/.oh-my-zsh/custom/themes/robbyrussell.zsh-theme"
+if [[ -d ~/.oh-my-zsh/custom ]]; then
+    mkdir -p "$to_dir/.dotfiles.bak/.oh-my-zsh" 
+    for f in "$from_dir"/zsh/*; do
+        link=~/.oh-my-zsh/custom/${f##*/}
+        if [[ -e "$link" ]]; then
+            rsync -a "$link" "$to_dir/.dotfiles.bak/.oh-my-zsh" && rm -rf "$link"
+        fi
+
+        ln -vTfs "$f" "$link"
+    done
 fi
 
 exit 0

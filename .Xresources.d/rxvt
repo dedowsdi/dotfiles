@@ -71,4 +71,6 @@ URxvt.color14: #8ec07c
 URxvt.color7:  #a89984
 URxvt.color15: #ebdbb2
 
+# 256 color is set by ~/.vim/plugged/gruvbox/gruvbox_256palette.sh
+
 ! vim:set ft=xdefaults:

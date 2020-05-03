@@ -1,7 +1,7 @@
 alias val='valgrind --gen-suppressions=all --num-callers=40 --log-file=valgrind.txt --error-limit=no'
 alias valgl='val --suppressions=$HOME/.config/opengl.supp'
 alias qt4d='LC_ALL=en_US.UTF-8 designer4'
-alias go=gio open
+alias go='gio open'
 alias vless="vim -R -"
 alias svim='sudo -E vim --cmd "set modeline"'
 alias gpb='( { git push &>/tmp/gitpush_$(basename $(pwd))_$(date +"%T") || { tput setaf 1 ; tput bold ; echo push failed !!!!!!!!!!!!!!!! ; } ; } & )'
@@ -14,6 +14,8 @@ alias vpr='CPP_BUILD_TYPE=Release vp'
 alias vprd='CPP_BUILD_TYPE=RelWithDebInfo vp'
 alias todo=todo-txt
 alias ntoyf='ntoy --shadertoy --frag'
+alias recenthistory='rh'
+alias v='vim'
 
 # quite gdb
 alias gdb='gdb -q'
