@@ -5,10 +5,6 @@ stty -ixon
 
 [ -f ~/.bash_aliases ] && . ~/.bash_aliases
 
-if [ -s ~/.vim/plugged/gruvbox/gruvbox_256palette.sh ] ; then
-    . ~/.vim/plugged/gruvbox/gruvbox_256palette.sh
-fi
-
 if [[ -s /opt/vlab-4.4.1/bin/sourceme.sh ]]; then
     source /opt/vlab-4.4.1/bin/sourceme.sh
 fi
@@ -52,7 +48,7 @@ nnlf()
 
 cph()
 {
-    history "${1:--1}" | sed -E 's/^\w+\s*//g' | xclip
+    history "${1:-1}" | sed -E 's/^\w+\s*//g' | xclip
 }
 
 # vgdb cmd args

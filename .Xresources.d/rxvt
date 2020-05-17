@@ -1,12 +1,14 @@
 URxvt.font: xft:Ubuntu Mono:regular:medium:size=13
-! Rxvt.font: -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
+! URxvt.font: -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
 URxvt.letterSpace: -1
 
-URxvt.perl-ext-common: default,matcher,resize-font,fullscreen
-URxvt.keysym.C-minus:     resize-font:smaller
-URxvt.keysym.C-plus:      resize-font:bigger
-URxvt.keysym.C-equal:     resize-font:reset
-URxvt.keysym.C-question:  resize-font:show
+URxvt.perl-ext:
+URxvt.perl-ext-common:default,fullscreen
+! URxvt.perl-ext-common: default,matcher,resize-font,fullscreen
+! URxvt.keysym.C-minus:     resize-font:smaller
+! URxvt.keysym.C-plus:      resize-font:bigger
+! URxvt.keysym.C-equal:     resize-font:reset
+! URxvt.keysym.C-question:  resize-font:show
 URxvt.keysym.F11: perl:fullscreen:switch
 
 URxvt.scrollBar: false
@@ -17,7 +19,7 @@ URxvt.iso14755_52: false
 
 ! clickable url
 URxvt.url-launcher: /usr/bin/xdg-open
-URxvt.matcher.button: 1
+! URxvt.matcher.button: 1
 
 ! rxvt s-f1=f11, s-f2=f12, s-f4 and s-f4 do not work for unknown reason, replace
 ! them with xterm code
@@ -34,43 +36,31 @@ URxvt.keysym.Shift-F5:    \033[15;2~
 ! URxvt.keysym.Shift-F11:   \033[23;2~
 ! URxvt.keysym.Shift-F12:   \033[24;2~
 
-! -----------------------------------------------------------------------------
-! File: gruvbox-dark.xresources
-! Description: Retro groove colorscheme generalized
-! Author: morhetz <morhetz@gmail.com>
-! Source: https://github.com/morhetz/gruvbox-generalized
-! Last Modified: 6 Sep 2014
-! -----------------------------------------------------------------------------
+! solarized dark
+URxvt.background:             #002b36
+URxvt.foreground:             #839396
+URxvt.fading:                 40
+URxvt.fadeColor:              #002b36
+URxvt.cursorColor:            #93a1a1
+URxvt.pointerColorBackground: #586e75
+URxvt.pointerColorForeground: #93a1a1
 
-! hard contrast: *background: #1d2021
-URxvt.background: #282828
-! soft contrast: Rxvt.background: #32302f
-URxvt.foreground: #ebdbb2
-! Black + DarkGrey
-URxvt.color0:  #282828
-URxvt.color8:  #928374
-! DarkRed + Red
-URxvt.color1:  #cc241d
-URxvt.color9:  #fb4934
-! DarkGreen + Green
-URxvt.color2:  #98971a
-URxvt.color10: #b8bb26
-! DarkYellow + Yellow
-URxvt.color3:  #d79921
-URxvt.color11: #fabd2f
-! DarkBlue + Blue
-URxvt.color4:  #458588
-URxvt.color12: #83a598
-! DarkMagenta + Magenta
-URxvt.color5:  #b16286
-URxvt.color13: #d3869b
-! DarkCyan + Cyan
-URxvt.color6:  #689d6a
-URxvt.color14: #8ec07c
-! LightGrey + White
-URxvt.color7:  #a89984
-URxvt.color15: #ebdbb2
+! swap 0-8, 7-C
+URxvt.color8:  #073642
+URxvt.color1:  #dc322f
+URxvt.color2:  #859900
+URxvt.color3:  #b58900
+URxvt.color4:  #268bd2
+URxvt.color5:  #d33682
+URxvt.color6:  #2aa198
+URxvt.color12: #93a1a1
+URxvt.color0:  #002b36
+URxvt.color9:  #cb4b16
+URxvt.color10: #586e75
+URxvt.color11: #657b83
+URxvt.color7:  #839496
+URxvt.color13: #6c71c4
+URxvt.color14: #eee8d5
+URxvt.color15: #fdf6e3
 
-# 256 color is set by ~/.vim/plugged/gruvbox/gruvbox_256palette.sh
-
-! vim:set ft=xdefaults:
+! vim:set filetype=cfg et sw=4 ts=8:

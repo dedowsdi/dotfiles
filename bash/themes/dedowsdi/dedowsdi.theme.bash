@@ -4,13 +4,23 @@
 # show_user_host=
 
 # require colors.theme.bash
-start_seq="$cyan"
+start_seq="$yellow"
 false_seq="$bold_red"
 git_seq="$purple"
-end_seq="$purple"
-wd_seq="$bold_cyan"
+end_seq="$yellow"
+wd_seq="$blue"
 user_seq="$blue"
 sgr0="$normal"
+end_mark='$'
+
+# \e[?style(hardware blink 0-6, 16+ non blink software);fg;bg;c
+# fg bg will be devided by 16, so 0-15 is actually 0
+if [[ $TERM == 'linux*' ]]; then
+    cursor_style='\[\e[?16;127;0;c\]'
+    cursor_style=
+else
+    cursor_style=
+fi
 
 # no sub shell if GIT_BRANCH exists
 ___dedowsdi_ps()
@@ -20,11 +30,11 @@ ___dedowsdi_ps()
 
     # change color, show exit code upon error
     if [[ $exit_code == 0 ]] ; then
-        printf -v start_symbol "$start_seq-->"
-        printf -v end_symbol " $end_seq\u2717$sgr0"
+        start_symbol="$start_seq-->"
+        end_symbol=" ${end_seq}${end_mark}${sgr0}"
     else
         printf -v start_symbol "$false_seq-->[%s]" "$exit_code"
-        printf -v end_symbol " $false_seq\u2717$sgr0"
+        end_symbol=" ${false_seq}${end_mark}${sgr0}"
     fi
 
     # show user@host only if show_user_host exist
@@ -54,8 +64,9 @@ ___dedowsdi_ps()
         printf -v git_branch " $git_seq(%s)" "$git_branch"
     fi
 
-    printf -v PS1 '%s%s%s%s%s ' \
-        "$start_symbol" "$user_host" "$workding_dir" "$git_branch" "$end_symbol"
+    printf -v PS1 '%s%s%s%s%s %s' \
+        "$start_symbol" "$user_host" "$workding_dir" "$git_branch" \
+        "$end_symbol" "$cursor_style"
 }
 
 PROMPT_COMMAND='___dedowsdi_ps'

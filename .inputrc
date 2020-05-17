@@ -4,17 +4,17 @@ $include /etc/inputrc
 
 set editing-mode vi
 set convert-meta on
-set colored-completion-prefix on
+# set colored-completion-prefix on
 
 # replace prefix with ... if it's longer than 8 characters, it conflicts with
 # colored-completion-prefix
-# set completion-prefix-display-length 8
+set completion-prefix-display-length 3
 
 # skip ringing bell, list completions immediately
 set show-all-if-ambiguous on
 
 # color completion by LS_COLORS
-set colored-stats on
+# set colored-stats on
 
 # avoid duplicate tail
 set skip-completed-text on
