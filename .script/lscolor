@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# \e[30-37m \e[90-97m
+printf "Colors 0 to 15 for the standard 16 foreground colors\n"
+for ((c = 0; c < 16; c++)); do
+    printf "|%s%3d%s" "$(tput setaf "$c")" "$c" "$(tput sgr0)"
+done
+printf "|\n\n"
+
+# \e[40-47m \e[100-107m
+printf "Colors 0 to 15 for the standard 16 background colors\n"
+for ((c = 0; c < 16; c++)); do
+    printf "|%s%3d%s" "$(tput setab "$c")" "$c" "$(tput sgr0)"
+done
+printf "|\n\n"
+
+# \e[38;5;1-256m for bg, \e[48;5;1-256m for fg
+printf "Colors 16 to 231 for 256 colors\n"
+for ((i = j = 0; c < 232; c++, i++)); do
+
+        # print start | for every cell
+        printf "|"
+
+        # print an extra space every block, each block has 6 items
+        ((i > 5 && (i = 0, ++j))) && printf " |"
+
+        # move cursor left, erase it,  print a newline every 6 blocks
+        ((j > 5 && (j = 0, 1)))   && printf "\b \n|"
+
+        # print colored number
+        printf "%s%3d%s" "$(tput setaf "$c")" "$c" "$(tput sgr0)"
+done
+printf "|\n\n" # the last |
+
+printf "Greyscale 232 to 255 for 256 colors\n"
+for ((; c < 256; c++)); do
+    printf "|%s%3d%s" "$(tput setaf "$c")" "$c" "$(tput sgr0)"
+done
+printf "|\n\n"
+
+# \e[38;2;r;g;bm for bg, \e[48;2;r;g;bm for fg
+printf "test true color\n"
+printf "\e[48;2;%d;%d;%dm" $(eval echo 0\ 0\ {1..256})
+printf "\n"

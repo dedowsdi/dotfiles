@@ -1,15 +1,16 @@
-% ascii32(7)
+.TH ascii32 7 "2020-05-26" "1.0" "ascii32 man page"
 
-## Name ##
+.SH Name
 ascii32
 
-## SYNOPSIS
-group ascii code in 32. copied from https://bestasciitable.com/
+.SH SYNOPSIS
+Group ascii code in 32. copied from https://bestasciitable.com/
 
-## DESCRIPTION
-```
+.SH DESCRIPTION
+.TS
+tab(|) box;
+l l l l.
 Dec Hex  Binary   Char | Dec Hex  Binary   Char  | Dec Hex  Binary   Char | Dec Hex  Binary   Char
---------------------------------------------------------------------------------------------------
 0   0x00 00_00000 NUL  | 32  0x20 01_00000 SPACE | 64  0x40 10_00000 @    | 96  0x60 11_00000 `
 1   0x01 00_00001 SOH  | 33  0x21 01_00001 !     | 65  0x41 10_00001 A    | 97  0x61 11_00001 a
 2   0x02 00_00010 STX  | 34  0x22 01_00010 "     | 66  0x42 10_00010 B    | 98  0x62 11_00010 b
@@ -42,6 +43,12 @@ Dec Hex  Binary   Char | Dec Hex  Binary   Char  | Dec Hex  Binary   Char | Dec 
 29  0x1d 00_11101 GS   | 61  0x3d 01_11101 =     | 93  0x5d 10_11101 ]    | 125 0x7d 11_11101 }
 30  0x1e 00_11110 RS   | 62  0x3e 01_11110 >     | 94  0x5e 10_11110 ^    | 126 0x7e 11_11110 ~
 31  0x1f 00_11111 US   | 63  0x3f 01_11111 ?     | 95  0x5f 10_11111 _    | 127 0x7f 11_11111 DEL
-```
-- control : `& 01_11111`. ctrl-[a-z] doesn't make too much sense, most shell treat ctrl-[a-z] asctrl-[A-Z]
-- shift :   `& 10_11111`
+.TE
+
+.PP
+ctrl-x is done as 'x & 10111111' ctrl-[a-z] doesn't make too much sense, most shell treat ctrl-[a-z] asctrl-[A-Z]
+.br
+shift-x is done as 'x & 11011111'
+
+.\" see man 7 man, man tbl, and groff.html
+.\" should be compressed by gzip and installed to /usr/local/share/man/man7/
