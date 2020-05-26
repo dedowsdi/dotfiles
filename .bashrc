@@ -73,19 +73,19 @@ if [[ "$TERM" == linux* ]]; then
 
     # solarized tty color, swap 0-8, 7-C
     echo -e "
-      \e]P8073642
+      \e]P0002b36
       \e]P1dc322f
       \e]P2859900
       \e]P3b58900
       \e]P4268bd2
       \e]P5d33682
       \e]P62aa198
-      \e]PC93a1a1
-      \e]P0002b36
+      \e]P7839496
+      \e]P8073642
       \e]P9cb4b16
       \e]PA586e75
       \e]PB657b83
-      \e]P7839496
+      \e]PC93a1a1
       \e]PD6c71c4
       \e]PEeee8d5
       \e]PFfdf6e3
@@ -101,3 +101,7 @@ fi
 [[ -f "$BASH_IT"/bash_it.sh ]] && source "$BASH_IT"/bash_it.sh
 
 GREP_COLOR='1;31'
+
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
