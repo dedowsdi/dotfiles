@@ -17,7 +17,6 @@
 
 --exclude=build
 --exclude=bin
---exclude=*.md
 --exclude=*.json
 
 # osg macros
