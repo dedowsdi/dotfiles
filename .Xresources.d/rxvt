@@ -1,5 +1,6 @@
-URxvt.font: xft:Ubuntu Mono:regular:medium:size=13
-! URxvt.font: -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
+URxvt.font: xft:Ubuntu Mono:regular:medium:size=13,\
+            xft:AR PL UKai CN:medium:size=13,\
+            -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
 URxvt.letterSpace: -1
 
 URxvt.perl-ext:
@@ -63,4 +64,4 @@ URxvt.color13: #6c71c4
 URxvt.color14: #eee8d5
 URxvt.color15: #fdf6e3
 
-! vim:set filetype=cfg et sw=4 ts=8:
+! vim:set filetype=xdefaults et sw=4 ts=8:
