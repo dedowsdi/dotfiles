@@ -3,6 +3,8 @@ URxvt.font: xft:Ubuntu Mono:regular:medium:size=13,\
             -*-terminus-medium-*-*-*-20-*-*-*-*-*-iso10646-1
 URxvt.letterSpace: -1
 
+URxvt.iconFile: /usr/share/icons/Humanity/apps/64/terminal.svg
+
 URxvt.perl-ext:
 URxvt.perl-ext-common:default,fullscreen
 ! URxvt.perl-ext-common: default,matcher,resize-font,fullscreen
