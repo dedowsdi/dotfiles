@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -u -o pipefail
 
 show_usage()
 {
@@ -71,24 +71,24 @@ while true ; do
     # update count
     sleep "${steps[$stage]}"
     count=$((count+1))
+
+    # output count
     [[ $stage -eq 0 ]] && symbol='$$' || symbol='**'
     text="$symbol  $count / ${total_steps[$stage]}  $symbol"
     tput setaf $((RANDOM % 256)) ; figlet -ktc "$text"
 
     # set tmux status background to red for the last 2 steps
-    if [[ $((count + 1)) -eq ${total_steps[$stage]} && $stage -eq 0 ]]; then
+    if (( (count + 1) == total_steps[stage] && stage == 0 )); then
         tmux set -t work status-style "$work_rest_style"
     fi
 
-    if [[ $count -eq ${total_steps[$stage]} ]]; then
+    if (( count == total_steps[stage] )); then
 
-        if [[ $stage -eq 0 ]] ; then
+        if (( stage == 0 )) ; then
             last_wid="$(xdotool getactivewindow)"
             xdotool windowactivate "$tmux_wid"
         else
-
-            # switch back to last active window
-            xdotool windowactivate "$last_wid"
+            xdotool windowactivate "$last_wid" || xdotool windowactivate "$tmux_wid"
         fi
 
         echo "${names[$stage]} done"
@@ -96,7 +96,7 @@ while true ; do
         stage=$((stage^1))
 
         # reset tmux status style
-        if [[ $stage -eq 0 ]]; then
+        if (( stage == 0 )); then
             tmux set -t work status-style "$work_regular_style"
         fi
 
