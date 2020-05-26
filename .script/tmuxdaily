@@ -8,9 +8,9 @@ if ! tmux has-session -t rest ; then
     tmux send-keys -t rest "workrest $work $rest" 'Enter'
 fi
 
-if ! tmux has-session -t irc ; then
-    tmux new-session -ds irc -n irc
-    tmux send-keys -t irc "weechat" 'Enter'
+if ! tmux has-session -t rest:irc ; then
+    tmux new-window -d -t rest: -n irc
+    tmux send-keys -t rest:irc "weechat" 'Enter'
 fi
 
 if ! tmux has-session -t work ; then
@@ -18,5 +18,3 @@ if ! tmux has-session -t work ; then
 else
     tmux attach -t work
 fi
-
-# vim:set et ft=sh:
