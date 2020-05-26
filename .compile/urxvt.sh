@@ -1,11 +1,14 @@
 #!/bin/bash
 
+set -eu -o pipefail
+shopt -s failglob
+
 if [[ ! -d libev ]]; then
-    git clone https://github.com/enki/libev
+    git clone --depth 1 https://github.com/enki/libev
 fi
 
 if [[ ! -d libptytty ]]; then
-    git clone https://github.com/yusiwen/libptytty
+    git clone --depth 1 https://github.com/yusiwen/libptytty
 fi
 
 ./configure \
