@@ -86,9 +86,16 @@ while true ; do
 
         if (( stage == 0 )) ; then
             last_wid="$(xdotool getactivewindow)"
-            xdotool windowactivate "$tmux_wid"
+            {
+                xdotool windowactivate "$tmux_wid" || \
+                    xdotool search --classname x-terminal-emulator windowactivate
+            } &>/dev/null
         else
-            xdotool windowactivate "$last_wid" || xdotool windowactivate "$tmux_wid"
+            {
+                xdotool windowactivate "$last_wid" || \
+                    xdotool windowactivate "$tmux_wid" || \
+                    xdotool search --classname x-terminal-emulator windowactivate
+            } &>/dev/null
         fi
 
         echo "${names[$stage]} done"
