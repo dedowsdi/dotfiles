@@ -95,12 +95,16 @@ if [[ "$TERM" == linux* ]]; then
     if [[ $(tty) == *[456] ]]; then
         TERM=linux-16color
     fi
+    PS0='\[\e[?16;255;136c\]'
+elif [[ "$TERM" == screen* || "$TERM" == tmux* ]]; then
+    PS0='\[\ePtmux;\e\e[2 q\e\\\]'
+elif [[ -z $VTE_VERSION ]]; then
+    # gnome-terminal render garbage for unknown reason.
+    PS0='\[\e[2 q\]'
 fi
 
 # Load Bash It
 [[ -f "$BASH_IT"/bash_it.sh ]] && source "$BASH_IT"/bash_it.sh
-
-GREP_COLOR='1;31'
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

@@ -30,9 +30,21 @@ $if mode=vi
     set keyseq-timeout 0
     set show-mode-in-prompt on
 
-    # display mod string in yellow
-    set vi-cmd-mode-string \1\e[0;33m\2(c)
-    set vi-ins-mode-string \1\e[0;33m\2(i)
+    # use yellow mod string
+    $if term=linux
+        # 136=10001000, select bink, bold and existing bits, 255 toggle all bits.
+        set vi-cmd-mode-string \1\e[0;33m\e[?16;255;136c\2(c)
+        set vi-ins-mode-string \1\e[0;33m\e[?0c\2(i)
+    $else
+        # use bar cursor in ins mode, block cursor in cmd mode
+        $if term=screen
+            set vi-cmd-mode-string \1\e[0;33m\ePtmux;\e\e[2 q\e\\\2(c)
+            set vi-ins-mode-string \1\e[0;33m\ePtmux;\e\e[5 q\e\\\2(i)
+        $else
+            set vi-cmd-mode-string \1\e[0;33m\e[2 q\2(c)
+            set vi-ins-mode-string \1\e[0;33m\e[5 q\2(i)
+        $endif
+    $endif
 
     # insert mode map
     set keymap vi-insert
