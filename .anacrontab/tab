@@ -1,0 +1,13 @@
+# configuration file for user anacron
+
+# See anacron(8) and anacrontab(5) for details.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# These replace cron's entries
+1	5	user.cron.daily	run-parts --report ~/.anacrontab/cron.daily
+7	10	user.cron.weekly	run-parts --report ~/.anacrontab/cron.weekly
+@monthly	15	user.cron.monthly	run-parts --report ~/.anacrontab/cron.monthly
+
+vim:set et sw=4 ts=8 filetype=conf:
