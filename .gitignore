@@ -30,6 +30,7 @@ compile_commands.json
 *.log
 
 # misc
+.anacrontab/spool/*
 build
 dependences
 __pycache__
