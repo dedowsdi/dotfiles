@@ -4,6 +4,7 @@ tree
 uuid
 pcregrep
 gawk
+urlview
 
 # ssh
 openssh-server
