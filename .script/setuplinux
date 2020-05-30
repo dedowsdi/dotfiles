@@ -150,12 +150,6 @@ install_essential()
         # restore .zshrc
     fi
 
-    # bash
-    if ! grep -q zxdBashrc ~/.bashrc ; then
-        echo source ~/.zxdBashrc >>~/.bashrc
-        source ~/.bashrc
-    fi
-
     # manage window in commandline. (wmctrl is needed by urxvt-fullscreen)
     sudo apt -y install xdotool wmctrl
 

@@ -72,7 +72,7 @@ if [[ -d ~/.oh-my-zsh/custom ]]; then
     for f in "$from_dir"/zsh/*; do
         link=~/.oh-my-zsh/custom/${f##*/}
         if [[ -e "$link" ]]; then
-            rsync -a "$link" "$to_dir/.dotfiles.bak/.oh-my-zsh" && rm -rf "$link"
+            rsync -a "$link" "$to_dir/.dotfiles.bak/.oh-my-zsh/custom" && rm -rf "$link"
         fi
 
         ln -vTfs "$f" "$link"
