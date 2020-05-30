@@ -2,54 +2,25 @@
 
 set -eu -o pipefail
 
-prog_name=${0##*/}
 template_path=~/.mkt_template
 study_path=~/study
-suffix=
 
-prog_name=${0##*/}
 show_usage()
 {
     echo "
-  Usage: $prog_name [name | -s SUFFIX | -t TEMPLATE]
+  Usage: ${0##*/} TEMPLATE NAME
 
-  Create test project or file under $study_path/year/month/day/.
+  Create test project under $study_path/year/month/day/.
 
   Options:
     -h           Show this help.
 
     -p           Create $study_path/year/month/day and print it.
 
-    -t TEMPLATE  Use template from ~/.mkt_template, name new directory as TEMPLATE_N.
-
     -l           List templates from ~/.mkt_template.
-
-    -s SUFFIX    Add suffix to file name.
 "
 }
 
-load_template()
-{
-    local template=$1
-    local src_dir
-    src_dir="$(realpath "$template_path/$template")"
-    if [[ ! -d "$src_dir" ]]; then
-        1>&2 echo "$src_dir doesn't exists"
-        return 1
-    fi
-
-    # use template_n style name
-    local n
-    n=$(find . -regextype posix-egrep -regex "^./${template}_[0-9]+" | cut -b "$((${#template}+4))"- | sort -n | tail -1)
-    if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
-
-    # copy template
-    local dest_dir=${template}_$n
-    mkdir -p "${dest_dir}"
-
-    rsync -a --exclude="build/*/*/*" --exclude="tags" --exclude="compile_commands.json" "$src_dir/" "$dest_dir"
-    cd "$dest_dir" && pwd
-}
 
 list_templates()
 {
@@ -70,11 +41,6 @@ while getopts "ht:pls:" opt; do
             exit 0
             ;;
 
-        t)
-            load_template "$OPTARG"
-            exit $?
-            ;;
-
         p)
             pwd
             exit 0
@@ -85,10 +51,6 @@ while getopts "ht:pls:" opt; do
             exit $?
             ;;
 
-        s)
-            suffix="$OPTARG"
-            ;;
-
         * )
             echo -e "\n  Option does not exist : $OPTARG\n"
             usage; exit 1
@@ -97,20 +59,21 @@ while getopts "ht:pls:" opt; do
 done
 shift $((OPTIND-1))
 
-# create new file and print it's path
-fname=${1:-}
-if [[ -z "$fname" ]]; then
-    set +e
-    n=$(find . -regextype posix-egrep -regex "^./f_[0-9]+.*" | grep -oP 'f_\K\d+' | sort -n | tail -1)
-    set -e
-    if [[ -z "$n" ]]; then n=0; else n=$((n+1)); fi
-    fname="f_$n$suffix"
+if (( $# < 2 )); then
+    show_usage
+    exit 1
 fi
 
-touch "$fname"
-if [[ ${fname##*.} == 'sh' ]]; then
-    chmod a+x "$fname"
+template=$1
+dest=$2
+src="$(realpath "$template_path/$template")"
+if [[ ! -d "$src" ]]; then
+    1>&2 echo "$src doesn't exists"
+    return 1
 fi
-realpath "$fname"
+
+mkdir -p "${dest}"
+rsync -a --exclude="build/*/*/*" --exclude="tags" --exclude="compile_commands.json" "$src/" "$dest"
+cd "$dest" && pwd
 
 exit $?
