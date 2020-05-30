@@ -95,12 +95,21 @@ if [[ "$TERM" == linux* ]]; then
     if [[ $(tty) == *[456] ]]; then
         TERM=linux-16color
     fi
+else
+    # gnome-terminal display crap if PS0 contain escape sequence.
+    # you can't change cursor shape in terminal<--vim<--tmux
+    # so I decide to only change cursor in plain x terminal emulator.
+    if [[ -z $TMUX && -z $VTE_VERSION ]]; then
+        PS0='\[\e[2 q\]'
+        INPUTRC=~/.urxvt_inputrc
+    fi
 fi
 
 # Load Bash It
 [[ -f "$BASH_IT"/bash_it.sh ]] && source "$BASH_IT"/bash_it.sh
 
-GREP_COLOR='1;31'
+TT=~/study/$(date +"%Y/%m/%d")
+export TT
 
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
