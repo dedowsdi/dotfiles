@@ -1,0 +1,78 @@
+# to run this rc:
+#   /join cmdbuffer
+#   /exec -oc cat /home/dedowsdi/.weechatrc
+
+# freenode server
+# /server add freenode chat.freenode.net
+# /set irc.server.freenode.autoconnect on
+
+# register nickname to freenode
+# /nick dedowsdi
+# /msg NickServ REGISTER password youremail@example.com
+
+# identify
+# /msg /NickServ IDENTIFY username password
+
+# configure default nick
+# /set irc.server.freenode.sasl_mechanism PLAIN
+# /set irc.server.freenode.sasl_username dedowsdi
+# /set irc.server.freenode.sasl_password <password>
+
+# filter join/part/quit message
+/set irc.look.smart_filter on
+/filter add irc_smart * irc_smart_filter *
+
+# channel
+/set irc.server.freenode.autojoin #vim,##linux,##OpenGL,#ubuntu,#bash,#zsh,#cplusplus.com,#weechat,#osg,#openscenegraph,#bulletphysics,#git,#tmux
+
+# mouse
+/set weechat.look.mouse on
+/mouse enable
+
+# desktop notify
+/set trigger.trigger.beep.command "/print -beep;/exec -bg notify-send -i '/usr/share/icons/hicolor/32x32/apps/firefox.png' 'IRC Notification' "${tg_tag_nick}: ${tg_message_nocolor}""
+
+# solarized colors
+
+/set buflist.format.buffer_current "${color:,8}${format_buffer}"
+/set buflist.format.hotlist_low "${color:2}"
+/set irc.color.input_nick 7
+/set irc.color.nick_prefixes 3
+/set irc.color.topic_new 2
+/set iset.color.bg_selected 3
+/set iset.color.help_option_name 3
+/set iset.color.option_selected 0
+/set iset.color.type_selected 0
+/set iset.color.value_diff_selected lightcyan
+/set iset.color.value_diff_selected3
+/set iset.color.value_selected 0
+/set relay.color.text_selected 3
+/set script.color.status_held 3
+/set script.color.status_installed 3
+/set script.color.text_bg_selected 3
+/set script.color.text_date_selected 0
+/set script.color.text_description_selected 0
+/set script.color.text_extension_selected 0
+/set script.color.text_name_selected 0
+/set script.color.text_version_loaded_selected 3
+/set script.color.text_version_selected 0
+/set trigger.color.flag_regex 3
+/set trigger.color.regex 3
+/set weechat.bar.status.color_bg 8
+/set weechat.bar.title.color_bg 8
+/set weechat.color.chat_buffer 12
+/set weechat.color.chat_channel 3
+/set weechat.color.chat_highlight 0
+/set weechat.color.chat_highlight_bg 3
+/set weechat.color.chat_nick 3
+/set weechat.color.chat_nick_colors "cyan,magenta,green,brown,default,lightmagenta,blue"
+/set weechat.color.chat_nick_self 12
+/set weechat.color.chat_prefix_action 3
+/set weechat.color.emphasized 0
+/set weechat.color.emphasized_bg 9
+/set weechat.color.nick_color 7
+/set weechat.color.status_name 3
+/set xfer.color.status_waiting cyan
+/set xfer.color.text_selected 3
+
+# vim:set et sw=4 ts=8 filetype=conf:
