@@ -30,11 +30,9 @@ eval "$(\
     )"
 
 # beep before record
-DELAY=${DELAY:-5}
-while (( DELAY-- > 0 )) ; do
-    printf '\r%3d' "$DELAY"
-    sleep 1s
-done
-printf '\rrecording\n\a'
+DELAY=${DELAY:-3}
+sleep "${DELAY}s"
 
+printf '\a'
 byzanz-record -x "$X" -y "$Y" -w "$Width" -h "$Height" --delay 0 "$@"
+printf '\a'
