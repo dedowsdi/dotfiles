@@ -48,7 +48,7 @@ nnlf()
 
 cph()
 {
-    history "${1:-1}" | sed -E 's/^\w+\s*//g' | xclip
+    history "${1:-2}" | sed -E 's/^\w+\s*//g' | xclip
 }
 
 # vgdb cmd args
