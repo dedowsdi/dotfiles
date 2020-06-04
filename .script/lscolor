@@ -40,5 +40,11 @@ printf "|\n\n"
 
 # \e[38;2;r;g;bm for bg, \e[48;2;r;g;bm for fg
 printf "test true color\n"
-printf "\e[48;2;%d;%d;%dm" $(eval echo 0\ 0\ {1..256})
-printf "\n"
+printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {0..63})
+printf "%s\n" $(tput sgr0)
+printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {64..127})
+printf "%s\n" $(tput sgr0)
+printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {128..191})
+printf "%s\n" $(tput sgr0)
+printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {192..255})
+printf "%s\n" $(tput sgr0)
