@@ -75,7 +75,7 @@ while true ; do
     # output count
     [[ $stage -eq 0 ]] && symbol='$$' || symbol='**'
     text="$symbol  $count / ${total_steps[$stage]}  $symbol"
-    tput setaf $((RANDOM % 256)) ; figlet -ktc "$text"
+    tput setaf $((RANDOM % 8)) ; figlet -ktc "$text"
 
     # set tmux status background to red for the last 2 steps
     if (( (count + 1) == total_steps[stage] && stage == 0 )); then
@@ -84,31 +84,27 @@ while true ; do
 
     if (( count == total_steps[stage] )); then
 
-        if (( stage == 0 )) ; then
+        echo "${names[$stage]} done"
+        count=0
+        ((stage ^= 1))
+
+        if (( stage == 1 )) ; then
             last_wid="$(xdotool getactivewindow)"
             {
                 xdotool windowactivate "$tmux_wid" || \
                     xdotool search --classname x-terminal-emulator windowactivate
             } &>/dev/null
+            tmux switch-client -t "rest:rest"
         else
             {
                 xdotool windowactivate "$last_wid" || \
                     xdotool windowactivate "$tmux_wid" || \
                     xdotool search --classname x-terminal-emulator windowactivate
             } &>/dev/null
-        fi
-
-        echo "${names[$stage]} done"
-        count=0
-        stage=$((stage^1))
-
-        # reset tmux status style
-        if (( stage == 0 )); then
             tmux set -t work status-style "$work_regular_style"
+            tmux switch-client -t "work:main"
         fi
 
-        tmux switch-client -t "${sessions[$stage]}"
         echo "${names[$stage]} begin, ${total_steps[stage]} * ${steps[stage]}"
-
     fi
 done
