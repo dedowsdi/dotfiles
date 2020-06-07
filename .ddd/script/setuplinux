@@ -4,7 +4,7 @@
 
 prog_name=$0
 apache_web=/var/www/html
-rc=$HOME/.dotfiles/rc
+rc=$HOME/.ddd/dotfiles/rc
 git_source=/usr/local/source
 download="$HOME/.setup_download"
 log="$HOME/setup_log"

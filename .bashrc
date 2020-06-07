@@ -7,7 +7,7 @@ esac
 
 # Path to the bash it configuration
 export BASH_IT="$HOME/.bash_it"
-export BASH_IT_CUSTOM="$HOME/.dotfiles/bash"
+export BASH_IT_CUSTOM="$HOME/.dotfiles/.bash_it/custom"
 
 # Lock and Load a custom theme file.
 # Leave empty to disable theming.

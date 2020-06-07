@@ -13,7 +13,7 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-PATH="$HOME/bin:$HOME/.local/bin:$HOME/.script:$HOME/.vim/script:$PATH"
+PATH="$HOME/bin:$HOME/.local/bin:$HOME/.ddd/script:$HOME/.vim/script:$PATH"
 PATH=${PATH}:/usr/local/bin/script:$HOME/.cargo/bin:$PATH:/opt/Qt/Qt5.6.0/5.6/gcc_64/bin/
 
 export PYTHONPATH=${PYTHONPATH}:~/study/python/util

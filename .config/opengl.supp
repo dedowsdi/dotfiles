@@ -12,6 +12,17 @@
    obj:/usr/lib/libGL*
 }
 {
+   opengl nvidia Cond
+   Memcheck:Cond
+   obj:/usr/lib/*/libnvidia*
+}
+{
+   opengl glfw Leak
+   Memcheck:Leak
+   ...
+   obj:/*/libglfw.*
+}
+{
    opengl cond (3)
    Memcheck:Cond
    obj:/usr/lib/libGL*

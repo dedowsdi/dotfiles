@@ -1,9 +1,13 @@
 .titlebar {
     background: #333333;
-    color:white;
+    color:gray;
 }
 
 .titlebar:backdrop  {
     background: #444444;
-    color:white;
+    color:gray;
+}
+
+vte-terminal, VteTerminal {
+    -GtkWidget-cursor-aspect-ratio: 0.12;
 }

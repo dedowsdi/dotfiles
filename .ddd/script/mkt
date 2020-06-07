@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-template_path=~/.mkt_template
+template_path=~/.ddd/mkt
 study_path=~/study
 
 show_usage()

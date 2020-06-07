@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+show_usage()
+{
+    echo "
+  Usage: ${0##*/} [-hft]
+
+  Install dotfiles by creating symbolic links. If target exists and is not
+  a link, It will be moved to .dotfiles.bak.
+
+  Options:
+    -h             Show this help
+
+    -f FROM_DIR    Dot files source directory. [default: /../.. of this script]
+
+    -t TO_DIR Dot  files target directory. [default: home]
+"
+}
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+from_dir=$(realpath "$script_dir/../..")
+to_dir=~
+
+if [[ "$from_dir" == "$to_dir" ]]; then
+    echo can not set both from_dir and to_dir to_dir "$from_dir"
+    exit 1
+fi
+
+while getopts ":hf:t:" opt; do
+    case $opt in
+        h)
+            show_usage
+            exit 0
+            ;;
+
+        f)
+            from_dir=$OPTARG
+            ;;
+
+        t)
+            to_dir=$OPTARG
+            ;;
+
+        * )
+            echo -e "\n  Option does not exist : $OPTARG\n"
+            usage; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+bakdir="$to_dir/.dotfiles.bak"
+mkdir -p "$bakdir"
+
+printf "\nlink pure dot file:\n"
+
+link_pure()
+{
+    local dest=$to_dir/${1##*/}
+
+    # backup
+    if [[ ! -L "$dest" && -e "$dest" ]]; then
+        mv -vf "$dest" "$bakdir"
+    fi
+
+    # add -T always treat dest as a file
+    ln -vfsT "$1" "$dest"
+}
+
+find "$from_dir" -mindepth 1 -maxdepth 1 -type f -name '.*' -print0 |
+    while IFS= read -r -d $'\0' ; do
+        link_pure "$REPLY"
+    done
+
+printf "\nlink pure dot dir:\n"
+
+dotdirs=(.gdbinit.d .anacrontab .mkt_template .ctags.d .Xresources.d .ddd)
+for dir in "${dotdirs[@]}"; do
+    link_pure "$from_dir/$dir"
+done
+
+printf "\nlink partial dot file:\n"
+
+link_partial()
+{
+    local tail=${1#${from_dir}/}
+    local dest=$to_dir/$tail
+    local dest_dir=${dest%/*}
+
+    if [[ ! -L "$dest" && -e "$dest" ]]; then
+        local bak_parent="$bakdir/${dest_dir#${HOME}/}"
+        mkdir -vp "$bak_parent"
+        mv -vf "$dest" "$bak_parent"
+    elif [[ ! -d "$dest_dir" ]]; then
+        echo "missing $dest_dir"
+        return 0
+    fi
+
+    ln -vfs "$1" "$dest"
+}
+
+pdirs=(.config .oh-my-zsh)
+find "${pdirs[@]/#/${from_dir}/}" -mindepth 1 -type f -print0 |
+    while IFS= read -r -d $'\0' ; do
+        link_partial "$REPLY"
+    done
