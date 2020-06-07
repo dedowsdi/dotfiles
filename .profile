@@ -23,6 +23,8 @@ export NTOY_DEFAULT_FRAG=~/.mkt_template/osg.frag
 export OSG_DIR=/usr/local
 export OSGDIR=/usr/local
 
+export GCC_COLORS='error=91:warning=35:note=36:range1=32:range2=34:locus=32:quote=33:fixit-insert=32:fixit-delete=31:diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32'
+
 # ReaderWriterViewer need deprecated library.
 # export OSG_CONFIG_FILE="$HOME/.osg.view"
 
