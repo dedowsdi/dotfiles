@@ -5,7 +5,7 @@
 
 # require colors.theme.bash
 start_seq="$yellow"
-false_seq="$bold_red"
+false_seq="\e[0;91m"
 git_seq="$purple"
 end_seq="$yellow"
 wd_seq="$blue"
