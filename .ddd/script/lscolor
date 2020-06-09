@@ -1,18 +1,29 @@
 #!/usr/bin/env bash
 
+sgr0="$(tput sgr0)"
+
 # \e[30-37m \e[90-97m
 printf "Colors 0 to 15 for the standard 16 foreground colors\n"
 for ((c = 0; c < 16; c++)); do
-    printf "|%s%3d%s" "$(tput setaf "$c")" "$c" "$(tput sgr0)"
+    printf "|%s%3d%s" "$(tput setaf "$c")" "$c" "$sgr0"
 done
 printf "|\n\n"
 
 # \e[40-47m \e[100-107m
 printf "Colors 0 to 15 for the standard 16 background colors\n"
 for ((c = 0; c < 16; c++)); do
-    printf "|%s%3d%s" "$(tput setab "$c")" "$c" "$(tput sgr0)"
+    printf "|%s%3d%s" "$(tput setab "$c")" "$c" "$sgr0"
 done
 printf "|\n\n"
+
+fg_black=$(tput setaf 0)
+for (( i = 0; i < 8; i++ )); do
+    c0="$(tput setab $i)"
+    c1="$(tput setab $(( i + 8 )))"
+    printf "%s$fg_black%-16q%s  %s$fg_black%-16q%s\n\n" \
+        "$c0" "$c0" "$sgr0" \
+        "$c1" "$c1" "$sgr0"
+done
 
 # \e[38;5;1-256m for bg, \e[48;5;1-256m for fg
 printf "Colors 16 to 231 for 256 colors\n"
@@ -28,23 +39,23 @@ for ((i = j = 0; c < 232; c++, i++)); do
         ((j > 5 && (j = 0, 1)))   && printf "\b \n|"
 
         # print colored number
-        printf "%s%3d%s" "$(tput setaf "$c")" "$c" "$(tput sgr0)"
+        printf "%s%3d%s" "$(tput setaf "$c")" "$c" "$sgr0"
 done
 printf "|\n\n" # the last |
 
 printf "Greyscale 232 to 255 for 256 colors\n"
 for ((; c < 256; c++)); do
-    printf "|%s%3d%s" "$(tput setaf "$c")" "$c" "$(tput sgr0)"
+    printf "|%s%3d%s" "$(tput setaf "$c")" "$c" "$sgr0"
 done
 printf "|\n\n"
 
 # \e[38;2;r;g;bm for bg, \e[48;2;r;g;bm for fg
 printf "test true color\n"
 printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {0..63})
-printf "%s\n" $(tput sgr0)
+printf "%s\n" "$sgr0"
 printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {64..127})
-printf "%s\n" $(tput sgr0)
+printf "%s\n" "$sgr0"
 printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {128..191})
-printf "%s\n" $(tput sgr0)
+printf "%s\n" "$sgr0"
 printf "\e[48;2;%d;%d;%dm " $(eval echo 0\ 0\ {192..255})
-printf "%s\n" $(tput sgr0)
+printf "%s\n" "$sgr0"
