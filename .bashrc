@@ -67,7 +67,7 @@ CDPATH=~/work
 source ~/.commonrc
 source ~/.bash_aliases
 
-[[ -r ~/.dir_colors ]] && eval "$(dircolors ~/.dir_colors)"
+[[ -r ~/.dircolors ]] && eval "$(dircolors ~/.dircolors)"
 
 if [[ "$TERM" == linux* ]]; then
 
@@ -84,11 +84,11 @@ if [[ "$TERM" == linux* ]]; then
       \e]P8073642
       \e]P9cb4b16
       \e]PA586e75
-      \e]PB657b83
+      \e]PBbf7600
       \e]PC93a1a1
       \e]PD6c71c4
-      \e]PEeee8d5
-      \e]PFfdf6e3
+      \e]PE009942
+      \e]PFa39883
       "
     clear
 
