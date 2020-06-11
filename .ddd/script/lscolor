@@ -3,6 +3,7 @@
 set -eu
 
 sgr0="$(tput sgr0)"
+bold="$(tput bold)"
 af=()
 ab=()
 
@@ -17,7 +18,8 @@ printf "\n"
 
 for ((c = 8; c < 16; c++)); do
     af[c]="$(tput setaf "$c")"
-    printf "%sxxxxxxxx  %s" "${af[c]}" "$sgr0"
+    # render bold tail
+    printf "%sxxxx%sxxxx  %s" "${af[c]}" "$bold" "$sgr0"
 done
 printf "\n"
 
@@ -43,7 +45,7 @@ for ((r = 0; r < 16; r++)); do
     bg=${ab[r]}
     printf "%-3d" "$r"
     for (( c = 0; c < 16; c++ )); do
-        printf "%s%sxxx  " "$bg" "${af[c]}"
+        printf "%sxxx  " "$bg${af[c]}"
     done
     printf "$sgr0\n"
 done
