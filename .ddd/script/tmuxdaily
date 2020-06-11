@@ -5,10 +5,6 @@ work=${DAILY_WORK-"1m 45"}
 
 if ! tmux has-session -t rest ; then
     tmux new-session -ds rest -n rest
-fi
-
-if ! tmux has-session -t rest:rest ; then
-    tmux new-window -d -t rest: -n rest
     tmux send-keys -t rest:rest "workrest $work $rest" 'Enter'
 fi
 
