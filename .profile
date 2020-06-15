@@ -43,6 +43,10 @@ if [ -d ~/journey/gl2/data ]; then
     export GL_FILE_PATH="$(realpath ~/journey/gl2/data);$(realpath ~/journey/gl4/data)"
 fi
 
+if [ -r "$HOME/.localrc"  ]; then
+    . "$HOME/.localrc"
+fi
+
 # awk posix
 # POSIXLY_CORRECT=true
 # export POSIXLY_CORRECT
