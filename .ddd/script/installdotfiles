@@ -101,7 +101,7 @@ link_partial()
     ln -vfs "$1" "$dest"
 }
 
-pdirs=(.config .oh-my-zsh)
+pdirs=(.config .oh-my-zsh .ssh)
 find "${pdirs[@]/#/${from_dir}/}" -mindepth 1 -type f -print0 |
     while IFS= read -r -d $'\0' ; do
         link_partial "$REPLY"
