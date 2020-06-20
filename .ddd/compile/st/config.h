@@ -108,11 +108,11 @@ static const char *colorname[] = {
     "#073642",
     "#cb4b16",
     "#586e75",
-    "#657b83",
-    "#93a1a1",
+    "#bf7600",
+    "#3e64fb",
     "#6c71c4",
-    "#eee8d5",
-    "#fdf6e3",
+    "#009942",
+    "#a39883",
 
 	[255] = 0,
 
@@ -128,8 +128,8 @@ static const char *colorname[] = {
  */
 unsigned int defaultfg = 7;
 unsigned int defaultbg = 0;
-static unsigned int defaultcs = 12;
-static unsigned int defaultrcs = 0;
+static unsigned int defaultcs = 7;
+static unsigned int defaultrcs = 1;
 
 /*
  * Default shape of cursor

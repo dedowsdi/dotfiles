@@ -85,10 +85,10 @@ if [[ "$TERM" == linux* ]]; then
       \e]P9cb4b16
       \e]PA586e75
       \e]PBbf7600
-      \e]PC93a1a1
+      \e]PC3e64fb
       \e]PD6c71c4
       \e]PE009942
-      \e]PFa39883
+      \e]PFa39383
       "
     clear
 
