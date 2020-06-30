@@ -99,7 +99,7 @@ else
     # gnome-terminal display crap if PS0 contain escape sequence.
     # you can't change cursor shape in terminal<--vim<--tmux
     # so I decide to only change cursor in plain x terminal emulator.
-    if [[ -z $TMUX && -z $VTE_VERSION ]]; then
+    if [[ -z $TMUX && -z $VTE_VERSION && $VIM_HOST_TERM != linux* ]]; then
         PS0='\[\e[2 q\]'
         INPUTRC=~/.urxvt_inputrc
     fi
