@@ -194,7 +194,27 @@ void closeOpenAL()
 
 int main( int argc, char* argv[] )
 {
+    // even alut require al context
+    {
+        ALsizei size;
+        ALfloat frequence;
+        ALenum format;
+        auto data = alutLoadMemoryFromFile("data/sound/hit.wav", &format, &size, &frequence);
+        ALUT_CHECK_ERROR;
+        std::cout << data << std::endl;
+    }
+
     initOpenAL( argc, argv );
+
+    {
+        ALsizei size;
+        ALfloat frequence;
+        ALenum format;
+        auto data = alutLoadMemoryFromFile("data/sound/hit.wav", &format, &size, &frequence);
+        ALUT_CHECK_ERROR;
+        std::cout << data << std::endl;
+    }
+
 
     std::string cfg = "data/al.cfg";
 
