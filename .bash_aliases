@@ -12,6 +12,12 @@ alias ntoyf='ntoy --shadertoy --frag'
 alias recenthistory='rh'
 alias v='vim'
 alias gdb='gdb -q'
+alias g='git'
+alias f='find'
+alias f1='find . -mindepth 1 -maxdepth 1'
+alias ta='tmux attach'
+alias m=make
+alias mm='make -j $(lscpu | grep -Po "^CPU\(s\).*\s*\K\d+")'
 
 # grep text file, skip devices, binaries, repos
 alias grept='grep --color=auto --binary-files=without-match --devices=skip --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.clangd}'
