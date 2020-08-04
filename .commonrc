@@ -35,10 +35,10 @@ run_cmake()
     fi
 }
 
-apitraceq()
+aq()
 {
-    apitrace trace "$@"
-    qapitrace "$( find . -maxdepth 1 -type f -name '*.trace' -printf "%T@\t%p\0" | sort -nrz | cut -f2 )"
+    apitrace trace -o "$1" "${@:2}"
+    qapitrace "$1"
 }
 
 nnlf()
