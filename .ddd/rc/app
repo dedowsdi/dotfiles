@@ -6,6 +6,9 @@ pcregrep
 gawk
 urlview
 
+# input method
+fcitx-googlepinyin
+
 # ssh
 openssh-server
 
