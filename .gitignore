@@ -41,7 +41,3 @@ __pycache__
 .oh-my-zsh/example.zsh
 .oh-my-zsh/custom/plugins/examples
 .oh-my-zsh/custom/themes/example.zsh-theme
-
-# parts of .config
-.config/*
-!.config/nvim/autoload
