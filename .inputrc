@@ -40,10 +40,12 @@ $if mode=vi
     "\M-e":history-expand-line
     "\M-t":complete
 
-    # use tab for both complete and history expand line.  If current word
+    # Use tab for both complete and history expand line.  If current word
     # starts with !, and it's possible to complete, complete will escaped the
     # leading ! as \!, so history expansion won't be triggered.
-    "\t":"\M-t\M-e"
+    # For unknown readson, this cause gdb to switch to cmd mode if complete failed.
+    # "\t":"\M-t\M-e"
+
     "\C-e":shell-expand-line
     "\C-x\C-r":re-read-init-file
     "\C-x\C-a":alias-expand-line
