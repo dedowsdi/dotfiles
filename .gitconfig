@@ -15,7 +15,10 @@
         co = checkout
         cm = commit
         br = branch
+        s  = status
 [diff]
 	tool = vimdiff
 [difftool]
 	prompt = false
+[http]
+	proxy = socks5://127.0.0.1:11608
