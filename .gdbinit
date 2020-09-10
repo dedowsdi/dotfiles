@@ -1,4 +1,4 @@
-source ~/.gdbinit.d/glm_pretty_printer.py
+# source ~/.gdbinit.d/glm_pretty_printer.py
 
 # history {{{1
 
