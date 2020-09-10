@@ -37,8 +37,9 @@ $if mode=vi
     # insert mode map
     set keymap vi-insert
 
-    "\M-e":history-expand-line
-    "\M-t":complete
+    # "\M-e":history-expand-line
+    # "\C-h":history-expand-line
+    # "\M-t":complete
 
     # Use tab for both complete and history expand line.  If current word
     # starts with !, and it's possible to complete, complete will escaped the
@@ -48,7 +49,7 @@ $if mode=vi
 
     "\C-e":shell-expand-line
     "\C-x\C-r":re-read-init-file
-    "\C-x\C-a":alias-expand-line
+    # "\C-x\C-a":alias-expand-line
 
     # command mode map
     set keymap vi-command
